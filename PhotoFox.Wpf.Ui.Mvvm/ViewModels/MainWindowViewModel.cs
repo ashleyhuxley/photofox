@@ -15,12 +15,16 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly IPhotoFileStorage photoFileStorage;
 
+        private readonly ISettingsStorage settingsStorage;
+
         public MainWindowViewModel(
             IPhotoDataStorage photoStorage,
-            IPhotoFileStorage photoFileStorage)
+            IPhotoFileStorage photoFileStorage,
+            ISettingsStorage settingsStorage)
         {
             this.photoStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
+            this.settingsStorage = settingsStorage;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
         }
@@ -36,11 +40,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 var viewModel = new AlbumViewModel();
                 viewModel.Title = album.AlbumName;
 
-                if (!string.IsNullOrEmpty(album.CoverPhotoId))
-                {
-                    var blob = await this.photoFileStorage.GetFileAsync(album.CoverPhotoId);
-                    viewModel.Image = GetImageFromBytes(blob.ToArray());
-                }
+                string coverId = 
+                    string.IsNullOrEmpty(album.CoverPhotoId) 
+                    ? await this.settingsStorage.GetSetting("DefaultPhotoId")
+                    : album.CoverPhotoId;
+
+                var blob = await this.photoFileStorage.GetFileAsync(coverId);
+                viewModel.Image = GetImageFromBytes(blob.ToArray());
 
                 this.Albums.Add(viewModel);
             }
