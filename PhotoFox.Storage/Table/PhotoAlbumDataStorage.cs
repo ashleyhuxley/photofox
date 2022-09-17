@@ -5,11 +5,15 @@ using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table
 {
-    public class PhotoDataStorage : IPhotoDataStorage
+    public class PhotoAlbumDataStorage : IPhotoAlbumDataStorage
     {
         private readonly IStorageConfig config;
 
-        public PhotoDataStorage(IStorageConfig config)
+        private const string TableName = "PhotoAlbums";
+
+        private const string PartitionKey = "photoalbum";
+
+        public PhotoAlbumDataStorage(IStorageConfig config)
         {
             this.config = config;
         }
@@ -27,8 +31,8 @@ namespace PhotoFox.Storage.Table
         public AsyncPageable<PhotoAlbum> GetPhotoAlbums()
         {
             var client = new TableServiceClient(config.StorageConnectionString);
-            var tableClient = client.GetTableClient("PhotoAlbums");
-            return tableClient.QueryAsync<PhotoAlbum>(p => p.PartitionKey == "photoalbum");
+            var tableClient = client.GetTableClient(TableName);
+            return tableClient.QueryAsync<PhotoAlbum>(p => p.PartitionKey == PartitionKey);
         }
     }
 }

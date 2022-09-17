@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PhotoFox.Core\PhotoFox.Core.csproj" />
     <ProjectReference Include="..\PhotoFox.Model\PhotoFox.Model.csproj" />
   </ItemGroup>
 

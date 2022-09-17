@@ -7,27 +7,40 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Title="PhotoFox" Height="450" Width="800">
-    <Grid Margin="10">
-        <TabControl>
-            <TabItem Header="Albums">
-                <Grid Margin="5">
-                    <ListView x:Name="AlbumList" HorizontalAlignment="Stretch" VerticalAlignment="Top" ItemsSource="{Binding Albums}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="5" HorizontalAlignment="Stretch" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                    <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
-                                    <TextBlock Text="{Binding Title}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
-            </TabItem>
-        </TabControl>
-    </Grid>
+    <TabControl Margin="10">
+        <TabItem Header="Photos">
+            <ListView x:Name="PhotoList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Photos}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="5" HorizontalAlignment="Stretch" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
+                            <TextBlock Text="{Binding Title}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </TabItem>
+        <TabItem Header="Albums">
+            <ListView x:Name="AlbumList" HorizontalAlignment="Stretch" VerticalAlignment="Top" ItemsSource="{Binding Albums}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="5" HorizontalAlignment="Stretch" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
+                            <TextBlock Text="{Binding Title}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </TabItem>
+    </TabControl>
 </Window>

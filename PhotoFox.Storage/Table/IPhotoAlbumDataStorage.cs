@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table
 {
-    public interface IPhotoDataStorage
+    public interface IPhotoAlbumDataStorage
     {
         AsyncPageable<PhotoAlbum> GetPhotoAlbums();
 
