@@ -28,10 +28,11 @@ namespace PhotoFox.Ui.Wpf
 
             this.contianer.Bind<MainWindowViewModel>().ToSelf();
 
-            this.contianer.Bind<IPhotoDataStorage>().To<PhotoDataStorage>();
+            this.contianer.Bind<IPhotoAlbumDataStorage>().To<PhotoAlbumDataStorage>();
             this.contianer.Bind<IPhotoFileStorage>().To<PhotoFileStorage>();
             this.contianer.Bind<IStorageConfig>().To<PhotoFoxConfig>();
             this.contianer.Bind<ISettingsStorage>().To<SettingsStorage>();
+            this.contianer.Bind<IPhotoInBatchStorage>().To<PhotoInBatchDataStorage>();
         }
 
         private void ComposeObjects()

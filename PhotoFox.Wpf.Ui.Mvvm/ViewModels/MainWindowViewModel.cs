@@ -4,6 +4,7 @@ using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
@@ -11,37 +12,72 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
     public class MainWindowViewModel
     {
-        private readonly IPhotoDataStorage photoStorage;
+        private readonly IPhotoAlbumDataStorage albumStorage;
 
         private readonly IPhotoFileStorage photoFileStorage;
 
+        private readonly IPhotoInBatchStorage photoInBatchStorage;
+
         private readonly ISettingsStorage settingsStorage;
 
+        private int batchId;
+
         public MainWindowViewModel(
-            IPhotoDataStorage photoStorage,
+            IPhotoAlbumDataStorage photoStorage,
             IPhotoFileStorage photoFileStorage,
-            ISettingsStorage settingsStorage)
+            ISettingsStorage settingsStorage,
+            IPhotoInBatchStorage photoInBatchStorage)
         {
-            this.photoStorage = photoStorage;
+            this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
             this.settingsStorage = settingsStorage;
+            this.photoInBatchStorage = photoInBatchStorage;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
+            this.Photos = new ObservableCollection<PhotoViewModel>();
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
 
+        public ObservableCollection<PhotoViewModel> Photos { get; }
+
         public async Task Load()
+        {
+            this.batchId = int.Parse(await settingsStorage.GetSetting("LatestBatchId"));
+
+            await Task.WhenAll(
+                LoadAlbums(),
+                LoadPhotos()
+            );
+        }
+
+        private async Task LoadPhotos()
+        {
+            this.Photos.Clear();
+
+            await foreach (var photo in this.photoInBatchStorage.GetPhotosInBatch(this.batchId))
+            {
+                var viewModel = new PhotoViewModel();
+                viewModel.Title = photo.RowKey;
+
+                var blob = await this.photoFileStorage.GetFileAsync(photo.RowKey);
+                viewModel.Image = GetImageFromBytes(blob.ToArray());
+
+                this.Photos.Add(viewModel);
+            }
+        }
+
+        private async Task LoadAlbums()
         {
             this.Albums.Clear();
 
-            await foreach (var album in this.photoStorage.GetPhotoAlbums())
+            await foreach (var album in this.albumStorage.GetPhotoAlbums())
             {
                 var viewModel = new AlbumViewModel();
                 viewModel.Title = album.AlbumName;
 
-                string coverId = 
-                    string.IsNullOrEmpty(album.CoverPhotoId) 
+                string coverId =
+                    string.IsNullOrEmpty(album.CoverPhotoId)
                     ? await this.settingsStorage.GetSetting("DefaultPhotoId")
                     : album.CoverPhotoId;
 
@@ -54,18 +90,25 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private BitmapImage GetImageFromBytes(byte[] bytes)
         {
-            System.IO.MemoryStream Stream = new System.IO.MemoryStream();
-            Stream.Write(bytes, 0, bytes.Length);
-            Stream.Position = 0;
-            Image img = Image.FromStream(Stream);
-            BitmapImage bitImage = new BitmapImage();
+            var stream = new MemoryStream();
+
+            Image img;
+            stream.Write(bytes, 0, bytes.Length);
+            stream.Position = 0;
+            img = Image.FromStream(stream);
+
+            var bitImage = new BitmapImage();
             bitImage.BeginInit();
-            System.IO.MemoryStream MS = new System.IO.MemoryStream();
-            img.Save(MS, ImageFormat.Jpeg);
-            MS.Seek(0, System.IO.SeekOrigin.Begin);
-            bitImage.StreamSource = MS;
+
+            var ms = new MemoryStream();
+
+            img.Save(ms, ImageFormat.Jpeg);
+            ms.Seek(0, SeekOrigin.Begin);
+            bitImage.StreamSource = ms;
             bitImage.EndInit();
+
             return bitImage;
+
         }
     }
 }
