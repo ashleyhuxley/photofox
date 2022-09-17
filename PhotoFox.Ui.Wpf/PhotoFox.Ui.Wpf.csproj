@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ninject" Version="3.3.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhotoFox.Storage\PhotoFox.Storage.csproj" />
+    <ProjectReference Include="..\PhotoFox.Wpf.Ui.Mvvm\PhotoFox.Wpf.Ui.Mvvm.csproj" />
+  </ItemGroup>
+
+</Project>
