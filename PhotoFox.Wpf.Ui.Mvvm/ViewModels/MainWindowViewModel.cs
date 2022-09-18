@@ -1,4 +1,5 @@
-﻿using PhotoFox.Storage.Blob;
+﻿using NLog;
+using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using System.Collections.ObjectModel;
@@ -12,6 +13,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
     public class MainWindowViewModel
     {
+        private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
+
         private readonly IPhotoAlbumDataStorage albumStorage;
 
         private readonly IPhotoFileStorage photoFileStorage;
@@ -21,6 +24,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         private readonly ISettingsStorage settingsStorage;
 
         private int batchId;
+
+        private bool isLoading = false;
 
         public MainWindowViewModel(
             IPhotoAlbumDataStorage photoStorage,
@@ -45,15 +50,24 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             this.batchId = int.Parse(await settingsStorage.GetSetting("LatestBatchId"));
 
+            Log.Debug($"Initial load. Batch ID is {batchId}");
+
             await Task.WhenAll(
                 LoadAlbums(),
                 LoadPhotos()
             );
         }
 
-        private async Task LoadPhotos()
+        public async Task LoadPhotos()
         {
-            this.Photos.Clear();
+            if (isLoading || batchId == 0)
+            {
+                return;
+            }
+
+            isLoading = true;
+
+            Log.Debug($"Loading photos. Batch ID is {batchId}");
 
             await foreach (var photo in this.photoInBatchStorage.GetPhotosInBatch(this.batchId))
             {
@@ -61,10 +75,18 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 viewModel.Title = photo.RowKey;
 
                 var blob = await this.photoFileStorage.GetFileAsync(photo.RowKey);
-                viewModel.Image = GetImageFromBytes(blob.ToArray());
+                if (blob != null)
+                {
+                    viewModel.Image = GetImageFromBytes(blob.ToArray());
+                }
+
+                Log.Trace($"Adding {photo.RowKey}");
 
                 this.Photos.Add(viewModel);
             }
+
+            batchId--;
+            isLoading = false;
         }
 
         private async Task LoadAlbums()

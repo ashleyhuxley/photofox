@@ -9,7 +9,7 @@
         Title="PhotoFox" Height="450" Width="800">
     <TabControl Margin="10">
         <TabItem Header="Photos">
-            <ListView x:Name="PhotoList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Photos}">
+            <ListView x:Name="PhotoList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.ScrollChanged="PhotoList_ScrollChanged" ItemsSource="{Binding Photos}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="5" HorizontalAlignment="Stretch" />
