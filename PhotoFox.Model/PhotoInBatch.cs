@@ -6,6 +6,7 @@ namespace PhotoFox.Model
 {
     public class PhotoInBatch : ITableEntity
     {
+        public DateTime UtcDate { get; set; }
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }

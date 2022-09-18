@@ -23,6 +23,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly ISettingsStorage settingsStorage;
 
+        private readonly IPhotoMetadataStorage photoMetadataStorage;
+
         private int batchId;
 
         private bool isLoading = false;
@@ -31,12 +33,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             IPhotoAlbumDataStorage photoStorage,
             IPhotoFileStorage photoFileStorage,
             ISettingsStorage settingsStorage,
-            IPhotoInBatchStorage photoInBatchStorage)
+            IPhotoInBatchStorage photoInBatchStorage,
+            IPhotoMetadataStorage photoMetadataStorage)
         {
             this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
             this.settingsStorage = settingsStorage;
             this.photoInBatchStorage = photoInBatchStorage;
+            this.photoMetadataStorage = photoMetadataStorage;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
@@ -71,8 +75,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             await foreach (var photo in this.photoInBatchStorage.GetPhotosInBatch(this.batchId))
             {
-                var viewModel = new PhotoViewModel();
-                viewModel.Title = photo.RowKey;
+                var metadata = this.photoMetadataStorage.GetPhotoMetadata(photo.UtcDate, photo.RowKey);
+
+                var viewModel = new PhotoViewModel
+                {
+                    Title = photo.UtcDate.ToString("dd/MM/yyyy HH:mm"),
+                    DateTime = photo.UtcDate.ToString("dd/MM/yyyy")
+                };
 
                 var blob = await this.photoFileStorage.GetFileAsync(photo.RowKey);
                 if (blob != null)
