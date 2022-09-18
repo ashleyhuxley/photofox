@@ -25,5 +25,12 @@ namespace PhotoFox.Storage.Table
             var result = await tableClient.GetEntityAsync<PhotoMetadata>(utcDate.ToPartitionKey(), photoId);
             return result.Value;
         }
+
+        public AsyncPageable<PhotoMetadata> GetAllPhotos()
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            return tableClient.QueryAsync<PhotoMetadata>();
+        }
     }
 }
