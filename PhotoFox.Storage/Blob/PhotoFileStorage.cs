@@ -20,6 +20,11 @@ namespace PhotoFox.Storage.Blob
 
             var blob = container.GetBlobClient(id);
 
+            if (!blob.Exists())
+            {
+                return null;
+            }
+
             var res = await blob.DownloadContentAsync();
             return res.Value.Content;
         }
