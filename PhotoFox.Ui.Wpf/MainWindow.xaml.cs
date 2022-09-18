@@ -2,6 +2,7 @@
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace PhotoFox.Ui.Wpf
@@ -26,6 +27,10 @@ namespace PhotoFox.Ui.Wpf
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Log.Debug("Main window loaded");
+
+            var view = (CollectionView)CollectionViewSource.GetDefaultView(PhotoList.ItemsSource);
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription("DateTime");
+            view.GroupDescriptions.Add(groupDescription);
 
             await this.viewModel.Load();
         }

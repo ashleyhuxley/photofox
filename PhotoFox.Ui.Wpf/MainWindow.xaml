@@ -9,10 +9,16 @@
         Title="PhotoFox" Height="450" Width="800">
     <TabControl Margin="10">
         <TabItem Header="Photos">
-            <ListView x:Name="PhotoList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.ScrollChanged="PhotoList_ScrollChanged" ItemsSource="{Binding Photos}">
+            <ListView 
+                x:Name="PhotoList" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" 
+                ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                ScrollViewer.ScrollChanged="PhotoList_ScrollChanged" 
+                ItemsSource="{Binding Photos}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="5" HorizontalAlignment="Stretch" />
+                        <UniformGrid Columns="6" HorizontalAlignment="Stretch" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ListView.ItemTemplate>
@@ -23,6 +29,15 @@
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListView.GroupStyle>
             </ListView>
         </TabItem>
         <TabItem Header="Albums">

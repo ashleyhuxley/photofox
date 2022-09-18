@@ -33,6 +33,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IStorageConfig>().To<PhotoFoxConfig>();
             this.contianer.Bind<ISettingsStorage>().To<SettingsStorage>();
             this.contianer.Bind<IPhotoInBatchStorage>().To<PhotoInBatchDataStorage>();
+            this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
         }
 
         private void ComposeObjects()
