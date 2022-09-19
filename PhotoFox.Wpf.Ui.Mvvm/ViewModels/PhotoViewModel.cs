@@ -1,4 +1,5 @@
-﻿using System.Windows.Media.Imaging;
+﻿using System;
+using System.Windows.Media.Imaging;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
@@ -8,6 +9,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public BitmapImage Image { get; set; }
 
-        public string DateTime { get; set; }
+        public DateTime DateTime { get; set; }
+
+        public string GroupName => this.DateTime.ToLongDateString();
     }
 }

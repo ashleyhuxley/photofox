@@ -80,7 +80,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 var viewModel = new PhotoViewModel
                 {
                     Title = photo.UtcDate.ToString("dd/MM/yyyy HH:mm"),
-                    DateTime = photo.UtcDate.ToString("dd/MM/yyyy")
+                    DateTime = photo.UtcDate
                 };
 
                 var blob = await this.photoFileStorage.GetFileAsync(photo.RowKey);

@@ -29,7 +29,7 @@ namespace PhotoFox.Ui.Wpf
             Log.Debug("Main window loaded");
 
             var view = (CollectionView)CollectionViewSource.GetDefaultView(PhotoList.ItemsSource);
-            PropertyGroupDescription groupDescription = new PropertyGroupDescription("DateTime");
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription("GroupName");
             view.GroupDescriptions.Add(groupDescription);
 
             await this.viewModel.Load();
