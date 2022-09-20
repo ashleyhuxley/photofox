@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PhotoFox.Core
+namespace PhotoFox.Core.Extensions
 {
     public static class IntegerExtensions
     {

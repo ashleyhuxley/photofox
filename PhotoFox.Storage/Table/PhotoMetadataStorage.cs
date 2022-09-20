@@ -3,7 +3,8 @@ using Azure;
 using PhotoFox.Model;
 using System.Threading.Tasks;
 using System;
-using PhotoFox.Core;
+using System.Collections.Concurrent;
+using PhotoFox.Core.Extensions;
 
 namespace PhotoFox.Storage.Table
 {
@@ -31,6 +32,13 @@ namespace PhotoFox.Storage.Table
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
             return tableClient.QueryAsync<PhotoMetadata>();
+        }
+
+        public AsyncPageable<PhotoMetadata> GetPhotosByDate(DateTime date)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            return tableClient.QueryAsync<PhotoMetadata>(p => p.PartitionKey == date.ToPartitionKey());
         }
     }
 }
