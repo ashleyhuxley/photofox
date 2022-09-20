@@ -1,4 +1,7 @@
-﻿using NLog;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Win32;
+using NLog;
+using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,18 +13,22 @@ namespace PhotoFox.Ui.Wpf
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IRecipient<AddPhotosMessage>
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
         private MainWindowViewModel viewModel;
 
-        public MainWindow(MainWindowViewModel viewModel)
+        public MainWindow(
+            MainWindowViewModel viewModel,
+            IMessenger messenger)
         {
             InitializeComponent();
 
             this.viewModel = viewModel;
             this.DataContext = viewModel;
+
+            messenger.Register<AddPhotosMessage>(this);
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -56,6 +63,27 @@ namespace PhotoFox.Ui.Wpf
             {
                 await viewModel.LoadPhotos();
             }
+        }
+
+        public void Receive(AddPhotosMessage message)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Image Files (*.jpg;*.png)|*.jpg;*.png|All Files(*.*)|*.*",
+                Title = "Open images",
+                Multiselect = true
+            };
+
+            var result = dialog.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                message.FileNames.AddRange(dialog.FileNames);
+            }
+        }
+
+        private void RibbonButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.viewModel.AddPhotosCommand.Execute(null);
         }
     }
 }

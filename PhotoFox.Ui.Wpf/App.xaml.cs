@@ -1,4 +1,5 @@
-﻿using Ninject;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Ninject;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
@@ -34,6 +35,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<ISettingsStorage>().To<SettingsStorage>();
             this.contianer.Bind<IPhotoInBatchStorage>().To<PhotoInBatchDataStorage>();
             this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
+            this.contianer.Bind<IMessenger>().To<WeakReferenceMessenger>().InSingletonScope();
         }
 
         private void ComposeObjects()

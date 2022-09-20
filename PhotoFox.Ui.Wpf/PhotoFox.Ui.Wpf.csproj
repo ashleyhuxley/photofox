@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="add.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="NLog" Version="5.0.4" />
   </ItemGroup>
@@ -21,6 +25,10 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\add.png" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using PhotoFox.Core;
+﻿using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Storage.Table;
 using System;
