@@ -5,6 +5,9 @@ namespace PhotoFox.Storage.Blob
 {
     public interface IPhotoFileStorage
     {
-        Task<BinaryData> GetFileAsync(string id);
+        Task<BinaryData> GetThumbnailAsync(string id);
+        Task<BinaryData> GetPhotoAsync(string id);
+        Task PutThumbnailAsync(string id, BinaryData data);
+        Task PutPhotoAsync(string id, BinaryData data);
     }
 }
