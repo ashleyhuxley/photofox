@@ -12,5 +12,7 @@ namespace PhotoFox.Storage.Table
         AsyncPageable<PhotoMetadata> GetAllPhotos();
 
         AsyncPageable<PhotoMetadata> GetPhotosByDate(DateTime date);
+
+        Task AddPhotoAsync(PhotoMetadata photo);
     }
 }

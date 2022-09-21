@@ -24,8 +24,8 @@ namespace PhotoFox.Core
             var gpsLonRef = image.Properties.Get<ExifEnumProperty<GPSLongitudeRef>>(ExifTag.GPSLongitudeRef);
 
             if (iso != null) metadata.Iso = iso.Value.ToString();
-            if (dateTaken != null) metadata.DateTaken = dateTaken.Value;
-            if (focalLength != null) metadata.FocalLength = Math.Round(((double)focalLength.Value.Numerator / focalLength.Value.Denominator), 2).ToString();
+            if (dateTaken != null) metadata.UtcDate = dateTaken.Value.ToUniversalTime();
+            if (focalLength != null) metadata.FocalLength = Math.Round((double)focalLength.Value.Numerator / focalLength.Value.Denominator, 2).ToString();
             if (apeture != null) metadata.Aperture = Math.Round(Math.Pow(2, apeture.GetValue() / 2), 1).ToString();
             if (model != null) metadata.Device = model.Value;
             if (orientation != null) metadata.Orientation = orientation.Value;

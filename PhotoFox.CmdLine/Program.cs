@@ -30,13 +30,13 @@ namespace PhotoFox.CmdLine
             var batch = 0;
             var i = 0;
 
-            foreach (var photo in photos.OrderBy(p => p.DateTaken))
+            foreach (var photo in photos.OrderBy(p => p.UtcDate))
             {
                 var batchPhoto = new PhotoInBatch
                 {
                     PartitionKey = batch.ToBatchId(),
                     RowKey = photo.RowKey,
-                    UtcDate = photo.DateTaken
+                    UtcDate = photo.UtcDate
                 };
 
                 Console.WriteLine($"{batchPhoto.PartitionKey} - {batchPhoto.RowKey}");

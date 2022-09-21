@@ -10,7 +10,7 @@ namespace PhotoFox.Storage.Blob
 
         private const string ThumbnailsContainer = "thumbnails";
 
-        private const string PhotosContainer = "photos";
+        private const string PhotosContainer = "images";
 
         public PhotoFileStorage(IStorageConfig config)
         {
@@ -57,6 +57,8 @@ namespace PhotoFox.Storage.Blob
         {
             var client = new BlobServiceClient(this.config.StorageConnectionString);
             var container = client.GetBlobContainerClient(containerName);
+
+            await container.UploadBlobAsync(id, data);
         }
     }
 }

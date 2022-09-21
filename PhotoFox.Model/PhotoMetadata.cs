@@ -8,7 +8,7 @@ namespace PhotoFox.Model
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime DateTaken { get; set; }
+        public DateTime UtcDate { get; set; }
         public decimal Latitude { get; set; }
         public decimal Longitude { get; set; }
         public string Iso { get; set; }

@@ -80,10 +80,5 @@ namespace PhotoFox.Ui.Wpf
                 message.FileNames.AddRange(dialog.FileNames);
             }
         }
-
-        private void RibbonButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.viewModel.AddPhotosCommand.Execute(null);
-        }
     }
 }
