@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using ExifLibrary;
 using NLog;
 using PhotoFox.Core;
-using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
