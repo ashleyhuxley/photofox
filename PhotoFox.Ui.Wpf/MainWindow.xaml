@@ -12,7 +12,7 @@
         <Ribbon DockPanel.Dock="Top">
             <RibbonTab Header="Photos">
                 <RibbonGroup>
-                    <RibbonButton Label="Add Photos" LargeImageSource="/Images/add.png" Click="RibbonButton_Click" Command="{Binding AddPhotosCommand}" />
+                    <RibbonButton Label="Add Photos" LargeImageSource="/Images/add.png" Command="{Binding AddPhotosCommand}" />
                 </RibbonGroup>
             </RibbonTab>
 
@@ -27,6 +27,11 @@
                 ScrollViewer.VerticalScrollBarVisibility="Visible" 
                 ScrollViewer.ScrollChanged="PhotoList_ScrollChanged" 
                 ItemsSource="{Binding Photos}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="6" HorizontalAlignment="Stretch" />
@@ -34,9 +39,9 @@
                     </ItemsControl.ItemsPanel>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
-                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
+                                <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
+                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

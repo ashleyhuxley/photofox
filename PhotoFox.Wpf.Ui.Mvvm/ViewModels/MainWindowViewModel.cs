@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
 using PhotoFox.Core;
+using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
@@ -53,14 +54,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
 
-            AddPhotosCommand = new RelayCommand(AddPhotosExecute);
+            AddPhotosCommand = new AsyncRelayCommand(AddPhotosExecute);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
 
         public ObservableCollection<PhotoViewModel> Photos { get; }
 
-        public ICommand AddPhotosCommand;
+        public ICommand AddPhotosCommand { get; }
 
         public async Task Load()
         {
@@ -86,14 +87,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             while (numPhotos == 0)
             {
-                Log.Debug($"Loading photos. Batch ID is {batchId}");
+                Log.Trace($"Loading photos. Batch ID is {batchId}");
 
                 await foreach (var photo in this.photoMetadataStorage.GetPhotosByDate(this.batchId))
                 {
                     var viewModel = new PhotoViewModel
                     {
-                        Title = photo.DateTaken.ToString("dd/MM/yyyy HH:mm"),
-                        DateTime = photo.DateTaken
+                        Title = photo.UtcDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm"),
+                        DateTime = photo.UtcDate.ToLocalTime(),
                     };
 
                     var blob = await this.photoFileStorage.GetThumbnailAsync(photo.RowKey);
@@ -159,7 +160,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         }
 
-        private void AddPhotosExecute()
+        private async Task AddPhotosExecute()
         {
             var message = new AddPhotosMessage();
             this.messenger.Send(message);
@@ -168,25 +169,43 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             {
                 foreach (var file in message.FileNames)
                 {
-                    UploadImage(file);
+                    await UploadImage(file);
                 }
             }
         }
 
-        private void UploadImage(string fileName)
+        private async Task UploadImage(string fileName)
         {
             if (!File.Exists(fileName))
             {
                 return;
             }
 
+            Log.Debug($"Uploading {fileName}");
+
             var metatdata = new PhotoMetadata();
+
             ExifProcessor.SetExifData(fileName, metatdata);
 
+            metatdata.PartitionKey = metatdata.UtcDate.ToPartitionKey();
+            metatdata.RowKey = Guid.NewGuid().ToString();
+
+            Log.Trace($"PK: {metatdata.PartitionKey}, RK: {metatdata.RowKey}");
+
+            var thumbnail = ThumbnailProcessor.GetThumbnail(Image.FromFile(fileName), 250);
+
+            using (var ms = new MemoryStream())
+            {
+                thumbnail.Save(ms, ImageFormat.Jpeg);
+
+                ms.Seek(0, SeekOrigin.Begin);
+                var data = await BinaryData.FromStreamAsync(ms);
+                await this.photoFileStorage.PutThumbnailAsync(metatdata.RowKey, data);
+            }
+
+            await this.photoFileStorage.PutPhotoAsync(metatdata.RowKey, BinaryData.FromBytes(File.ReadAllBytes(fileName)));
+
+            await this.photoMetadataStorage.AddPhotoAsync(metatdata);
         }
-
-
-
-
     }
 }
