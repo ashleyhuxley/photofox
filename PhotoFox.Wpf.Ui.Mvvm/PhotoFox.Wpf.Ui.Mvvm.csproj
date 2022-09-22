@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PhotoFox.Services\PhotoFox.Services.csproj" />
     <ProjectReference Include="..\PhotoFox.Storage\PhotoFox.Storage.csproj" />
   </ItemGroup>
 

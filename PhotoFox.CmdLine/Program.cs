@@ -36,7 +36,7 @@ namespace PhotoFox.CmdLine
                 {
                     PartitionKey = batch.ToBatchId(),
                     RowKey = photo.RowKey,
-                    UtcDate = photo.UtcDate
+                    UtcDate = photo.UtcDate.Value
                 };
 
                 Console.WriteLine($"{batchPhoto.PartitionKey} - {batchPhoto.RowKey}");

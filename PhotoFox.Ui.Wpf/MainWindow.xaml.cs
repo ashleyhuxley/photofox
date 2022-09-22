@@ -3,6 +3,8 @@ using Microsoft.Win32;
 using NLog;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,7 +15,9 @@ namespace PhotoFox.Ui.Wpf
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IRecipient<AddPhotosMessage>
+    public partial class MainWindow : Window, 
+        IRecipient<AddPhotosMessage>,
+        IRecipient<OpenLinkMessage>
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
@@ -29,6 +33,7 @@ namespace PhotoFox.Ui.Wpf
             this.DataContext = viewModel;
 
             messenger.Register<AddPhotosMessage>(this);
+            messenger.Register<OpenLinkMessage>(this);
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -61,7 +66,7 @@ namespace PhotoFox.Ui.Wpf
 
             if (scrollViewer.VerticalOffset == scrollViewer.ScrollableHeight)
             {
-                await viewModel.LoadPhotos();
+                await viewModel.LoadPhotos(20);
             }
         }
 
@@ -79,6 +84,72 @@ namespace PhotoFox.Ui.Wpf
             {
                 message.FileNames.AddRange(dialog.FileNames);
             }
+        }
+
+        public void Receive(OpenLinkMessage message)
+        {
+            OpenUrl(message.Link);
+        }
+
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            //var sv = FindVisualChild<ScrollViewer>(PhotoList);
+            //while (!sv.CanContentScroll)
+            //{
+            //    await this.viewModel.LoadPhotos();
+            //}
+        }
+
+        public static T FindVisualChild<T>(DependencyObject obj)
+            where T : DependencyObject
+        {
+            // Iterate through all immediate children
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+
+                if (child != null && child is T)
+                    return (T)child;
+
+                else
+                {
+                    var childOfChild = FindVisualChild<T>(child);
+
+                    if (childOfChild != null)
+                        return childOfChild;
+                }
+            }
+
+            return null;
         }
     }
 }

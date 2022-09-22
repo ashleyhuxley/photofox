@@ -3,11 +3,11 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-namespace PhotoFox.Core
+namespace PhotoFox.Core.Imaging
 {
-    public static class ThumbnailProcessor
+    public class ThumbnailProvider : IThumbnailProvider
     {
-        public static Image GetThumbnail(Image original, int width)
+        public Image GenerateThumbnail(Image original, int width)
         {
             var factor = (double)original.Width / width;
             var newHeight = original.Height / factor;
