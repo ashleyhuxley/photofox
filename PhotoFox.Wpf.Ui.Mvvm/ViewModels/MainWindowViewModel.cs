@@ -1,9 +1,8 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
-using PhotoFox.Core;
-using PhotoFox.Core.Extensions;
-using PhotoFox.Model;
+using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
@@ -20,7 +19,7 @@ using System.Windows.Media.Imaging;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
-    public class MainWindowViewModel
+    public class MainWindowViewModel : ObservableObject
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
@@ -34,27 +33,34 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly IMessenger messenger;
 
+        private readonly IUploadService uploadService;
+
         private DateTime batchId = DateTime.MinValue;
 
         private bool isLoading = false;
+
+        private PhotoViewModel? selectedPhoto;
 
         public MainWindowViewModel(
             IPhotoAlbumDataStorage photoStorage,
             IPhotoFileStorage photoFileStorage,
             ISettingsStorage settingsStorage,
             IPhotoMetadataStorage photoMetadataStorage,
-            IMessenger messenger)
+            IMessenger messenger,
+            IUploadService uploadService)
         {
             this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
             this.settingsStorage = settingsStorage;
             this.photoMetadataStorage = photoMetadataStorage;
             this.messenger = messenger;
+            this.uploadService = uploadService;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
 
             AddPhotosCommand = new AsyncRelayCommand(AddPhotosExecute);
+            OpenGpsLink = new RelayCommand(OpenGpsLinkExecute);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -62,6 +68,23 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ObservableCollection<PhotoViewModel> Photos { get; }
 
         public ICommand AddPhotosCommand { get; }
+
+        public ICommand OpenGpsLink { get; }
+
+        public PhotoViewModel SelectedPhoto
+        {
+            get => selectedPhoto;
+            set
+            {
+                if (ReferenceEquals(this.selectedPhoto, value))
+                {
+                    return;
+                }
+
+                selectedPhoto = value;
+                OnPropertyChanged(nameof(SelectedPhoto));
+            }
+        }
 
         public async Task Load()
         {
@@ -71,11 +94,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             await Task.WhenAll(
                 LoadAlbums(),
-                LoadPhotos()
+                LoadPhotos(20)
             );
         }
 
-        public async Task LoadPhotos()
+        public async Task LoadPhotos(int minLoadCount)
         {
             if (isLoading || batchId == DateTime.MinValue)
             {
@@ -85,23 +108,22 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             isLoading = true;
             var numPhotos = 0;
 
-            while (numPhotos == 0)
+            while (numPhotos < minLoadCount)
             {
                 Log.Trace($"Loading photos. Batch ID is {batchId}");
 
                 await foreach (var photo in this.photoMetadataStorage.GetPhotosByDate(this.batchId))
                 {
-                    var viewModel = new PhotoViewModel
-                    {
-                        Title = photo.UtcDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm"),
-                        DateTime = photo.UtcDate.ToLocalTime(),
-                    };
-
                     var blob = await this.photoFileStorage.GetThumbnailAsync(photo.RowKey);
-                    if (blob != null)
+                    if (blob == null)
                     {
-                        viewModel.Image = GetImageFromBytes(blob.ToArray());
+                        Log.Error($"Photo {photo.RowKey} was not found in storage.");
+                        continue;
                     }
+
+                    var thumbnail = GetImageFromBytes(blob.ToArray());
+
+                    var viewModel = new PhotoViewModel(thumbnail, photo);
 
                     Log.Trace($"Adding {photo.RowKey}");
 
@@ -183,29 +205,29 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             Log.Debug($"Uploading {fileName}");
 
-            var metatdata = new PhotoMetadata();
+            var info = new FileInfo(fileName);
 
-            ExifProcessor.SetExifData(fileName, metatdata);
-
-            metatdata.PartitionKey = metatdata.UtcDate.ToPartitionKey();
-            metatdata.RowKey = Guid.NewGuid().ToString();
-
-            Log.Trace($"PK: {metatdata.PartitionKey}, RK: {metatdata.RowKey}");
-
-            var thumbnail = ThumbnailProcessor.GetThumbnail(Image.FromFile(fileName), 250);
-
-            using (var ms = new MemoryStream())
+            using (var stream = File.Open(fileName, FileMode.Open))
             {
-                thumbnail.Save(ms, ImageFormat.Jpeg);
+                try
+                {
+                    await this.uploadService.UploadFromStreamAsync(stream, info.CreationTimeUtc);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Could not upload {fileName} - {ex.Message}");
+                }
+            }
+        }
 
-                ms.Seek(0, SeekOrigin.Begin);
-                var data = await BinaryData.FromStreamAsync(ms);
-                await this.photoFileStorage.PutThumbnailAsync(metatdata.RowKey, data);
+        private void OpenGpsLinkExecute()
+        {
+            if (this.SelectedPhoto == null)
+            {
+                return;
             }
 
-            await this.photoFileStorage.PutPhotoAsync(metatdata.RowKey, BinaryData.FromBytes(File.ReadAllBytes(fileName)));
-
-            await this.photoMetadataStorage.AddPhotoAsync(metatdata);
+            this.messenger.Send(new OpenLinkMessage($"https://maps.google.com/?q={this.selectedPhoto.Latitude},{this.selectedPhoto.Longitude}"));
         }
     }
 }

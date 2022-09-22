@@ -1,5 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Ninject;
+using PhotoFox.Core.Hashing;
+using PhotoFox.Core.Imaging;
+using PhotoFox.Services;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
@@ -36,6 +39,9 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IPhotoInBatchStorage>().To<PhotoInBatchDataStorage>();
             this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
             this.contianer.Bind<IMessenger>().To<WeakReferenceMessenger>().InSingletonScope();
+            this.contianer.Bind<IUploadService>().To<UploadService>();
+            this.contianer.Bind<IThumbnailProvider>().To<ThumbnailProvider>();
+            this.contianer.Bind<IStreamHash>().To<StreamHashMD5>();
         }
 
         private void ComposeObjects()
