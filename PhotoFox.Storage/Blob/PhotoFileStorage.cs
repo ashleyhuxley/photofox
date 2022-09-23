@@ -60,5 +60,23 @@ namespace PhotoFox.Storage.Blob
 
             await container.UploadBlobAsync(id, data);
         }
+
+        public async Task DeleteThumbnailAsync(string id)
+        {
+            await this.DeleteFileAsync(id, ThumbnailsContainer);
+        }
+
+        public async Task DeletePhotoAsync(string id)
+        {
+            await this.DeleteFileAsync(id, PhotosContainer);
+        }
+
+        private async Task DeleteFileAsync(string id, string containerName)
+        {
+            var client = new BlobServiceClient(this.config.StorageConnectionString);
+            var container = client.GetBlobContainerClient(containerName);
+
+            await container.DeleteBlobIfExistsAsync(id);
+        }
     }
 }

@@ -14,5 +14,7 @@ namespace PhotoFox.Storage.Table
         AsyncPageable<PhotoMetadata> GetPhotosByDate(DateTime date);
 
         Task AddPhotoAsync(PhotoMetadata photo);
+
+        Task DeletePhotoAsync(string partitionKey, string rowKey);
     }
 }

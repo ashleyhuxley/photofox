@@ -9,5 +9,7 @@ namespace PhotoFox.Storage.Blob
         Task<BinaryData> GetPhotoAsync(string id);
         Task PutThumbnailAsync(string id, BinaryData data);
         Task PutPhotoAsync(string id, BinaryData data);
+        Task DeleteThumbnailAsync(string id);
+        Task DeletePhotoAsync(string id);
     }
 }

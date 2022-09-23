@@ -49,6 +49,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return string.Empty;
             }
         }
-        
+
+        public string PartitionKey => this.Metadata.PartitionKey;
+        public string RowKey => this.Metadata.RowKey;
     }
 }
