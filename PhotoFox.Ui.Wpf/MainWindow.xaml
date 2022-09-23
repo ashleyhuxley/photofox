@@ -12,9 +12,13 @@
     <DockPanel>
         <Ribbon DockPanel.Dock="Top">
             <RibbonTab Header="Photos">
-                <RibbonGroup>
+                <RibbonGroup Header="Photos">
                     <RibbonButton Label="Add Photos" LargeImageSource="/Images/add.png" Command="{Binding AddPhotosCommand}" />
-                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/add.png" Command="{Binding DeletePhotoCommand}" />
+                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/add.png" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhoto}" />
+                </RibbonGroup>
+                <RibbonGroup Header="Albums">
+                    <RibbonButton Label="Add Album" LargeImageSource="/Images/add.png" Command="{Binding AddAlbumCommand}" />
+                    <RibbonButton Label="Delete Album" LargeImageSource="/Images/add.png" Command="{Binding DeleteAlbumCommand}" />
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>
@@ -107,7 +111,7 @@
                 <Label FontWeight="Bold">Exposure</Label>
                 <TextBlock Text="{Binding SelectedPhoto.Exposure}" Margin="10,0,0,0" />
                 <Label FontWeight="Bold">GPS Location</Label>
-                <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}">
+                <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}" CommandParameter="{Binding SelectedPhoto}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <TextBlock TextDecorations="Underline">

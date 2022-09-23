@@ -6,6 +6,7 @@ using PhotoFox.Services;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
+using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System.Windows;
 
@@ -42,6 +43,10 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IUploadService>().To<UploadService>();
             this.contianer.Bind<IThumbnailProvider>().To<ThumbnailProvider>();
             this.contianer.Bind<IStreamHash>().To<StreamHashMD5>();
+
+            this.contianer.Bind<AddPhotosCommand>().ToSelf();
+            this.contianer.Bind<OpenGpsLocationCommand>().ToSelf();
+            this.contianer.Bind<DeletePhotoCommand>().ToSelf();
         }
 
         private void ComposeObjects()
