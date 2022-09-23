@@ -61,6 +61,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             AddPhotosCommand = new AsyncRelayCommand(AddPhotosExecute);
             OpenGpsLink = new RelayCommand(OpenGpsLinkExecute);
+            DeletePhotoCommand = new AsyncRelayCommand(DeletePhotoCommandExecute);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -70,6 +71,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand AddPhotosCommand { get; }
 
         public ICommand OpenGpsLink { get; }
+
+        public ICommand DeletePhotoCommand { get; }
 
         public PhotoViewModel SelectedPhoto
         {
@@ -227,7 +230,20 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            this.messenger.Send(new OpenLinkMessage($"https://maps.google.com/?q={this.selectedPhoto.Latitude},{this.selectedPhoto.Longitude}"));
+            this.messenger.Send(new OpenLinkMessage($"https://maps.google.com/?q={this.SelectedPhoto.Latitude},{this.selectedPhoto.Longitude}"));
+        }
+
+        private async Task DeletePhotoCommandExecute()
+        {
+            if (this.SelectedPhoto == null)
+            {
+                return;
+            }
+
+            await Task.WhenAll(
+                this.photoFileStorage.DeleteThumbnailAsync(this.SelectedPhoto.RowKey),
+                this.photoFileStorage.DeletePhotoAsync(this.SelectedPhoto.RowKey),
+                this.photoMetadataStorage.DeletePhotoAsync(this.SelectedPhoto.PartitionKey, this.SelectedPhoto.RowKey));
         }
     }
 }

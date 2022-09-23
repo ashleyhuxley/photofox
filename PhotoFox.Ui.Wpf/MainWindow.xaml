@@ -14,9 +14,9 @@
             <RibbonTab Header="Photos">
                 <RibbonGroup>
                     <RibbonButton Label="Add Photos" LargeImageSource="/Images/add.png" Command="{Binding AddPhotosCommand}" />
+                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/add.png" Command="{Binding DeletePhotoCommand}" />
                 </RibbonGroup>
             </RibbonTab>
-
         </Ribbon>
 
         <TabControl>
