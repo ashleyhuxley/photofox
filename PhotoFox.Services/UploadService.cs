@@ -26,6 +26,8 @@ namespace PhotoFox.Services
 
         private readonly IPhotoFileStorage photoFileStorage;
 
+        private readonly IPhotoHashStorage photoHashStorage;
+
         public UploadService(
             IPhotoMetadataStorage photoMetadataStorage,
             IThumbnailProvider thumbnailProvider,
@@ -44,6 +46,11 @@ namespace PhotoFox.Services
             var binaryData = await BinaryData.FromStreamAsync(stream);
 
             var md5 = await Task.Run(() => this.streamHash.ComputeHash(stream));
+            if (await photoHashStorage.HashExistsAsync(md5) != null)
+            {
+                return;
+            }
+
             var thumbnail = await Task.Run(() => this.thumbnailProvider.GenerateThumbnail(image, 250));
 
             var metatdata = new PhotoMetadata();
@@ -79,6 +86,7 @@ namespace PhotoFox.Services
             await this.photoFileStorage.PutPhotoAsync(metatdata.RowKey, binaryData);
 
             await this.photoMetadataStorage.AddPhotoAsync(metatdata);
+            await this.photoHashStorage.AddHashAsync(md5, metatdata.PartitionKey, metatdata.RowKey);
         }
     }
 }
