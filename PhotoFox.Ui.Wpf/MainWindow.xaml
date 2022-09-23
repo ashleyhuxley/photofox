@@ -9,7 +9,7 @@
         Loaded="Window_Loaded"
         Title="PhotoFox" Height="450" Width="800"
         SizeChanged="Window_SizeChanged">
-    <DockPanel Margin="10">
+    <DockPanel>
         <Ribbon DockPanel.Dock="Top">
             <RibbonTab Header="Photos">
                 <RibbonGroup>
@@ -19,16 +19,40 @@
             </RibbonTab>
         </Ribbon>
 
-        <TabControl>
-            <TabItem Header="Photos">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="5" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                
-                    <ListView 
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ListView x:Name="AlbumList" HorizontalAlignment="Stretch" VerticalAlignment="Top" ItemsSource="{Binding Albums}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="1" HorizontalAlignment="Stretch" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="150" />
+                            <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+
+            <ListView
+                        Grid.Column="2"
                         x:Name="PhotoList" 
                         HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch" 
@@ -36,98 +60,79 @@
                         ScrollViewer.ScrollChanged="PhotoList_ScrollChanged" 
                         ItemsSource="{Binding Photos}"
                         SelectedItem="{Binding SelectedPhoto}">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="6" HorizontalAlignment="Stretch" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="6" HorizontalAlignment="Stretch" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
+                            <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
+                            <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
-                                    <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
-                                    <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-                                </StackPanel>
+                                <Grid Background="CornflowerBlue" Margin="0,10,0,5">
+                                    <TextBlock FontWeight="Bold" FontSize="14" Margin="4" Text="{Binding Name}"/>
+                                </Grid>
                             </DataTemplate>
-                        </ListView.ItemTemplate>
-                        <ListView.GroupStyle>
-                            <GroupStyle>
-                                <GroupStyle.HeaderTemplate>
-                                    <DataTemplate>
-                                        <Grid Background="CornflowerBlue" Margin="0,10,0,5">
-                                            <TextBlock FontWeight="Bold" FontSize="14" Margin="4" Text="{Binding Name}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </GroupStyle.HeaderTemplate>
-                            </GroupStyle>
-                        </ListView.GroupStyle>
-                    </ListView>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+            </ListView>
 
-                    <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" />
 
-                    <StackPanel Orientation="Vertical" Grid.Column="2">
-                        <Label FontWeight="Bold">Title</Label>
-                        <TextBox Text="{Binding SelectedPhoto.Title}" Margin="10,0,0,0" />
-                        <Label FontWeight="Bold">Description</Label>
-                        <TextBox Text="{Binding SelectedPhoto.Description}" Margin="10,0,0,0" />
-                        <Label FontWeight="Bold">Date Taken</Label>
-                        <TextBlock Text="{Binding SelectedPhoto.DateTaken}" Margin="10,0,0,0" />
-                        <Label FontWeight="Bold">Device</Label>
-                        <TextBlock Text="{Binding SelectedPhoto.Device}" Margin="10,0,0,0" />
-                        <Label FontWeight="Bold">Aperture</Label>
-                        <TextBlock Text="{Binding SelectedPhoto.Apeture}" Margin="10,0,0,0" />
-                        <Label FontWeight="Bold">Exposure</Label>
-                        <TextBlock Text="{Binding SelectedPhoto.Exposure}" Margin="10,0,0,0" />
-                        <Label FontWeight="Bold">GPS Location</Label>
-                        <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <TextBlock TextDecorations="Underline">
+            <StackPanel Orientation="Vertical" Grid.Column="4">
+                <Label FontWeight="Bold">Title</Label>
+                <TextBox Text="{Binding SelectedPhoto.Title}" Margin="10,0,0,0" />
+                <Label FontWeight="Bold">Description</Label>
+                <TextBox Text="{Binding SelectedPhoto.Description}" Margin="10,0,0,0" />
+                <Label FontWeight="Bold">Date Taken</Label>
+                <TextBlock Text="{Binding SelectedPhoto.DateTaken}" Margin="10,0,0,0" />
+                <Label FontWeight="Bold">Device</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Device}" Margin="10,0,0,0" />
+                <Label FontWeight="Bold">Aperture</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Apeture}" Margin="10,0,0,0" />
+                <Label FontWeight="Bold">Exposure</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Exposure}" Margin="10,0,0,0" />
+                <Label FontWeight="Bold">GPS Location</Label>
+                <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <TextBlock TextDecorations="Underline">
                                         <ContentPresenter />
-                                    </TextBlock>
-                                </ControlTemplate>
-                            </Button.Template>
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Foreground" Value="Blue" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter Property="Foreground" Value="Red" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Width="120" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <Image />
-                                <TextBlock>Save Changes</TextBlock>
-                            </StackPanel>
-                        </Button>
+                            </TextBlock>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Foreground" Value="Blue" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="Foreground" Value="Red" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Width="120" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Image />
+                        <TextBlock>Save Changes</TextBlock>
                     </StackPanel>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Albums">
-                <ListView x:Name="AlbumList" HorizontalAlignment="Stretch" VerticalAlignment="Top" ItemsSource="{Binding Albums}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="5" HorizontalAlignment="Stretch" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
-                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </TabItem>
-        </TabControl>
+                </Button>
+            </StackPanel>
+        </Grid>
     </DockPanel>
 </Window>
