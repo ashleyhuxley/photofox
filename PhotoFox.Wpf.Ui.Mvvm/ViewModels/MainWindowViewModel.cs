@@ -6,13 +6,12 @@ using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
-using PhotoFox.Wpf.Ui.Mvvm.Messages;
+using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -47,7 +46,10 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             ISettingsStorage settingsStorage,
             IPhotoMetadataStorage photoMetadataStorage,
             IMessenger messenger,
-            IUploadService uploadService)
+            IUploadService uploadService,
+            AddPhotosCommand addPhotosCommand,
+            OpenGpsLocationCommand openGpsLocationCommand,
+            DeletePhotoCommand deletePhotoCommand)
         {
             this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
@@ -59,9 +61,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
 
-            AddPhotosCommand = new AsyncRelayCommand(AddPhotosExecute);
-            OpenGpsLink = new RelayCommand(OpenGpsLinkExecute);
-            DeletePhotoCommand = new AsyncRelayCommand(DeletePhotoCommandExecute);
+            AddPhotosCommand = addPhotosCommand;
+            OpenGpsLink = openGpsLocationCommand;
+            DeletePhotoCommand = deletePhotoCommand;
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -182,68 +184,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             bitImage.EndInit();
 
             return bitImage;
-
-        }
-
-        private async Task AddPhotosExecute()
-        {
-            var message = new AddPhotosMessage();
-            this.messenger.Send(message);
-
-            if (message.FileNames.Any())
-            {
-                foreach (var file in message.FileNames)
-                {
-                    await UploadImage(file);
-                }
-            }
-        }
-
-        private async Task UploadImage(string fileName)
-        {
-            if (!File.Exists(fileName))
-            {
-                return;
-            }
-
-            Log.Debug($"Uploading {fileName}");
-
-            var info = new FileInfo(fileName);
-
-            using (var stream = File.Open(fileName, FileMode.Open))
-            {
-                try
-                {
-                    await this.uploadService.UploadFromStreamAsync(stream, info.CreationTimeUtc);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Could not upload {fileName} - {ex.Message}");
-                }
-            }
-        }
-
-        private void OpenGpsLinkExecute()
-        {
-            if (this.SelectedPhoto == null)
-            {
-                return;
-            }
-
-            this.messenger.Send(new OpenLinkMessage($"https://maps.google.com/?q={this.SelectedPhoto.Latitude},{this.selectedPhoto.Longitude}"));
-        }
-
-        private async Task DeletePhotoCommandExecute()
-        {
-            if (this.SelectedPhoto == null)
-            {
-                return;
-            }
-
-            await Task.WhenAll(
-                this.photoFileStorage.DeleteThumbnailAsync(this.SelectedPhoto.RowKey),
-                this.photoFileStorage.DeletePhotoAsync(this.SelectedPhoto.RowKey),
-                this.photoMetadataStorage.DeletePhotoAsync(this.SelectedPhoto.PartitionKey, this.SelectedPhoto.RowKey));
         }
     }
 }
