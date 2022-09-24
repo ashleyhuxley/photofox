@@ -7,5 +7,6 @@ namespace PhotoFox.Ui.Wpf.Mvvm.ViewModels
         public string Title { get; set; }
 
         public BitmapImage Image { get; set; }
+        public string AlbumId { get; set; }
     }
 }
