@@ -1,10 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.Win32;
-using NLog;
-using PhotoFox.Wpf.Ui.Mvvm.Messages;
+﻿using NLog;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;

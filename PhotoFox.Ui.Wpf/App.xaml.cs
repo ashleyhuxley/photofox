@@ -49,6 +49,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<OpenGpsLocationCommand>().ToSelf();
             this.contianer.Bind<DeletePhotoCommand>().ToSelf();
             this.contianer.Bind<AddAlbumCommand>().ToSelf();
+            this.contianer.Bind<DeleteAlbumCommand>().ToSelf();
         }
 
         private void ComposeObjects()
