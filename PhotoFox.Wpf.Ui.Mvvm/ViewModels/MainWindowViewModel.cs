@@ -144,8 +144,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             await foreach (var album in this.albumStorage.GetPhotoAlbums())
             {
-                var viewModel = new AlbumViewModel();
-                viewModel.Title = album.AlbumName;
+                var viewModel = new AlbumViewModel
+                {
+                    Title = album.AlbumName,
+                    AlbumId = album.RowKey
+                };
 
                 string coverId =
                     string.IsNullOrEmpty(album.CoverPhotoId)
