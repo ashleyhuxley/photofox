@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
 using PhotoFox.Services;
@@ -30,10 +29,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly IPhotoMetadataStorage photoMetadataStorage;
 
-        private readonly IMessenger messenger;
-
-        private readonly IUploadService uploadService;
-
         private DateTime batchId = DateTime.MinValue;
 
         private bool isLoading = false;
@@ -45,18 +40,15 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             IPhotoFileStorage photoFileStorage,
             ISettingsStorage settingsStorage,
             IPhotoMetadataStorage photoMetadataStorage,
-            IMessenger messenger,
-            IUploadService uploadService,
             AddPhotosCommand addPhotosCommand,
             OpenGpsLocationCommand openGpsLocationCommand,
-            DeletePhotoCommand deletePhotoCommand)
+            DeletePhotoCommand deletePhotoCommand,
+            AddAlbumCommand addAlbumCommand)
         {
             this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
             this.settingsStorage = settingsStorage;
             this.photoMetadataStorage = photoMetadataStorage;
-            this.messenger = messenger;
-            this.uploadService = uploadService;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
@@ -64,6 +56,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             AddPhotosCommand = addPhotosCommand;
             OpenGpsLink = openGpsLocationCommand;
             DeletePhotoCommand = deletePhotoCommand;
+            AddAlbumCommand = addAlbumCommand;
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -75,6 +68,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand OpenGpsLink { get; }
 
         public ICommand DeletePhotoCommand { get; }
+
+        public ICommand AddAlbumCommand { get; }
 
         public PhotoViewModel SelectedPhoto
         {

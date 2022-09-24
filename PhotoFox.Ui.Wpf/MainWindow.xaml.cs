@@ -15,25 +15,25 @@ namespace PhotoFox.Ui.Wpf
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, 
-        IRecipient<AddPhotosMessage>,
-        IRecipient<OpenLinkMessage>
+    public partial class MainWindow : Window
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
         private MainWindowViewModel viewModel;
 
+        private IMessageHandler messageHandler;
+
         public MainWindow(
             MainWindowViewModel viewModel,
-            IMessenger messenger)
+            IMessageHandler messageHandler)
         {
             InitializeComponent();
 
             this.viewModel = viewModel;
             this.DataContext = viewModel;
 
-            messenger.Register<AddPhotosMessage>(this);
-            messenger.Register<OpenLinkMessage>(this);
+            this.messageHandler = messageHandler;
+            this.messageHandler.Register(this);
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -67,56 +67,6 @@ namespace PhotoFox.Ui.Wpf
             if (scrollViewer.VerticalOffset == scrollViewer.ScrollableHeight)
             {
                 await viewModel.LoadPhotos(20);
-            }
-        }
-
-        public void Receive(AddPhotosMessage message)
-        {
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Image Files (*.jpg;*.png)|*.jpg;*.png|All Files(*.*)|*.*",
-                Title = "Open images",
-                Multiselect = true
-            };
-
-            var result = dialog.ShowDialog();
-            if (result.HasValue && result.Value)
-            {
-                message.FileNames.AddRange(dialog.FileNames);
-            }
-        }
-
-        public void Receive(OpenLinkMessage message)
-        {
-            OpenUrl(message.Link);
-        }
-
-        private void OpenUrl(string url)
-        {
-            try
-            {
-                Process.Start(url);
-            }
-            catch
-            {
-                // hack because of this: https://github.com/dotnet/corefx/issues/10361
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    url = url.Replace("&", "^&");
-                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    Process.Start("xdg-open", url);
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    Process.Start("open", url);
-                }
-                else
-                {
-                    throw;
-                }
             }
         }
 
