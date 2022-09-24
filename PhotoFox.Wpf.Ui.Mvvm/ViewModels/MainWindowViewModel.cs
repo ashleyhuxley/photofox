@@ -6,6 +6,7 @@ using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
+using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -17,7 +18,8 @@ using System.Windows.Media.Imaging;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
-    public class MainWindowViewModel : ObservableObject
+    public class MainWindowViewModel : ObservableObject,
+        IRecipient<RefreshAlbumsMessage>
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
@@ -35,15 +37,19 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private PhotoViewModel? selectedPhoto;
 
+        private AlbumViewModel? selectedAlbum;
+
         public MainWindowViewModel(
             IPhotoAlbumDataStorage photoStorage,
             IPhotoFileStorage photoFileStorage,
             ISettingsStorage settingsStorage,
             IPhotoMetadataStorage photoMetadataStorage,
+            IMessenger messenger,
             AddPhotosCommand addPhotosCommand,
             OpenGpsLocationCommand openGpsLocationCommand,
             DeletePhotoCommand deletePhotoCommand,
-            AddAlbumCommand addAlbumCommand)
+            AddAlbumCommand addAlbumCommand,
+            DeleteAlbumCommand deleteAlbumCommand)
         {
             this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
@@ -57,6 +63,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             OpenGpsLink = openGpsLocationCommand;
             DeletePhotoCommand = deletePhotoCommand;
             AddAlbumCommand = addAlbumCommand;
+            DeleteAlbumCommand = deleteAlbumCommand;
+
+            messenger.Register<RefreshAlbumsMessage>(this);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -71,7 +80,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public ICommand AddAlbumCommand { get; }
 
-        public PhotoViewModel SelectedPhoto
+        public ICommand DeleteAlbumCommand { get; }
+
+        public PhotoViewModel? SelectedPhoto
         {
             get => selectedPhoto;
             set
@@ -83,6 +94,21 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
                 selectedPhoto = value;
                 OnPropertyChanged(nameof(SelectedPhoto));
+            }
+        }
+
+        public AlbumViewModel? SelectedAlbum
+        {
+            get => selectedAlbum;
+            set
+            {
+                if (ReferenceEquals(this.SelectedAlbum, value))
+                {
+                    return;
+                }
+
+                selectedAlbum = value;
+                OnPropertyChanged(nameof(SelectedAlbum));
             }
         }
 
@@ -182,6 +208,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             bitImage.EndInit();
 
             return bitImage;
+        }
+
+        public async void Receive(RefreshAlbumsMessage message)
+        {
+            await this.LoadAlbums();
         }
     }
 }

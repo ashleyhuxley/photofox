@@ -18,7 +18,7 @@
                 </RibbonGroup>
                 <RibbonGroup Header="Albums">
                     <RibbonButton Label="Add Album" LargeImageSource="/Images/add.png" Command="{Binding AddAlbumCommand}" />
-                    <RibbonButton Label="Delete Album" LargeImageSource="/Images/add.png" Command="{Binding DeleteAlbumCommand}" />
+                    <RibbonButton Label="Delete Album" LargeImageSource="/Images/add.png" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}"/>
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>
@@ -32,7 +32,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ListView x:Name="AlbumList" HorizontalAlignment="Stretch" VerticalAlignment="Top" ItemsSource="{Binding Albums}">
+            <ListView x:Name="AlbumList" HorizontalAlignment="Stretch" VerticalAlignment="Top" ItemsSource="{Binding Albums}" SelectedItem="{Binding SelectedAlbum}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
