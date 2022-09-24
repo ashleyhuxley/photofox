@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PhotoFox.Model;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table

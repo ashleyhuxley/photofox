@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Storage", "PhotoFo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Core", "PhotoFox.Core\PhotoFox.Core.csproj", "{FF06CF7B-636D-4FAA-BC11-C3A0BB172B56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoFox.Services", "PhotoFox.Services\PhotoFox.Services.csproj", "{01875AF0-6172-4215-9F16-0EA96510EFAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Services", "PhotoFox.Services\PhotoFox.Services.csproj", "{01875AF0-6172-4215-9F16-0EA96510EFAD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.CmdLine", "PhotoFox.CmdLine\PhotoFox.CmdLine.csproj", "{8A99E31D-B6E7-47AD-BAA7-679E6480E858}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{01875AF0-6172-4215-9F16-0EA96510EFAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01875AF0-6172-4215-9F16-0EA96510EFAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01875AF0-6172-4215-9F16-0EA96510EFAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
