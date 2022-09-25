@@ -22,7 +22,8 @@ using System.Windows.Media.Imaging;
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
     public class MainWindowViewModel : ObservableObject,
-        IRecipient<RefreshAlbumsMessage>
+        IRecipient<RefreshAlbumsMessage>,
+        IRecipient<LoadPhotoMessage>
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
@@ -78,6 +79,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             StopLoadingCommand = new RelayCommand(StopLoadingExecute, StopLoadingCanExecute);
 
             messenger.Register<RefreshAlbumsMessage>(this);
+            messenger.Register<LoadPhotoMessage>(this);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -151,13 +153,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             );
         }
 
-        private async Task AddPhoto(PhotoMetadata photo, CancellationToken token)
+        private async Task LoadPhoto(PhotoMetadata photo)
         {
-            if (token.IsCancellationRequested)
-            {
-                return;
-            }
-
             var blob = await this.photoFileStorage.GetThumbnailAsync(photo.RowKey);
             if (blob == null)
             {
@@ -187,7 +184,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             {
                 var photo = await this.photoMetadataStorage.GetPhotoMetadata(photoInAlbum.UtcDate, photoInAlbum.RowKey);
 
-                await AddPhoto(photo, token);
+                await LoadPhoto(photo);
             }
         }
 
@@ -221,7 +218,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                         break;
                     }
 
-                    await AddPhoto(photo, token);
+                    await LoadPhoto(photo);
 
                     numPhotos++;
                 }
@@ -307,6 +304,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         private bool StopLoadingCanExecute()
         {
             return true;
+        }
+
+        public async void Receive(LoadPhotoMessage message)
+        {
+            await LoadPhoto(message.PhotoMetadata);
         }
     }
 }

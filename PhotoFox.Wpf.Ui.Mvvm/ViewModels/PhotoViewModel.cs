@@ -52,5 +52,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public string PartitionKey => this.Metadata.PartitionKey;
         public string RowKey => this.Metadata.RowKey;
+
+        public string FileHash => this.Metadata.FileHash;
     }
 }
