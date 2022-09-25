@@ -6,6 +6,6 @@ namespace PhotoFox.Services
 {
     public interface IUploadService
     {
-        Task UploadFromStreamAsync(Stream stream, DateTime fallbackTime);
+        Task UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle);
     }
 }

@@ -3,7 +3,6 @@ using Azure;
 using PhotoFox.Model;
 using System.Threading.Tasks;
 using System;
-using System.Collections.Concurrent;
 using PhotoFox.Core.Extensions;
 
 namespace PhotoFox.Storage.Table

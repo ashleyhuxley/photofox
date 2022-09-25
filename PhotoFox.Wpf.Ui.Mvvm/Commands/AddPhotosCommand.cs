@@ -65,7 +65,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             {
                 try
                 {
-                    await this.uploadService.UploadFromStreamAsync(stream, info.CreationTimeUtc);
+                    await this.uploadService.UploadFromStreamAsync(stream, info.CreationTimeUtc, Path.GetFileNameWithoutExtension(fileName));
                 }
                 catch (Exception ex)
                 {
