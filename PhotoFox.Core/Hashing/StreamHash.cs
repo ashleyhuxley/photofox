@@ -8,6 +8,8 @@ namespace PhotoFox.Core.Hashing
     {
         public string ComputeHash(Stream input)
         {
+            input.Seek(0, SeekOrigin.Begin);
+        
             byte[] bytes = new byte[input.Length];
 
             int numBytesToRead = (int)input.Length;

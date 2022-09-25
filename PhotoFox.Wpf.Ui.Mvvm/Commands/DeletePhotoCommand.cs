@@ -13,12 +13,16 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
         private readonly IPhotoMetadataStorage photoMetadataStorage;
 
+        private readonly IPhotoHashStorage photoHashStorage;
+
         public DeletePhotoCommand(
             IPhotoFileStorage photoFileStorage, 
-            IPhotoMetadataStorage photoMetadataStorage)
+            IPhotoMetadataStorage photoMetadataStorage,
+            IPhotoHashStorage photoHashStorage)
         {
             this.photoFileStorage = photoFileStorage;
             this.photoMetadataStorage = photoMetadataStorage;
+            this.photoHashStorage = photoHashStorage;
         }
 
         public event EventHandler? CanExecuteChanged
@@ -43,7 +47,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             await Task.WhenAll(
                 this.photoFileStorage.DeleteThumbnailAsync(selectedPhoto.RowKey),
                 this.photoFileStorage.DeletePhotoAsync(selectedPhoto.RowKey),
-                this.photoMetadataStorage.DeletePhotoAsync(selectedPhoto.PartitionKey, selectedPhoto.RowKey));
+                this.photoMetadataStorage.DeletePhotoAsync(selectedPhoto.PartitionKey, selectedPhoto.RowKey),
+                this.photoHashStorage.DeleteHashAsync(selectedPhoto.FileHash));
         }
     }
 }

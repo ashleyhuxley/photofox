@@ -42,7 +42,7 @@ namespace PhotoFox.Services
             this.photoHashStorage = photoHashStorage;
         }
 
-        public async Task UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle)
+        public async Task<PhotoMetadata> UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle)
         {
             var image = Image.FromStream(stream);
             var binaryData = await BinaryData.FromStreamAsync(stream);
@@ -50,7 +50,7 @@ namespace PhotoFox.Services
             var md5 = await Task.Run(() => this.streamHash.ComputeHash(stream));
             if (await photoHashStorage.HashExistsAsync(md5) != null)
             {
-                return;
+                return null;
             }
 
             var thumbnail = await Task.Run(() => this.thumbnailProvider.GenerateThumbnail(image, 250));
@@ -90,6 +90,8 @@ namespace PhotoFox.Services
 
             await this.photoMetadataStorage.AddPhotoAsync(metatdata);
             await this.photoHashStorage.AddHashAsync(md5, metatdata.PartitionKey, metatdata.RowKey);
+
+            return metatdata;
         }
     }
 }
