@@ -1,6 +1,7 @@
 ﻿using Azure;
 using PhotoFox.Model;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table

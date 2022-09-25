@@ -61,7 +61,7 @@ namespace PhotoFox.Ui.Wpf
 
             if (scrollViewer.VerticalOffset == scrollViewer.ScrollableHeight)
             {
-                await viewModel.LoadPhotos(20);
+                await viewModel.LoadMore();
             }
         }
 

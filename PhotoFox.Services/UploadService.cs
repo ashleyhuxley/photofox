@@ -32,15 +32,17 @@ namespace PhotoFox.Services
             IPhotoMetadataStorage photoMetadataStorage,
             IThumbnailProvider thumbnailProvider,
             IStreamHash streamHash,
-            IPhotoFileStorage photoFileStorage)
+            IPhotoFileStorage photoFileStorage,
+            IPhotoHashStorage photoHashStorage)
         {
             this.photoMetadataStorage = photoMetadataStorage;
             this.thumbnailProvider = thumbnailProvider;
             this.streamHash = streamHash;
             this.photoFileStorage = photoFileStorage;
+            this.photoHashStorage = photoHashStorage;
         }
 
-        public async Task UploadFromStreamAsync(Stream stream, DateTime fallbackTime)
+        public async Task UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle)
         {
             var image = Image.FromStream(stream);
             var binaryData = await BinaryData.FromStreamAsync(stream);
@@ -64,6 +66,7 @@ namespace PhotoFox.Services
             metatdata.GeolocationLattitude = exifReader.GetGpsLatitude();
             metatdata.GeolocationLongitude = exifReader.GetGpsLongitude();
             metatdata.Iso = exifReader.GetIso();
+            metatdata.Title = fallbackTitle;
 
             var date = exifReader.GetDateTakenUtc() ?? fallbackTime;
             metatdata.PartitionKey = date.ToPartitionKey();

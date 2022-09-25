@@ -33,10 +33,16 @@ namespace PhotoFox.Storage.Table
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            var result = await tableClient.GetEntityAsync<PhotoHash>(hash.ToHashPartitionKey(), hash);
-            return result == null 
-                ? null 
-                : Tuple.Create(result.Value.PhotoPartitionKey, result.Value.PhotoRowKey);
+
+            if (await tableClient.EntityExistsAsync<PhotoHash>(hash.ToHashPartitionKey(), hash))
+            {
+                var hashResult = await tableClient.GetEntityAsync<PhotoHash>(hash.ToHashPartitionKey(), hash);
+                return Tuple.Create(hashResult.Value.PhotoPartitionKey, hashResult.Value.PhotoRowKey);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task DeleteHashAsync(string hash)

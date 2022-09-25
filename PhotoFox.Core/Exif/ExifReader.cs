@@ -17,6 +17,7 @@ namespace PhotoFox.Core.Exif
 
         public static async Task<ExifReader> FromStreamAsync(Stream stream)
         {
+            stream.Seek(0, SeekOrigin.Begin);
             return new ExifReader(await ImageFile.FromStreamAsync(stream));
         }
 

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm"
+        xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
@@ -13,15 +13,39 @@
         <Ribbon DockPanel.Dock="Top">
             <RibbonTab Header="Photos">
                 <RibbonGroup Header="Photos">
-                    <RibbonButton Label="Add Photos" LargeImageSource="/Images/add.png" Command="{Binding AddPhotosCommand}" />
-                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/add.png" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhoto}" />
+                    <RibbonButton Label="Add Photos" LargeImageSource="/Images/add_photo.png" Command="{Binding AddPhotosCommand}" />
+                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/delete.png" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhoto}" />
                 </RibbonGroup>
                 <RibbonGroup Header="Albums">
-                    <RibbonButton Label="Add Album" LargeImageSource="/Images/add.png" Command="{Binding AddAlbumCommand}" />
-                    <RibbonButton Label="Delete Album" LargeImageSource="/Images/add.png" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}"/>
+                    <RibbonButton Label="Add Album" LargeImageSource="/Images/add_album.png" Command="{Binding AddAlbumCommand}" />
+                    <RibbonButton Label="Delete Album" LargeImageSource="/Images/delete.png" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}"/>
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>
+
+        <StatusBar DockPanel.Dock="Bottom" Height="25">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <wpf:ImageButton Command="{Binding StopLoadingCommand}" Width="20" Height="20" ImageSource="/Images/stop.png" ImageWidth="20" ImageHeight="20" ImageLocation="Center" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="{Binding LoadingStatusText}" />
+            </StatusBarItem>
+            
+        </StatusBar>
 
         <Grid>
             <Grid.ColumnDefinitions>
@@ -99,23 +123,23 @@
 
             <StackPanel Orientation="Vertical" Grid.Column="4">
                 <Label FontWeight="Bold">Title</Label>
-                <TextBox Text="{Binding SelectedPhoto.Title}" Margin="10,0,0,0" />
+                <TextBox Text="{Binding SelectedPhoto.Title}" Margin="10,0,10,0" />
                 <Label FontWeight="Bold">Description</Label>
-                <TextBox Text="{Binding SelectedPhoto.Description}" Margin="10,0,0,0" />
+                <TextBox Text="{Binding SelectedPhoto.Description}" Margin="10,0,10,0" />
                 <Label FontWeight="Bold">Date Taken</Label>
-                <TextBlock Text="{Binding SelectedPhoto.DateTaken}" Margin="10,0,0,0" />
+                <TextBlock Text="{Binding SelectedPhoto.DateTaken}" Margin="10,0,10,0" />
                 <Label FontWeight="Bold">Device</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Device}" Margin="10,0,0,0" />
+                <TextBlock Text="{Binding SelectedPhoto.Device}" Margin="10,0,10,0" />
                 <Label FontWeight="Bold">Aperture</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Apeture}" Margin="10,0,0,0" />
+                <TextBlock Text="{Binding SelectedPhoto.Apeture}" Margin="10,0,10,0" />
                 <Label FontWeight="Bold">Exposure</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Exposure}" Margin="10,0,0,0" />
+                <TextBlock Text="{Binding SelectedPhoto.Exposure}" Margin="10,0,10,0" />
                 <Label FontWeight="Bold">GPS Location</Label>
                 <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}" CommandParameter="{Binding SelectedPhoto}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <TextBlock TextDecorations="Underline">
-                                        <ContentPresenter />
+                                <ContentPresenter />
                             </TextBlock>
                         </ControlTemplate>
                     </Button.Template>
@@ -130,9 +154,9 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Width="120" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0">
+                <Button Width="130" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0">
                     <StackPanel Orientation="Horizontal">
-                        <Image />
+                        <Image Width="20" Height="20" Margin="0,0,10,0" Source="/Images/yes.png" />
                         <TextBlock>Save Changes</TextBlock>
                     </StackPanel>
                 </Button>

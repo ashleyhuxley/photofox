@@ -44,6 +44,8 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IThumbnailProvider>().To<ThumbnailProvider>();
             this.contianer.Bind<IStreamHash>().To<StreamHashMD5>();
             this.contianer.Bind<IMessageHandler>().To<MessageHandler>();
+            this.contianer.Bind<IPhotoInAlbumStorage>().To<PhotoInAlbumStorage>();
+            this.contianer.Bind<IPhotoHashStorage>().To<PhotoHashStorage>();
 
             this.contianer.Bind<AddPhotosCommand>().ToSelf();
             this.contianer.Bind<OpenGpsLocationCommand>().ToSelf();

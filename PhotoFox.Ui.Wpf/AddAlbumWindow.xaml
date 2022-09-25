@@ -21,14 +21,14 @@
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <Button Width="120" Height="28" HorizontalAlignment="Left" Margin="0,0,10,0">
                 <StackPanel Orientation="Horizontal">
-                    <Image Width="16" Height="16" Margin="0,0,10,0" />
+                    <Image Width="20" Height="20" Margin="0,0,10,0" Source="/Images/yes.png" />
                     <TextBlock>Add Album</TextBlock>
                 </StackPanel>
             </Button>
 
             <Button Width="120" Height="28" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal">
-                    <Image Width="16" Height="16" Margin="0,0,10,0" />
+                    <Image Width="20" Height="20" Margin="0,0,10,0" Source="/Images/no.png" />
                     <TextBlock>Cancel</TextBlock>
                 </StackPanel>
             </Button>
