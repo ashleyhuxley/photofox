@@ -23,7 +23,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
     public class MainWindowViewModel : ObservableObject,
         IRecipient<RefreshAlbumsMessage>,
-        IRecipient<LoadPhotoMessage>
+        IRecipient<LoadPhotoMessage>,
+        IRecipient<UnloadPhotoMessage>
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
@@ -80,6 +81,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             messenger.Register<RefreshAlbumsMessage>(this);
             messenger.Register<LoadPhotoMessage>(this);
+            messenger.Register<UnloadPhotoMessage>(this);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -309,6 +311,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public async void Receive(LoadPhotoMessage message)
         {
             await LoadPhoto(message.PhotoMetadata);
+        }
+
+        public void Receive(UnloadPhotoMessage message)
+        {
+            this.Photos.Remove(message.ViewModel);
         }
     }
 }

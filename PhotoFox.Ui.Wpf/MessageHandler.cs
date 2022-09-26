@@ -11,7 +11,8 @@ namespace PhotoFox.Ui.Wpf
         IMessageHandler,
         IRecipient<AddPhotosMessage>,
         IRecipient<OpenLinkMessage>,
-        IRecipient<AddAlbumMessage>
+        IRecipient<AddAlbumMessage>,
+        IRecipient<UserConfirmMessage>
     {
         private readonly IMessenger messenger;
 
@@ -28,6 +29,7 @@ namespace PhotoFox.Ui.Wpf
             messenger.Register<AddPhotosMessage>(this);
             messenger.Register<OpenLinkMessage>(this);
             messenger.Register<AddAlbumMessage>(this);
+            messenger.Register<UserConfirmMessage>(this);
         }
 
         public void Receive(AddPhotosMessage message)
@@ -85,6 +87,12 @@ namespace PhotoFox.Ui.Wpf
             var window = new AddAlbumWindow();
             window.Owner = this.ownerWindow;
             window.ShowDialog();
+        }
+
+        public void Receive(UserConfirmMessage message)
+        {
+            var result = MessageBox.Show(message.MessageText, message.Caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            message.IsConfirmed = result == MessageBoxResult.Yes;
         }
     }
 }
