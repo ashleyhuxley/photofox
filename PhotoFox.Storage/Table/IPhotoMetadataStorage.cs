@@ -17,5 +17,6 @@ namespace PhotoFox.Storage.Table
         Task AddPhotoAsync(PhotoMetadata photo);
 
         Task DeletePhotoAsync(string partitionKey, string rowKey);
+        Task SavePhotoAsync(PhotoMetadata metadata);
     }
 }

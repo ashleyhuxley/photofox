@@ -53,5 +53,12 @@ namespace PhotoFox.Storage.Table
             var tableClient = client.GetTableClient(TableName);
             await tableClient.DeleteEntityAsync(partitionKey, rowKey);
         }
+
+        public async Task SavePhotoAsync(PhotoMetadata metadata)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            await tableClient.UpdateEntityAsync(metadata, metadata.ETag, TableUpdateMode.Replace);
+        }
     }
 }

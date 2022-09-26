@@ -52,6 +52,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<DeletePhotoCommand>().ToSelf();
             this.contianer.Bind<AddAlbumCommand>().ToSelf();
             this.contianer.Bind<DeleteAlbumCommand>().ToSelf();
+            this.contianer.Bind<SaveChangesCommand>().ToSelf();
         }
 
         private void ComposeObjects()

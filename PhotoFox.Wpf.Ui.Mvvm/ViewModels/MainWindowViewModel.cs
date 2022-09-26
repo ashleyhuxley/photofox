@@ -24,7 +24,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
     public class MainWindowViewModel : ObservableObject,
         IRecipient<RefreshAlbumsMessage>,
         IRecipient<LoadPhotoMessage>,
-        IRecipient<UnloadPhotoMessage>
+        IRecipient<UnloadPhotoMessage>,
+        IRecipient<UpdateStatusMessage>
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
@@ -61,7 +62,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             OpenGpsLocationCommand openGpsLocationCommand,
             DeletePhotoCommand deletePhotoCommand,
             AddAlbumCommand addAlbumCommand,
-            DeleteAlbumCommand deleteAlbumCommand)
+            DeleteAlbumCommand deleteAlbumCommand,
+            SaveChangesCommand saveChangesCommand)
         {
             this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
@@ -78,10 +80,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             AddAlbumCommand = addAlbumCommand;
             DeleteAlbumCommand = deleteAlbumCommand;
             StopLoadingCommand = new RelayCommand(StopLoadingExecute, StopLoadingCanExecute);
+            SaveChangesCommand = saveChangesCommand;
 
             messenger.Register<RefreshAlbumsMessage>(this);
             messenger.Register<LoadPhotoMessage>(this);
             messenger.Register<UnloadPhotoMessage>(this);
+            messenger.Register<UpdateStatusMessage>(this);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -99,6 +103,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand DeleteAlbumCommand { get; }
 
         public ICommand StopLoadingCommand { get; }
+
+        public ICommand SaveChangesCommand { get; }
 
         public PhotoViewModel? SelectedPhoto
         {
@@ -226,7 +232,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 }
 
                 batchId = batchId.AddDays(-1);
-                if (batchId < DateTime.UtcNow.AddMonths(-6))
+                if (batchId < DateTime.UtcNow.AddMonths(-12))
                 {
                     break;
                 }
@@ -316,6 +322,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public void Receive(UnloadPhotoMessage message)
         {
             this.Photos.Remove(message.ViewModel);
+        }
+
+        public void Receive(UpdateStatusMessage message)
+        {
+            this.LoadingStatusText = message.Message;
         }
     }
 }
