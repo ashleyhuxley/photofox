@@ -1,5 +1,6 @@
 ﻿using NLog;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -38,6 +39,9 @@ namespace PhotoFox.Ui.Wpf
             var view = (CollectionView)CollectionViewSource.GetDefaultView(PhotoList.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("GroupName");
             view.GroupDescriptions.Add(groupDescription);
+
+            view.SortDescriptions.Add(new SortDescription("GroupName", ListSortDirection.Descending));
+            view.SortDescriptions.Add(new SortDescription("UtcDate", ListSortDirection.Descending));
 
             await this.viewModel.Load();
         }
