@@ -11,5 +11,18 @@ namespace PhotoFox.Ui.Wpf
         {
             InitializeComponent();
         }
+
+        private void CancelButtonClick(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            this.Close();
+        }
+
+        private void OkButtonClick(object sender, RoutedEventArgs e)
+        {
+
+            DialogResult = true;
+            this.Close();
+        }
     }
 }

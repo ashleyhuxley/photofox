@@ -19,14 +19,14 @@
         <TextBox VerticalAlignment="Center" Grid.Column="1" Height="23" />
 
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-            <Button Width="120" Height="28" HorizontalAlignment="Left" Margin="0,0,10,0">
+            <Button Width="120" Height="28" HorizontalAlignment="Left" Margin="0,0,10,0" Click="OkButtonClick">
                 <StackPanel Orientation="Horizontal">
                     <Image Width="20" Height="20" Margin="0,0,10,0" Source="/Images/yes.png" />
                     <TextBlock>Add Album</TextBlock>
                 </StackPanel>
             </Button>
 
-            <Button Width="120" Height="28" HorizontalAlignment="Left">
+            <Button Width="120" Height="28" HorizontalAlignment="Left" Click="CancelButtonClick">
                 <StackPanel Orientation="Horizontal">
                     <Image Width="20" Height="20" Margin="0,0,10,0" Source="/Images/no.png" />
                     <TextBlock>Cancel</TextBlock>
