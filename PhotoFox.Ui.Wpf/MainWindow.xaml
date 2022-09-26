@@ -7,7 +7,7 @@
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
-        Title="PhotoFox" Height="450" Width="800"
+        Title="PhotoFox" Height="800" Width="1200"
         SizeChanged="Window_SizeChanged">
     <DockPanel>
         <Ribbon DockPanel.Dock="Top">
@@ -154,7 +154,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Width="130" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0">
+                <Button Width="130" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0" Command="{Binding SaveChangesCommand}" CommandParameter="{Binding SelectedPhoto}">
                     <StackPanel Orientation="Horizontal">
                         <Image Width="20" Height="20" Margin="0,0,10,0" Source="/Images/yes.png" />
                         <TextBlock>Save Changes</TextBlock>

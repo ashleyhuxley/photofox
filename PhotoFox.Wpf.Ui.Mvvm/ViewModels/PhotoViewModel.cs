@@ -6,7 +6,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
     public class PhotoViewModel
     {
-        private PhotoMetadata Metadata { get; set; }
+        public PhotoMetadata Metadata { get; private set; }
 
         public PhotoViewModel(BitmapImage image, PhotoMetadata metadata)
         {
