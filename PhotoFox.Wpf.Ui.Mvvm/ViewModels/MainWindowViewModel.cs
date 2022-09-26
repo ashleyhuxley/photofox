@@ -14,6 +14,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -163,6 +164,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private async Task LoadPhoto(PhotoMetadata photo)
         {
+            if (this.Photos.Any(p => p.RowKey == photo.RowKey))
+            {
+                this.Photos.Remove(this.Photos.First(p => p.RowKey == photo.RowKey));
+            }
+
             var blob = await this.photoFileStorage.GetThumbnailAsync(photo.RowKey);
             if (blob == null)
             {

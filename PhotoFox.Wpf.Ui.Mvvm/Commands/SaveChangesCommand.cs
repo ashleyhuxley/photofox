@@ -42,7 +42,10 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
             await this.photoMetadataStorage.SavePhotoAsync(selectedPhoto.Metadata);
 
+            var newMetadata = await this.photoMetadataStorage.GetPhotoMetadata(selectedPhoto.DateTaken, selectedPhoto.RowKey);
+
             this.messenger.Send(new UpdateStatusMessage("Image updated."));
+            this.messenger.Send(new LoadPhotoMessage(newMetadata));
         }
     }
 }
