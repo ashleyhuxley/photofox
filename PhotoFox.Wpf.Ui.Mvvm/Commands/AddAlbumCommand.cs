@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
@@ -47,7 +48,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             var message = this.messenger.Send(new AddAlbumMessage());
             if (message.DialogResult.HasValue && message.DialogResult.Value)
             {
-                var album = new Model.PhotoAlbum
+                var album = new PhotoAlbum
                 {
                     PartitionKey = "photoalbum",
                     RowKey = Guid.NewGuid().ToString(),
