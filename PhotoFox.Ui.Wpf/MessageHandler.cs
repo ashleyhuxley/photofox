@@ -86,7 +86,10 @@ namespace PhotoFox.Ui.Wpf
         {
             var window = new AddAlbumWindow();
             window.Owner = this.ownerWindow;
-            window.ShowDialog();
+            window.DataContext = message.ViewModel;
+            var result = window.ShowDialog();
+
+            message.DialogResult = result;
         }
 
         public void Receive(UserConfirmMessage message)

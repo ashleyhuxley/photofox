@@ -17,7 +17,7 @@
                     <RibbonButton Label="Delete Photo" LargeImageSource="/Images/delete.png" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhoto}" />
                 </RibbonGroup>
                 <RibbonGroup Header="Albums">
-                    <RibbonButton Label="Add Album" LargeImageSource="/Images/add_album.png" Command="{Binding AddAlbumCommand}" />
+                    <RibbonButton Label="Add Album" LargeImageSource="/Images/add_album.png" Command="{Binding AddAlbumCommand}" CommandParameter="{Binding SelectedPhoto}" />
                     <RibbonButton Label="Delete Album" LargeImageSource="/Images/delete.png" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}"/>
                 </RibbonGroup>
             </RibbonTab>
