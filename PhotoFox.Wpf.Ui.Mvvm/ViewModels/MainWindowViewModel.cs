@@ -2,8 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
-using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
+using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
@@ -34,8 +34,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly IPhotoFileStorage photoFileStorage;
 
-        private readonly ISettingsStorage settingsStorage;
-
         private readonly IPhotoMetadataStorage photoMetadataStorage;
 
         private readonly IPhotoInAlbumStorage photoInAlbumStorage;
@@ -55,7 +53,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public MainWindowViewModel(
             IPhotoAlbumDataStorage photoStorage,
             IPhotoFileStorage photoFileStorage,
-            ISettingsStorage settingsStorage,
             IPhotoMetadataStorage photoMetadataStorage,
             IPhotoInAlbumStorage photoInAlbumStorage,
             IMessenger messenger,
@@ -68,7 +65,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             this.albumStorage = photoStorage;
             this.photoFileStorage = photoFileStorage;
-            this.settingsStorage = settingsStorage;
             this.photoMetadataStorage = photoMetadataStorage;
             this.photoInAlbumStorage = photoInAlbumStorage;
 
@@ -261,10 +257,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                     AlbumId = album.RowKey
                 };
 
-                string coverId =
-                    string.IsNullOrEmpty(album.CoverPhotoId)
-                    ? await this.settingsStorage.GetSetting("DefaultPhotoId")
-                    : album.CoverPhotoId;
+                string coverId = album.CoverPhotoId;
 
                 var blob = await this.photoFileStorage.GetThumbnailAsync(coverId);
                 viewModel.Image = GetImageFromBytes(blob.ToArray());

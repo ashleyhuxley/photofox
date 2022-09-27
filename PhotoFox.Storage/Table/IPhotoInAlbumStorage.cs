@@ -1,5 +1,5 @@
 ﻿using Azure;
-using PhotoFox.Model;
+using PhotoFox.Storage.Models;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table

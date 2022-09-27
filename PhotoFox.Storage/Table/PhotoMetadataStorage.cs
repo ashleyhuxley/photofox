@@ -1,9 +1,9 @@
 ﻿using Azure.Data.Tables;
 using Azure;
-using PhotoFox.Model;
 using System.Threading.Tasks;
 using System;
 using PhotoFox.Core.Extensions;
+using PhotoFox.Storage.Models;
 
 namespace PhotoFox.Storage.Table
 {

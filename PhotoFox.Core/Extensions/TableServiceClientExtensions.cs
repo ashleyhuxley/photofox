@@ -1,5 +1,4 @@
 ﻿using Azure.Data.Tables;
-using PhotoFox.Model;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Core.Extensions

@@ -1,6 +1,6 @@
 ﻿using Azure.Data.Tables;
 using PhotoFox.Core.Extensions;
-using PhotoFox.Model;
+using PhotoFox.Storage.Models;
 using System;
 using System.Threading.Tasks;
 

@@ -1,4 +1,4 @@
-﻿using PhotoFox.Model;
+﻿using PhotoFox.Storage.Models;
 using System;
 using System.Windows.Media.Imaging;
 
