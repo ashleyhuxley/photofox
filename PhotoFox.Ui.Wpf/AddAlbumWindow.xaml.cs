@@ -20,7 +20,6 @@ namespace PhotoFox.Ui.Wpf
 
         private void OkButtonClick(object sender, RoutedEventArgs e)
         {
-
             DialogResult = true;
             this.Close();
         }

@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Data.Tables;
 using PhotoFox.Model;
+using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table
 {
@@ -20,6 +21,13 @@ namespace PhotoFox.Storage.Table
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
             return tableClient.QueryAsync<PhotoInAlbum>(p => p.PartitionKey == albumId);
+        }
+
+        public async Task AddPhotoInAlbumAsync(string albumId, string photoId)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            await tableClient.AddEntityAsync(new PhotoInAlbum { PartitionKey = albumId, RowKey = photoId });
         }
     }
 }

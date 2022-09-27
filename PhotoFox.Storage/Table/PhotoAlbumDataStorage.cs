@@ -18,9 +18,11 @@ namespace PhotoFox.Storage.Table
             this.config = config;
         }
 
-        public Task AddPhotoAlbum(PhotoAlbum album)
+        public async Task AddPhotoAlbum(PhotoAlbum album)
         {
-            throw new System.NotImplementedException();
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            await tableClient.AddEntityAsync(album);
         }
 
         public Task<PhotoAlbum> GetPhotoAlbum(int id)
