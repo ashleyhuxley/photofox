@@ -2,16 +2,14 @@
 using Azure.Data.Tables;
 using System;
 
-namespace PhotoFox.Model
+namespace PhotoFox.Storage.Models
 {
-    public class PhotoAlbum : ITableEntity
+    public class PhotoInAlbum : ITableEntity
     {
-        public string AlbumName { get; set; }
-        public string AlbumDescription { get; set; }
-        public string CoverPhotoId { get; set; }
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public ETag ETag { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
+        public DateTime UtcDate { get; set; }
     }
 }
