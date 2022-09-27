@@ -7,7 +7,6 @@ using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
-using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System.Windows;
 
@@ -37,7 +36,6 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IPhotoAlbumDataStorage>().To<PhotoAlbumDataStorage>();
             this.contianer.Bind<IPhotoFileStorage>().To<PhotoFileStorage>();
             this.contianer.Bind<IStorageConfig>().To<PhotoFoxConfig>();
-            this.contianer.Bind<ISettingsStorage>().To<SettingsStorage>();
             this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
             this.contianer.Bind<IMessenger>().To<WeakReferenceMessenger>().InSingletonScope();
             this.contianer.Bind<IUploadService>().To<UploadService>();

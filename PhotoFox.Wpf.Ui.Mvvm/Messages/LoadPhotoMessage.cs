@@ -1,4 +1,4 @@
-﻿using PhotoFox.Model;
+﻿using PhotoFox.Storage.Models;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.Messages
 {

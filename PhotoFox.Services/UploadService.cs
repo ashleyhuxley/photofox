@@ -8,8 +8,8 @@ using PhotoFox.Core.Exif;
 using PhotoFox.Core.Extensions;
 using PhotoFox.Core.Hashing;
 using PhotoFox.Core.Imaging;
-using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
+using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 
 namespace PhotoFox.Services

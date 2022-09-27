@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using System;
-using PhotoFox.Model;
+using PhotoFox.Storage.Models;
 
 namespace PhotoFox.Services
 {
