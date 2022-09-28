@@ -33,18 +33,24 @@ namespace PhotoFox.Ui.Wpf
 
             this.contianer.Bind<MainWindowViewModel>().ToSelf();
 
-            this.contianer.Bind<IPhotoAlbumDataStorage>().To<PhotoAlbumDataStorage>();
-            this.contianer.Bind<IPhotoFileStorage>().To<PhotoFileStorage>();
             this.contianer.Bind<IStorageConfig>().To<PhotoFoxConfig>();
-            this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
             this.contianer.Bind<IMessenger>().To<WeakReferenceMessenger>().InSingletonScope();
-            this.contianer.Bind<IUploadService>().To<UploadService>();
             this.contianer.Bind<IThumbnailProvider>().To<ThumbnailProvider>();
             this.contianer.Bind<IStreamHash>().To<StreamHashMD5>();
             this.contianer.Bind<IMessageHandler>().To<MessageHandler>();
+
+            // Services
+            this.contianer.Bind<IUploadService>().To<UploadService>();
+            this.contianer.Bind<IPhotoAlbumService>().To<PhotoAlbumService>();
+
+            // Storage
+            this.contianer.Bind<IPhotoAlbumDataStorage>().To<PhotoAlbumDataStorage>();
+            this.contianer.Bind<IPhotoFileStorage>().To<PhotoFileStorage>();
+            this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
             this.contianer.Bind<IPhotoInAlbumStorage>().To<PhotoInAlbumStorage>();
             this.contianer.Bind<IPhotoHashStorage>().To<PhotoHashStorage>();
 
+            // Commands
             this.contianer.Bind<AddPhotosCommand>().ToSelf();
             this.contianer.Bind<OpenGpsLocationCommand>().ToSelf();
             this.contianer.Bind<DeletePhotoCommand>().ToSelf();

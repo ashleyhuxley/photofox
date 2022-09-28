@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
+using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
@@ -30,7 +31,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
-        private readonly IPhotoAlbumDataStorage albumStorage;
+        private readonly IPhotoAlbumService photoAlbumService;
 
         private readonly IPhotoFileStorage photoFileStorage;
 
@@ -51,7 +52,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         private CancellationTokenSource cancellationTokenSource;
 
         public MainWindowViewModel(
-            IPhotoAlbumDataStorage photoStorage,
+            IPhotoAlbumService photoAlbumService,
             IPhotoFileStorage photoFileStorage,
             IPhotoMetadataStorage photoMetadataStorage,
             IPhotoInAlbumStorage photoInAlbumStorage,
@@ -63,7 +64,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             DeleteAlbumCommand deleteAlbumCommand,
             SaveChangesCommand saveChangesCommand)
         {
-            this.albumStorage = photoStorage;
+            this.photoAlbumService = photoAlbumService;
             this.photoFileStorage = photoFileStorage;
             this.photoMetadataStorage = photoMetadataStorage;
             this.photoInAlbumStorage = photoInAlbumStorage;
@@ -249,12 +250,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             this.Albums.Clear();
 
-            await foreach (var album in this.albumStorage.GetPhotoAlbums())
+            await foreach (var album in this.photoAlbumService.GetAllAlbums())
             {
                 var viewModel = new AlbumViewModel
                 {
-                    Title = album.AlbumName,
-                    AlbumId = album.RowKey
+                    Title = album.Title,
+                    AlbumId = album.AlbumId
                 };
 
                 string coverId = album.CoverPhotoId;
