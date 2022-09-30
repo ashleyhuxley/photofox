@@ -1,10 +1,15 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using AutoMapper;
+using CommunityToolkit.Mvvm.Messaging;
 using Ninject;
+using Ninject.Activation;
+using PhotoFox.Core.Extensions;
 using PhotoFox.Core.Hashing;
 using PhotoFox.Core.Imaging;
+using PhotoFox.Model;
 using PhotoFox.Services;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
+using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
@@ -27,9 +32,30 @@ namespace PhotoFox.Ui.Wpf
             Current.MainWindow.Show();
         }
 
+        private IMapper AutoMapper(IContext context)
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<PhotoMetadata, Photo>()
+                    .ForMember(dest => dest.PhotoId, opt => opt.MapFrom(src => src.RowKey))
+                    .ForMember(dest => dest.DateTaken, opt => opt.MapFrom(src => src.UtcDate));
+                cfg.CreateMap<Storage.Models.PhotoAlbum, Model.PhotoAlbum>();
+                cfg.CreateMap<Photo, PhotoMetadata>()
+                    .ForMember(dest => dest.RowKey, opt => opt.MapFrom(src => src.PhotoId))
+                    .ForMember(dest => dest.UtcDate, opt => opt.MapFrom(src => src.DateTaken))
+                    .ForMember(dest => dest.PartitionKey, opt => opt.MapFrom(src => src.DateTaken.ToPartitionKey()));
+            });
+
+            var mapper = new Mapper(config);
+
+            return mapper;
+        }
+
         private void ConfigureContainer()
         {
             this.contianer = new StandardKernel();
+
+            this.contianer.Bind<IMapper>().ToMethod(AutoMapper).InSingletonScope();
 
             this.contianer.Bind<MainWindowViewModel>().ToSelf();
 

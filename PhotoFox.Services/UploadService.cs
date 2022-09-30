@@ -3,11 +3,13 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
+using AutoMapper;
 using NLog;
 using PhotoFox.Core.Exif;
 using PhotoFox.Core.Extensions;
 using PhotoFox.Core.Hashing;
 using PhotoFox.Core.Imaging;
+using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
@@ -28,21 +30,25 @@ namespace PhotoFox.Services
 
         private readonly IPhotoHashStorage photoHashStorage;
 
+        private readonly IMapper mapper;
+
         public UploadService(
             IPhotoMetadataStorage photoMetadataStorage,
             IThumbnailProvider thumbnailProvider,
             IStreamHash streamHash,
             IPhotoFileStorage photoFileStorage,
-            IPhotoHashStorage photoHashStorage)
+            IPhotoHashStorage photoHashStorage,
+            IMapper mapper)
         {
             this.photoMetadataStorage = photoMetadataStorage;
             this.thumbnailProvider = thumbnailProvider;
             this.streamHash = streamHash;
             this.photoFileStorage = photoFileStorage;
             this.photoHashStorage = photoHashStorage;
+            this.mapper = mapper;
         }
 
-        public async Task<PhotoMetadata> UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle)
+        public async Task<Photo> UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle)
         {
             var image = Image.FromStream(stream);
             var binaryData = await BinaryData.FromStreamAsync(stream);
@@ -91,7 +97,7 @@ namespace PhotoFox.Services
             await this.photoMetadataStorage.AddPhotoAsync(metatdata);
             await this.photoHashStorage.AddHashAsync(md5, metatdata.PartitionKey, metatdata.RowKey);
 
-            return metatdata;
+            return mapper.Map<Photo>(metatdata);
         }
     }
 }

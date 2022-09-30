@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using PhotoFox.Services;
 using PhotoFox.Storage.Table;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
@@ -9,15 +10,15 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 {
     public class SaveChangesCommand : ICommand
     {
-        private readonly IPhotoMetadataStorage photoMetadataStorage;
+        private readonly IPhotoService photoService;
 
         private readonly IMessenger messenger;
 
         public SaveChangesCommand(
-            IPhotoMetadataStorage photoMetadataStorage,
+            IPhotoService photoService,
             IMessenger messenger)
         {
-            this.photoMetadataStorage = photoMetadataStorage;
+            this.photoService = photoService;
             this.messenger = messenger;
         }
 
@@ -40,9 +41,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 return;
             }
 
-            await this.photoMetadataStorage.SavePhotoAsync(selectedPhoto.Photo);
+            await this.photoService.SavePhotoAsync(selectedPhoto.Photo);
 
-            var newMetadata = await this.photoMetadataStorage.GetPhotoMetadata(selectedPhoto.Photo.DateTaken, selectedPhoto.Photo.PhotoId);
+            var newMetadata = await this.photoService.GetPhotoAsync(selectedPhoto.Photo.DateTaken, selectedPhoto.Photo.PhotoId);
 
             this.messenger.Send(new UpdateStatusMessage("Image updated."));
             this.messenger.Send(new LoadPhotoMessage(newMetadata));
