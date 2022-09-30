@@ -1,6 +1,8 @@
-﻿using PhotoFox.Model;
+﻿using AutoMapper;
+using PhotoFox.Model;
 using PhotoFox.Storage.Table;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PhotoFox.Services
 {
@@ -12,14 +14,18 @@ namespace PhotoFox.Services
 
         private readonly IPhotoMetadataStorage photoMetadataStorage;
 
+        private readonly IMapper mapper;
+
         public PhotoAlbumService(
             IPhotoAlbumDataStorage photoAlbumDataStorage,
             IPhotoInAlbumStorage photoInAlbumStorage,
-            IPhotoMetadataStorage photoMetadataStorage)
+            IPhotoMetadataStorage photoMetadataStorage,
+            IMapper mapper)
         {
             this.photoAlbumDataStorage = photoAlbumDataStorage;
             this.photoInAlbumStorage = photoInAlbumStorage;
             this.photoMetadataStorage = photoMetadataStorage;
+            this.mapper = mapper;
         }
 
         public async IAsyncEnumerable<PhotoAlbum> GetAllAlbums()
@@ -42,23 +48,18 @@ namespace PhotoFox.Services
             {
                 var photo = await this.photoMetadataStorage.GetPhotoMetadata(photoInAlbum.UtcDate, photoInAlbum.RowKey);
 
-                yield return new Photo
-                {
-                    Aperture = photo.Aperture,
-                    DateTaken = photo.UtcDate,
-                    Description = photo.Description,
-                    Device = photo.Device,
-                    Exposure = photo.Exposure,
-                    FileHash = photo.FileHash,
-                    FocalLength = photo.FocalLength,
-                    GeolocationLattitude = photo.GeolocationLattitude,
-                    GeolocationLongitude = photo.GeolocationLongitude,
-                    Iso = photo.Iso,
-                    Orientation = photo.Orientation,
-                    Title = photo.Title,
-                    PhotoId = photo.RowKey
-                };
+                yield return mapper.Map<Photo>(photo);
             }
+        }
+
+        public async Task AddAlbumAsync(PhotoAlbum album)
+        {
+            await this.photoAlbumDataStorage.AddPhotoAlbum(mapper.Map<Storage.Models.PhotoAlbum>(album));
+        }
+
+        public async Task AddPhotoToAlbumAsync(string albumId, string photoId)
+        {
+            await this.photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, photoId);
         }
     }
 }

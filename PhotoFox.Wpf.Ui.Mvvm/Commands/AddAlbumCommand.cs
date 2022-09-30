@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using PhotoFox.Storage.Models;
-using PhotoFox.Storage.Table;
+using PhotoFox.Services;
+using PhotoFox.Model;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System;
@@ -12,18 +12,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
     {
         private readonly IMessenger messenger;
 
-        private readonly IPhotoAlbumDataStorage photoAlbumDataStorage;
-
-        private readonly IPhotoInAlbumStorage photoInAlbumStorage;
+        private readonly IPhotoAlbumService photoAlbumService;
 
         public AddAlbumCommand(
             IMessenger messenger,
-            IPhotoAlbumDataStorage photoAlbumDataStorage,
-            IPhotoInAlbumStorage photoInAlbumStorage)
+            IPhotoAlbumService photoAlbumService)
         {
             this.messenger = messenger;
-            this.photoAlbumDataStorage = photoAlbumDataStorage;
-            this.photoInAlbumStorage = photoInAlbumStorage;
+            this.photoAlbumService = photoAlbumService;
         }
 
         public event EventHandler? CanExecuteChanged
@@ -50,15 +46,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             {
                 var album = new PhotoAlbum
                 {
-                    PartitionKey = "photoalbum",
-                    RowKey = Guid.NewGuid().ToString(),
-                    AlbumName = message.ViewModel.AlbumName,
+                    AlbumId = Guid.NewGuid().ToString(),
+                    Title = message.ViewModel.AlbumName,
                     CoverPhotoId = selectedPhoto.Photo.PhotoId
                 };
 
-                this.photoAlbumDataStorage.AddPhotoAlbum(album);
+                this.photoAlbumService.AddAlbumAsync(album);
 
-                this.photoInAlbumStorage.AddPhotoInAlbumAsync(album.RowKey, selectedPhoto.Photo.PhotoId);
+                this.photoAlbumService.AddPhotoToAlbumAsync(album.AlbumId, selectedPhoto.Photo.PhotoId);
             }
 
             this.messenger.Send(new RefreshAlbumsMessage());
