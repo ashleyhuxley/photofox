@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using PhotoFox.Core.Extensions;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
@@ -57,10 +58,10 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             }
 
             await Task.WhenAll(
-                this.photoFileStorage.DeleteThumbnailAsync(selectedPhoto.RowKey),
-                this.photoFileStorage.DeletePhotoAsync(selectedPhoto.RowKey),
-                this.photoMetadataStorage.DeletePhotoAsync(selectedPhoto.PartitionKey, selectedPhoto.RowKey),
-                this.photoHashStorage.DeleteHashAsync(selectedPhoto.FileHash));
+                this.photoFileStorage.DeleteThumbnailAsync(selectedPhoto.Photo.PhotoId),
+                this.photoFileStorage.DeletePhotoAsync(selectedPhoto.Photo.PhotoId),
+                this.photoMetadataStorage.DeletePhotoAsync(selectedPhoto.Photo.DateTaken.ToPartitionKey(), selectedPhoto.Photo.PhotoId),
+                this.photoHashStorage.DeleteHashAsync(selectedPhoto.Photo.FileHash));
 
             this.messenger.Send(new UnloadPhotoMessage(selectedPhoto));
         }

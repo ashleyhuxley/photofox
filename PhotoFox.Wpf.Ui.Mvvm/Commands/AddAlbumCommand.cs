@@ -53,12 +53,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                     PartitionKey = "photoalbum",
                     RowKey = Guid.NewGuid().ToString(),
                     AlbumName = message.ViewModel.AlbumName,
-                    CoverPhotoId = selectedPhoto.Metadata.RowKey
+                    CoverPhotoId = selectedPhoto.Photo.PhotoId
                 };
 
                 this.photoAlbumDataStorage.AddPhotoAlbum(album);
 
-                this.photoInAlbumStorage.AddPhotoInAlbumAsync(album.RowKey, selectedPhoto.Metadata.RowKey);
+                this.photoInAlbumStorage.AddPhotoInAlbumAsync(album.RowKey, selectedPhoto.Photo.PhotoId);
             }
 
             this.messenger.Send(new RefreshAlbumsMessage());

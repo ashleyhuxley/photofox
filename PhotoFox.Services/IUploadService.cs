@@ -1,12 +1,12 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using System;
-using PhotoFox.Storage.Models;
+using PhotoFox.Model;
 
 namespace PhotoFox.Services
 {
     public interface IUploadService
     {
-        Task<PhotoMetadata> UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle);
+        Task<Photo> UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle);
     }
 }
