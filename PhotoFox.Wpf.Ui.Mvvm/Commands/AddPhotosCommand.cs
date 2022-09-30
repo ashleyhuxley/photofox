@@ -15,6 +15,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
         private readonly IMessenger messenger;
+
         private readonly IUploadService uploadService;
 
         public AddPhotosCommand(

@@ -13,5 +13,7 @@ namespace PhotoFox.Services
         Task AddAlbumAsync(PhotoAlbum album);
 
         Task AddPhotoToAlbumAsync(string albumId, string photoId);
+
+        Task DeleteAlbumAsync(string albumId);
     }
 }

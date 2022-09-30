@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using PhotoFox.Services;
 using PhotoFox.Storage.Table;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
@@ -9,15 +10,15 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 {
     public class DeleteAlbumCommand : ICommand
     {
-        private readonly IPhotoAlbumDataStorage photoAlbumDataStorage;
-
         private readonly IMessenger messenger;
 
+        private readonly IPhotoAlbumService IPhotoAlbumService;
+
         public DeleteAlbumCommand(
-            IPhotoAlbumDataStorage photoAlbumDataStorage,
+            IPhotoAlbumService IPhotoAlbumService,
             IMessenger messenger)
         {
-            this.photoAlbumDataStorage = photoAlbumDataStorage;
+            this.IPhotoAlbumService = IPhotoAlbumService;
             this.messenger = messenger;
         }
 
@@ -41,7 +42,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 return;
             }
 
-            this.photoAlbumDataStorage.DeleteAlbumAsync(viewModel.AlbumId);
+            this.IPhotoAlbumService.DeleteAlbumAsync(viewModel.AlbumId);
             this.messenger.Send(new RefreshAlbumsMessage());
         }
     }
