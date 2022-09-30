@@ -6,5 +6,7 @@ namespace PhotoFox.Services
     public interface IPhotoAlbumService
     {
         IAsyncEnumerable<PhotoAlbum> GetAllAlbums();
+
+        IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId);
     }
 }

@@ -1,4 +1,4 @@
-﻿using PhotoFox.Storage.Models;
+﻿using PhotoFox.Model;
 using System;
 using System.Windows.Media.Imaging;
 
@@ -6,53 +6,29 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
     public class PhotoViewModel
     {
-        public PhotoMetadata Metadata { get; private set; }
+        public Photo Photo { get; private set; }
 
-        public PhotoViewModel(BitmapImage image, PhotoMetadata metadata)
+        public PhotoViewModel(BitmapImage image, Photo photo)
         {
             Image = image;
-            Metadata = metadata;
+            Photo = photo;
         }
 
         public BitmapImage Image { get; }
-        public string GroupName => this.DateTaken.ToLongDateString();
 
-        public string Title
-        {
-            get => this.Metadata.Title;
-            set => this.Metadata.Title = value;
-        }
-
-        public DateTime DateTaken => this.Metadata.UtcDate;
-        public string Description
-        {
-            get => this.Metadata.Description;
-            set => this.Metadata.Description = value;
-        }
-
-        public string Exposure => this.Metadata.Exposure;
-        public string Apeture => this.Metadata.Aperture;
-        public string Device => this.Metadata.Device;
-
-        public double Latitude => this.Metadata.GeolocationLattitude.Value;
-        public double Longitude => this.Metadata.GeolocationLongitude.Value;
+        public string GroupName => this.Photo.DateTaken.ToLongDateString();
 
         public string GpsCoords
         {
             get
             {
-                if (Metadata.GeolocationLongitude.HasValue && Metadata.GeolocationLattitude.HasValue)
+                if (Photo.GeolocationLongitude.HasValue && Photo.GeolocationLattitude.HasValue)
                 {
-                    return $"{this.Metadata.GeolocationLattitude:0.#####}, {this.Metadata.GeolocationLongitude:0.#####}";
+                    return $"{this.Photo.GeolocationLattitude:0.#####}, {this.Photo.GeolocationLongitude:0.#####}";
                 }
 
                 return string.Empty;
             }
         }
-
-        public string PartitionKey => this.Metadata.PartitionKey;
-        public string RowKey => this.Metadata.RowKey;
-
-        public string FileHash => this.Metadata.FileHash;
     }
 }

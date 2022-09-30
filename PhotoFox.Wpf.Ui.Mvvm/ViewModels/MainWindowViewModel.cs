@@ -2,10 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
+using PhotoFox.Model;
 using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
-using PhotoFox.Storage.Models;
-using PhotoFox.Storage.Table;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
@@ -31,19 +30,17 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
+        private readonly IPhotoService photoService;
+
         private readonly IPhotoAlbumService photoAlbumService;
 
         private readonly IPhotoFileStorage photoFileStorage;
-
-        private readonly IPhotoMetadataStorage photoMetadataStorage;
-
-        private readonly IPhotoInAlbumStorage photoInAlbumStorage;
 
         private DateTime batchId = DateTime.MinValue;
 
         private bool isLoading = false;
 
-        private string loadingStatusText;
+        private string loadingStatusText = string.Empty;
 
         private PhotoViewModel? selectedPhoto;
 
@@ -52,10 +49,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         private CancellationTokenSource cancellationTokenSource;
 
         public MainWindowViewModel(
+            IPhotoService photoService,
             IPhotoAlbumService photoAlbumService,
             IPhotoFileStorage photoFileStorage,
-            IPhotoMetadataStorage photoMetadataStorage,
-            IPhotoInAlbumStorage photoInAlbumStorage,
             IMessenger messenger,
             AddPhotosCommand addPhotosCommand,
             OpenGpsLocationCommand openGpsLocationCommand,
@@ -64,10 +60,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             DeleteAlbumCommand deleteAlbumCommand,
             SaveChangesCommand saveChangesCommand)
         {
+            this.photoService = photoService;
             this.photoAlbumService = photoAlbumService;
             this.photoFileStorage = photoFileStorage;
-            this.photoMetadataStorage = photoMetadataStorage;
-            this.photoInAlbumStorage = photoInAlbumStorage;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
@@ -159,24 +154,24 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             );
         }
 
-        private async Task LoadPhoto(PhotoMetadata photo)
+        private async Task LoadPhoto(Photo photo)
         {
-            if (this.Photos.Any(p => p.RowKey == photo.RowKey))
+            if (this.Photos.Any(p => p.Photo.PhotoId == photo.PhotoId))
             {
-                this.Photos.Remove(this.Photos.First(p => p.RowKey == photo.RowKey));
+                this.Photos.Remove(this.Photos.First(p => p.Photo.PhotoId == photo.PhotoId));
             }
 
-            var blob = await this.photoFileStorage.GetThumbnailAsync(photo.RowKey);
+            var blob = await this.photoFileStorage.GetThumbnailAsync(photo.PhotoId);
             if (blob == null)
             {
-                throw new InvalidOperationException($"Unable to find {photo.RowKey} in thumbnail storage");
+                throw new InvalidOperationException($"Unable to find {photo.PhotoId} in thumbnail storage");
             }
 
             var thumbnail = GetImageFromBytes(blob.ToArray());
 
             var viewModel = new PhotoViewModel(thumbnail, photo);
 
-            Log.Trace($"Adding {photo.RowKey}");
+            Log.Trace($"Adding {photo.PhotoId}");
 
             this.Photos.Add(viewModel);
         }
@@ -191,10 +186,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.Photos.Clear();
 
             isLoading = true;
-            await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbum(this.SelectedAlbum.AlbumId))
+            await foreach (var photo in this.photoAlbumService.GetPhotosInAlbum(this.SelectedAlbum.AlbumId))
             {
-                var photo = await this.photoMetadataStorage.GetPhotoMetadata(photoInAlbum.UtcDate, photoInAlbum.RowKey);
-
                 await LoadPhoto(photo);
             }
         }
@@ -222,7 +215,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 string strDate = batchId.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
                 this.LoadingStatusText = $"Loading photos from {strDate}...";
 
-                await foreach (var photo in this.photoMetadataStorage.GetPhotosByDate(this.batchId))
+                await foreach (var photo in this.photoService.GetPhotosByDateTaken(this.batchId))
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -316,7 +309,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public async void Receive(LoadPhotoMessage message)
         {
-            await LoadPhoto(message.PhotoMetadata);
+            await LoadPhoto(message.Photo);
         }
 
         public void Receive(UnloadPhotoMessage message)

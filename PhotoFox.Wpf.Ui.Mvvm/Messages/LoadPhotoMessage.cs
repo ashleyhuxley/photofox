@@ -1,14 +1,14 @@
-﻿using PhotoFox.Storage.Models;
+﻿using PhotoFox.Model;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.Messages
 {
     public class LoadPhotoMessage
     {
-        public LoadPhotoMessage(PhotoMetadata photoMetadata)
+        public LoadPhotoMessage(Photo photo)
         {
-            this.PhotoMetadata = photoMetadata;
+            this.Photo = photo;
         }
 
-        public PhotoMetadata PhotoMetadata { get; }
+        public Photo Photo { get; }
     }
 }
