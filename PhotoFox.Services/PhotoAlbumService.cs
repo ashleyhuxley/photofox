@@ -61,5 +61,10 @@ namespace PhotoFox.Services
         {
             await this.photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, photoId);
         }
+
+        public async Task DeleteAlbumAsync(string albumId)
+        {
+            await this.photoAlbumDataStorage.DeleteAlbumAsync(albumId);
+        }
     }
 }
