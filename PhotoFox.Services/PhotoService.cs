@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
+using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using System;
@@ -12,13 +14,21 @@ namespace PhotoFox.Services
     {
         private readonly IPhotoMetadataStorage photoMetadataStorage;
 
+        private readonly IPhotoFileStorage photoFileStorage;
+
+        private readonly IPhotoHashStorage photoHashStorage;
+
         private readonly IMapper mapper;
 
         public PhotoService(
             IPhotoMetadataStorage photoMetadataStorage,
+            IPhotoFileStorage photoFileStorage,
+            IPhotoHashStorage photoHashStorage,
             IMapper mapper)
         {
             this.photoMetadataStorage = photoMetadataStorage;
+            this.photoFileStorage = photoFileStorage;
+            this.photoHashStorage = photoHashStorage;
             this.mapper = mapper;
         }
 
@@ -39,6 +49,15 @@ namespace PhotoFox.Services
         public async Task SavePhotoAsync(Photo photo)
         {
             await this.photoMetadataStorage.SavePhotoAsync(mapper.Map<PhotoMetadata>(photo));
+        }
+
+        public async Task DeletePhotoAsync(Photo photo)
+        {
+            await Task.WhenAll(
+                this.photoFileStorage.DeleteThumbnailAsync(photo.PhotoId),
+                this.photoFileStorage.DeletePhotoAsync(photo.PhotoId),
+                this.photoMetadataStorage.DeletePhotoAsync(photo.DateTaken.ToPartitionKey(), photo.PhotoId),
+                this.photoHashStorage.DeleteHashAsync(photo.FileHash));
         }
     }
 }
