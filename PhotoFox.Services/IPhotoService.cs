@@ -12,5 +12,7 @@ namespace PhotoFox.Services
         Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId);
 
         Task SavePhotoAsync(Photo photo);
+
+        Task DeletePhotoAsync(Photo photo);
     }
 }

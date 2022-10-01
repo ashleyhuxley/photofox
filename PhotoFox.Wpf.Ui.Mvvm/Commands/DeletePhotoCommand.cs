@@ -1,34 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using PhotoFox.Core.Extensions;
-using PhotoFox.Storage.Blob;
-using PhotoFox.Storage.Table;
+using PhotoFox.Services;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 {
     public class DeletePhotoCommand : ICommand
     {
-        private readonly IPhotoFileStorage photoFileStorage;
-
-        private readonly IPhotoMetadataStorage photoMetadataStorage;
-
-        private readonly IPhotoHashStorage photoHashStorage;
+        private readonly IPhotoService photoService;
 
         private readonly IMessenger messenger;
 
         public DeletePhotoCommand(
-            IPhotoFileStorage photoFileStorage, 
-            IPhotoMetadataStorage photoMetadataStorage,
-            IPhotoHashStorage photoHashStorage,
+            IPhotoService photoService,
             IMessenger messenger)
         {
-            this.photoFileStorage = photoFileStorage;
-            this.photoMetadataStorage = photoMetadataStorage;
-            this.photoHashStorage = photoHashStorage;
+            this.photoService = photoService;
             this.messenger = messenger;
         }
 
@@ -57,11 +46,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 return;
             }
 
-            await Task.WhenAll(
-                this.photoFileStorage.DeleteThumbnailAsync(selectedPhoto.Photo.PhotoId),
-                this.photoFileStorage.DeletePhotoAsync(selectedPhoto.Photo.PhotoId),
-                this.photoMetadataStorage.DeletePhotoAsync(selectedPhoto.Photo.DateTaken.ToPartitionKey(), selectedPhoto.Photo.PhotoId),
-                this.photoHashStorage.DeleteHashAsync(selectedPhoto.Photo.FileHash));
+            await this.photoService.DeletePhotoAsync(selectedPhoto.Photo);
 
             this.messenger.Send(new UnloadPhotoMessage(selectedPhoto));
         }
