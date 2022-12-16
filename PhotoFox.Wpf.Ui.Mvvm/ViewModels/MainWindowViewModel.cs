@@ -36,6 +36,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly IPhotoFileStorage photoFileStorage;
 
+        private readonly IMessenger messenger;
+
         private DateTime batchId = DateTime.MinValue;
 
         private bool isLoading = false;
@@ -63,6 +65,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.photoService = photoService;
             this.photoAlbumService = photoAlbumService;
             this.photoFileStorage = photoFileStorage;
+            this.messenger = messenger;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
@@ -228,10 +231,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 }
 
                 batchId = batchId.AddDays(-1);
-                if (batchId < DateTime.UtcNow.AddMonths(-12))
-                {
-                    break;
-                }
             }
 
             isLoading = false;
@@ -254,7 +253,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 string coverId = album.CoverPhotoId;
 
                 var blob = await this.photoFileStorage.GetThumbnailAsync(coverId);
-                viewModel.Image = GetImageFromBytes(blob.ToArray());
+                if (blob != null)
+                {
+                    viewModel.Image = GetImageFromBytes(blob.ToArray());
+                }
+                else
+                {
+                    // TODO: Default Cover Image
+                }
 
                 this.Albums.Add(viewModel);
             }
@@ -320,6 +326,17 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public void Receive(UpdateStatusMessage message)
         {
             this.LoadingStatusText = message.Message;
+        }
+
+        public void OpenSelectedImage()
+        {
+            var selectedPhoto = this.Photos.SingleOrDefault(p => p.IsSelected);
+            if (selectedPhoto is null)
+            {
+                return;
+            }
+
+            this.messenger.Send(new OpenPhotoMessage(selectedPhoto.Photo.PhotoId));
         }
     }
 }
