@@ -91,6 +91,8 @@
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                        <EventSetter Event="MouseDoubleClick" Handler="ItemDoubleClicked" />
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ItemsControl.ItemsPanel>

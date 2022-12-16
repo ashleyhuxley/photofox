@@ -1,11 +1,14 @@
-﻿using PhotoFox.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using PhotoFox.Model;
 using System;
 using System.Windows.Media.Imaging;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
-    public class PhotoViewModel
+    public class PhotoViewModel : ObservableObject
     {
+        private bool isSelected;
+
         public Photo Photo { get; private set; }
 
         public PhotoViewModel(BitmapImage image, Photo photo)
@@ -18,6 +21,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public string GroupName => this.Photo.DateTaken.ToLongDateString();
 
+        public string GroupSort => this.Photo.DateTaken.ToString("yyyy-MM-dd");
+
         public string GpsCoords
         {
             get
@@ -28,6 +33,16 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 }
 
                 return string.Empty;
+            }
+        }
+
+        public bool IsSelected
+        {
+            get => this.isSelected;
+            set
+            {
+                this.isSelected = value;
+                this.OnPropertyChanged(nameof(IsSelected));
             }
         }
     }

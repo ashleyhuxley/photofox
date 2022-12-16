@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace PhotoFox.Ui.Wpf
@@ -40,7 +41,7 @@ namespace PhotoFox.Ui.Wpf
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("GroupName");
             view.GroupDescriptions.Add(groupDescription);
 
-            view.SortDescriptions.Add(new SortDescription("GroupName", ListSortDirection.Descending));
+            view.SortDescriptions.Add(new SortDescription("GroupSort", ListSortDirection.Descending));
             view.SortDescriptions.Add(new SortDescription("UtcDate", ListSortDirection.Descending));
 
             await this.viewModel.Load();
@@ -99,6 +100,11 @@ namespace PhotoFox.Ui.Wpf
             }
 
             return null;
+        }
+
+        private void ItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        {
+            viewModel.OpenSelectedImage();
         }
     }
 }

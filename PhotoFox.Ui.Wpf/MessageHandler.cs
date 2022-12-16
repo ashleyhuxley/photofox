@@ -1,9 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Win32;
+using PhotoFox.Storage.Blob;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.IO;
 
 namespace PhotoFox.Ui.Wpf
 {
@@ -12,15 +15,21 @@ namespace PhotoFox.Ui.Wpf
         IRecipient<AddPhotosMessage>,
         IRecipient<OpenLinkMessage>,
         IRecipient<AddAlbumMessage>,
-        IRecipient<UserConfirmMessage>
+        IRecipient<UserConfirmMessage>,
+        IRecipient<OpenPhotoMessage>
     {
         private readonly IMessenger messenger;
 
-        private Window ownerWindow;
+        private readonly IPhotoFileStorage photoStorage;
 
-        public MessageHandler(IMessenger messenger)
+        private Window? ownerWindow;
+
+        public MessageHandler(
+            IMessenger messenger,
+            IPhotoFileStorage photoStorage)
         {
             this.messenger = messenger;
+            this.photoStorage = photoStorage;
         }
 
         public void Register(Window ownerWindow)
@@ -30,6 +39,7 @@ namespace PhotoFox.Ui.Wpf
             messenger.Register<OpenLinkMessage>(this);
             messenger.Register<AddAlbumMessage>(this);
             messenger.Register<UserConfirmMessage>(this);
+            messenger.Register<OpenPhotoMessage>(this);
         }
 
         public void Receive(AddPhotosMessage message)
@@ -84,9 +94,14 @@ namespace PhotoFox.Ui.Wpf
 
         public void Receive(AddAlbumMessage message)
         {
-            var window = new AddAlbumWindow();
-            window.Owner = this.ownerWindow;
-            window.DataContext = message.ViewModel;
+            EnsureOwnerWindowIsSet();
+
+            var window = new AddAlbumWindow
+            {
+                Owner = this.ownerWindow,
+                DataContext = message.ViewModel
+            };
+
             var result = window.ShowDialog();
 
             message.DialogResult = result;
@@ -96,6 +111,27 @@ namespace PhotoFox.Ui.Wpf
         {
             var result = MessageBox.Show(message.MessageText, message.Caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
             message.IsConfirmed = result == MessageBoxResult.Yes;
+        }
+
+        public async void Receive(OpenPhotoMessage message)
+        {
+            var photo = await this.photoStorage.GetPhotoAsync(message.PhotoId);
+            var path = Path.GetTempFileName() + ".jpg";
+
+            File.WriteAllBytes(path, photo.ToArray());
+
+            var proc = new Process();
+            proc.StartInfo.FileName = "C:\\Program Files\\IrfanView\\i_view64.exe";
+            proc.StartInfo.Arguments = path;
+            proc.Start();
+        }
+
+        private void EnsureOwnerWindowIsSet()
+        {
+            if (this.ownerWindow is null)
+            {
+                throw new InvalidOperationException("Cannot handle window related messages without owner window being set. Please call Register first.");
+            }
         }
     }
 }
