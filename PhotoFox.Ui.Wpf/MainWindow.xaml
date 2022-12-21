@@ -93,7 +93,8 @@
                         <MenuItem Header="Open Image" Command="{Binding OpenPhotoCommand}" />
                         <Separator />
                         <MenuItem Header="Add image to album..." Command="{Binding AddToAlbumCommand}" />
-                        <MenuItem Header="Delete image" Command="{Binding DeletePhotoCommand}" />
+                        <MenuItem Header="Delete image" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhotos}" />
+                        <MenuItem Header="Set as album cover" Command="{Binding SetAlbumCoverCommand}" />
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemContainerStyle>

@@ -68,5 +68,12 @@ namespace PhotoFox.Services
         {
             await this.photoAlbumDataStorage.DeleteAlbumAsync(albumId);
         }
+
+        public async Task SetCoverImage(string albumId, string photoId)
+        {
+            var album = await this.photoAlbumDataStorage.GetPhotoAlbum(albumId);
+            album.CoverPhotoId = photoId;
+            await this.photoAlbumDataStorage.ModifyAlbumAsync(album);
+        }
     }
 }
