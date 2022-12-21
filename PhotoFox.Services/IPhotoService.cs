@@ -9,10 +9,14 @@ namespace PhotoFox.Services
     {
         IAsyncEnumerable<Photo> GetPhotosByDateTaken(DateTime dateTaken);
 
+        IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbum(DateTime dateTaken);
+
         Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId);
 
         Task SavePhotoAsync(Photo photo);
 
         Task DeletePhotoAsync(Photo photo);
+
+        IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId);
     }
 }

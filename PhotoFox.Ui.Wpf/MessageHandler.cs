@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.IO;
+using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
+using Ninject;
 
 namespace PhotoFox.Ui.Wpf
 {
@@ -16,20 +18,25 @@ namespace PhotoFox.Ui.Wpf
         IRecipient<OpenLinkMessage>,
         IRecipient<AddAlbumMessage>,
         IRecipient<UserConfirmMessage>,
-        IRecipient<OpenPhotoMessage>
+        IRecipient<OpenPhotoMessage>,
+        IRecipient<SelectAlbumMessage>
     {
         private readonly IMessenger messenger;
 
         private readonly IPhotoFileStorage photoStorage;
 
+        private readonly IKernel kernel;
+
         private Window? ownerWindow;
 
         public MessageHandler(
             IMessenger messenger,
-            IPhotoFileStorage photoStorage)
+            IPhotoFileStorage photoStorage,
+            IKernel kernel)
         {
             this.messenger = messenger;
             this.photoStorage = photoStorage;
+            this.kernel = kernel;
         }
 
         public void Register(Window ownerWindow)
@@ -40,6 +47,7 @@ namespace PhotoFox.Ui.Wpf
             messenger.Register<AddAlbumMessage>(this);
             messenger.Register<UserConfirmMessage>(this);
             messenger.Register<OpenPhotoMessage>(this);
+            messenger.Register<SelectAlbumMessage>(this);
         }
 
         public void Receive(AddPhotosMessage message)
@@ -132,6 +140,28 @@ namespace PhotoFox.Ui.Wpf
             {
                 throw new InvalidOperationException("Cannot handle window related messages without owner window being set. Please call Register first.");
             }
+        }
+
+        public void Receive(SelectAlbumMessage message)
+        {
+            var viewModel = this.kernel.Get<SelectAlbumViewModel>();
+
+            viewModel.Load();
+
+            var window = new SelectAlbumWindow
+            {
+                Owner = this.ownerWindow,
+                DataContext = viewModel
+            };
+
+            var result = window.ShowDialog();
+
+            message.Reply(new SelectAlbumMessageResponse
+            {
+                SelectedAlbumId = viewModel.SelectedAlbum.AlbumId,
+                Result = result.HasValue && result.Value,
+                NewAlbumName = viewModel.NewAlbumName
+            });
         }
     }
 }

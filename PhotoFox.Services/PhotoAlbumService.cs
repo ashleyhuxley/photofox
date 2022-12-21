@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PhotoFox.Model;
 using PhotoFox.Storage.Table;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -34,7 +35,7 @@ namespace PhotoFox.Services
             {
                 yield return new PhotoAlbum
                 {
-                    AlbumId = album.RowKey,
+                    AlbumId = album.PartitionKey,
                     CoverPhotoId = album.CoverPhotoId,
                     Description = album.AlbumDescription,
                     Title = album.AlbumName
@@ -54,12 +55,13 @@ namespace PhotoFox.Services
 
         public async Task AddAlbumAsync(PhotoAlbum album)
         {
-            await this.photoAlbumDataStorage.AddPhotoAlbum(mapper.Map<Storage.Models.PhotoAlbum>(album));
+            var storageAlbum = mapper.Map<Storage.Models.PhotoAlbum>(album);
+            await this.photoAlbumDataStorage.AddPhotoAlbum(storageAlbum);
         }
 
-        public async Task AddPhotoToAlbumAsync(string albumId, string photoId)
+        public async Task AddPhotoToAlbumAsync(string albumId, string photoId, DateTime utcDate)
         {
-            await this.photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, photoId);
+            await this.photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, photoId, utcDate);
         }
 
         public async Task DeleteAlbumAsync(string albumId)

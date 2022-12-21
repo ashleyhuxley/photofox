@@ -53,7 +53,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
                 this.photoAlbumService.AddAlbumAsync(album);
 
-                this.photoAlbumService.AddPhotoToAlbumAsync(album.AlbumId, selectedPhoto.Photo.PhotoId);
+                this.photoAlbumService.AddPhotoToAlbumAsync(album.AlbumId, selectedPhoto.Photo.PhotoId, selectedPhoto.Photo.DateTaken);
             }
 
             this.messenger.Send(new RefreshAlbumsMessage());

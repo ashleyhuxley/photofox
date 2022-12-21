@@ -6,37 +6,38 @@ using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table
 {
-    public class PhotoHashStorage : IPhotoHashStorage
+    public class PhotoDupeKeyStorage : IPhotoDupeKeyStorage
     {
-        private const string TableName = "PhotoHashes";
+        private const string TableName = "PhotoDupeKeys";
 
         private readonly IStorageConfig config;
 
-        public PhotoHashStorage(IStorageConfig storageConfig)
+        public PhotoDupeKeyStorage(IStorageConfig storageConfig)
         {
             config = storageConfig;
         }
 
-        public async Task AddHashAsync(string hash, string partitionKey, string rowKey)
+        public async Task AddKeyAsync(DateTime utcDate, long fileSize, string partitionKey, string rowKey)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.AddEntityAsync(new PhotoHash {
-                PartitionKey = hash,
-                RowKey = string.Empty,
+            await tableClient.AddEntityAsync(new PhotoHash
+            {
+                PartitionKey = utcDate.ToDupeKeyPartitionKey(),
+                RowKey = fileSize.ToString(),
                 PhotoPartitionKey = partitionKey,
                 PhotoRowKey = rowKey
             });
         }
 
-        public async Task<Tuple<string, string>?> HashExistsAsync(string hash)
+        public async Task<Tuple<string, string>?> KeyExistsAsync(DateTime utcDate, long fileSize, string partitionKey)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
 
-            if (await tableClient.EntityExistsAsync<PhotoHash>(hash, string.Empty))
+            if (await tableClient.EntityExistsAsync<PhotoHash>(utcDate.ToDupeKeyPartitionKey(), fileSize.ToString()))
             {
-                var hashResult = await tableClient.GetEntityAsync<PhotoHash>(hash, string.Empty);
+                var hashResult = await tableClient.GetEntityAsync<PhotoHash>(utcDate.ToDupeKeyPartitionKey(), fileSize.ToString());
                 return Tuple.Create(hashResult.Value.PhotoPartitionKey, hashResult.Value.PhotoRowKey);
             }
             else
@@ -45,11 +46,11 @@ namespace PhotoFox.Storage.Table
             }
         }
 
-        public async Task DeleteHashAsync(string hash)
+        public async Task DeleteKeyAsync(DateTime utcDate, long fileSize)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.DeleteEntityAsync(hash, string.Empty);
+            await tableClient.DeleteEntityAsync(utcDate.ToDupeKeyPartitionKey(), fileSize.ToString());
         }
     }
 }

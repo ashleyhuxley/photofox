@@ -1,0 +1,42 @@
+﻿<Window x:Class="PhotoFox.Ui.Wpf.SelectAlbumWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:SelectAlbumViewModel}"
+        SizeToContent="WidthAndHeight"
+        Title="Select Album" Height="168" Width="450" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" ResizeMode="NoResize">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Label>Album:</Label>
+        <Label Grid.Row="1">New Album Name:</Label>
+
+        <ComboBox Grid.Column="1" Height="23" ItemsSource="{Binding AlbumList}" DisplayMemberPath="Title" SelectedItem="{Binding SelectedAlbum}" />
+        <TextBox Grid.Column="1" Grid.Row="1" Height="23" IsEnabled="{Binding NewAlbumTextIsEnabled}" Text="{Binding NewAlbumName}" />
+
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+            <Button Height="30" Width="100" Margin="0,0,20,0" Click="Button_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Margin="0,0,20,0" Source="Images/yes.png"></Image>
+                    <TextBlock>OK</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Height="30" Width="100" Click="Button_Click_1">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Margin="0,0,20,0" Source="Images/no.png"></Image>
+                    <TextBlock>Cancel</TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

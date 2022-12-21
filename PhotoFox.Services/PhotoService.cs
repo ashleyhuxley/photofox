@@ -18,17 +18,21 @@ namespace PhotoFox.Services
 
         private readonly IPhotoHashStorage photoHashStorage;
 
+        private readonly IPhotoInAlbumStorage photoInAlbumStorage;
+
         private readonly IMapper mapper;
 
         public PhotoService(
             IPhotoMetadataStorage photoMetadataStorage,
             IPhotoFileStorage photoFileStorage,
             IPhotoHashStorage photoHashStorage,
+            IPhotoInAlbumStorage photoInAlbumStorage,
             IMapper mapper)
         {
             this.photoMetadataStorage = photoMetadataStorage;
             this.photoFileStorage = photoFileStorage;
             this.photoHashStorage = photoHashStorage;
+            this.photoInAlbumStorage = photoInAlbumStorage;
             this.mapper = mapper;
         }
 
@@ -57,7 +61,28 @@ namespace PhotoFox.Services
                 this.photoFileStorage.DeleteThumbnailAsync(photo.PhotoId),
                 this.photoFileStorage.DeletePhotoAsync(photo.PhotoId),
                 this.photoMetadataStorage.DeletePhotoAsync(photo.DateTaken.ToPartitionKey(), photo.PhotoId),
-                this.photoHashStorage.DeleteHashAsync(photo.FileHash));
+                this.photoHashStorage.DeleteHashAsync(photo.FileHash),
+                this.photoInAlbumStorage.RemoveFromAllAlbums(photo.PhotoId));
+        }
+
+        public async IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbum(DateTime dateTaken)
+        {
+            await foreach (var photo in this.photoMetadataStorage.GetPhotosByDate(dateTaken))
+            {
+                if (! await this.photoInAlbumStorage.IsPhotoInAnAlbumAsync(photo.RowKey))
+                {
+                    yield return mapper.Map<Photo>(photo);
+                }
+            }
+        }
+
+        public async IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId)
+        {
+            await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbum(albumId))
+            {
+                var photo = await this.photoMetadataStorage.GetPhotoMetadata(photoInAlbum.UtcDate, photoInAlbum.RowKey);
+                yield return mapper.Map<Photo>(photo);
+            }
         }
     }
 }

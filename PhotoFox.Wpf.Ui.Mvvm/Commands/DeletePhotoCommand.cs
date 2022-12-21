@@ -3,6 +3,7 @@ using PhotoFox.Services;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.Commands
@@ -29,26 +30,36 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
         public bool CanExecute(object? parameter)
         {
-            return parameter != null && parameter is PhotoViewModel;
+            return parameter != null && parameter is IEnumerable<PhotoViewModel>;
         }
 
         public async void Execute(object? parameter)
         {
-            var selectedPhoto = parameter as PhotoViewModel;
-            if (selectedPhoto == null)
+            var selectedPhotos = parameter as IEnumerable<PhotoViewModel>;
+            if (selectedPhotos == null)
             {
                 return;
             }
 
-            var msg = this.messenger.Send(new UserConfirmMessage("Are you sure you want to delete the selected photo?", "Warning"));
+            var msg = this.messenger.Send(new UserConfirmMessage("Are you sure you want to delete the selected photos?", "Warning"));
             if (!msg.IsConfirmed)
             {
                 return;
             }
 
-            await this.photoService.DeletePhotoAsync(selectedPhoto.Photo);
+            var photosToRemove = new List<PhotoViewModel>();
 
-            this.messenger.Send(new UnloadPhotoMessage(selectedPhoto));
+            foreach (var selectedPhoto in selectedPhotos)
+            {
+                await this.photoService.DeletePhotoAsync(selectedPhoto.Photo);
+
+                photosToRemove.Add(selectedPhoto);
+            }
+
+            foreach (var selectedPhoto in photosToRemove)
+            {
+                this.messenger.Send(new UnloadPhotoMessage(selectedPhoto));
+            }
         }
     }
 }

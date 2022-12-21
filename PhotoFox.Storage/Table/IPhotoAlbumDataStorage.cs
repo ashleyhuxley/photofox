@@ -8,8 +8,6 @@ namespace PhotoFox.Storage.Table
     {
         AsyncPageable<PhotoAlbum> GetPhotoAlbums();
 
-        Task<PhotoAlbum> GetPhotoAlbum(int id);
-
         Task AddPhotoAlbum(PhotoAlbum album);
 
         Task DeleteAlbumAsync(string albumId);

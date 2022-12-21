@@ -14,7 +14,7 @@
             <RibbonTab Header="Photos">
                 <RibbonGroup Header="Photos">
                     <RibbonButton Label="Add Photos" LargeImageSource="/Images/add_photo.png" Command="{Binding AddPhotosCommand}" />
-                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/delete.png" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhoto}" />
+                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/delete.png" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhotos}" />
                 </RibbonGroup>
                 <RibbonGroup Header="Albums">
                     <RibbonButton Label="Add Album" LargeImageSource="/Images/add_album.png" Command="{Binding AddAlbumCommand}" CommandParameter="{Binding SelectedPhoto}" />
@@ -56,20 +56,20 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ListView x:Name="AlbumList" HorizontalAlignment="Stretch" VerticalAlignment="Top" ItemsSource="{Binding Albums}" SelectedItem="{Binding SelectedAlbum}">
+            <ListView 
+                x:Name="AlbumList" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Top" 
+                ItemsSource="{Binding Albums}" 
+                SelectedItem="{Binding SelectedAlbum}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                     </Style>
                 </ListView.ItemContainerStyle>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="1" HorizontalAlignment="Stretch" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,0,0,20">
                             <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="150" />
                             <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                         </StackPanel>
@@ -88,11 +88,20 @@
                         ScrollViewer.ScrollChanged="PhotoList_ScrollChanged" 
                         ItemsSource="{Binding Photos}"
                         SelectedItem="{Binding SelectedPhoto}">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open Image" Command="{Binding OpenPhotoCommand}" />
+                        <Separator />
+                        <MenuItem Header="Add image to album..." Command="{Binding AddToAlbumCommand}" />
+                        <MenuItem Header="Delete image" Command="{Binding DeletePhotoCommand}" />
+                    </ContextMenu>
+                </ListView.ContextMenu>
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                         <EventSetter Event="MouseDoubleClick" Handler="ItemDoubleClicked" />
+                        <!--Setter Property="ContextMenu" Value="{StaticResource ItemMenu}" /-->
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ItemsControl.ItemsPanel>
@@ -124,19 +133,43 @@
             <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" />
 
             <StackPanel Orientation="Vertical" Grid.Column="4">
-                <Label FontWeight="Bold">Title</Label>
-                <TextBox Text="{Binding SelectedPhoto.Title}" Margin="10,0,10,0" />
-                <Label FontWeight="Bold">Description</Label>
-                <TextBox Text="{Binding SelectedPhoto.Description}" Margin="10,0,10,0" />
-                <Label FontWeight="Bold">Date Taken</Label>
-                <TextBlock Text="{Binding SelectedPhoto.DateTaken}" Margin="10,0,10,0" />
-                <Label FontWeight="Bold">Device</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Device}" Margin="10,0,10,0" />
-                <Label FontWeight="Bold">Aperture</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Apeture}" Margin="10,0,10,0" />
-                <Label FontWeight="Bold">Exposure</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Exposure}" Margin="10,0,10,0" />
-                <Label FontWeight="Bold">GPS Location</Label>
+                <StackPanel.Resources>
+                    <Style x:Key="LabelStyle" TargetType="Label">
+                        <Setter Property="FontWeight" Value="Bold" />
+                    </Style>
+                    <Style x:Key="PropertyStyle" TargetType="FrameworkElement">
+                        <Setter Property="Margin" Value="10,0,10,0" />
+                    </Style>
+                </StackPanel.Resources>
+                <Label Style="{StaticResource LabelStyle}">Title</Label>
+                <TextBox Text="{Binding SelectedPhoto.Photo.Title}" Style="{StaticResource PropertyStyle}" />
+                
+                <Label Style="{StaticResource LabelStyle}">Description</Label>
+                <TextBox Text="{Binding SelectedPhoto.Photo.Description}" Style="{StaticResource PropertyStyle}" />
+                
+                <Label Style="{StaticResource LabelStyle}">Dimensions</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Dimensions}" Style="{StaticResource PropertyStyle}" />
+                
+                <Label Style="{StaticResource LabelStyle}">Date Taken</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.DateTaken}" Style="{StaticResource PropertyStyle}" />
+
+                <Label Style="{StaticResource LabelStyle}">Manufacturer</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.Manufacturer}" Style="{StaticResource PropertyStyle}" />
+                
+                <Label Style="{StaticResource LabelStyle}">Device</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.Device}" Style="{StaticResource PropertyStyle}" />
+                <Label Style="{StaticResource LabelStyle}">Aperture</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.Aperture}" Style="{StaticResource PropertyStyle}" />
+                <Label Style="{StaticResource LabelStyle}">Exposure</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.Exposure}" Style="{StaticResource PropertyStyle}" />
+                <Label Style="{StaticResource LabelStyle}">ISO</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.ISO}" Style="{StaticResource PropertyStyle}" />
+                <Label Style="{StaticResource LabelStyle}">Focal Length</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.FocalLength}" Style="{StaticResource PropertyStyle}" />
+                <Label Style="{StaticResource LabelStyle}">File Size</Label>
+                <TextBlock Text="{Binding SelectedPhoto.FileSize}" Style="{StaticResource PropertyStyle}" />
+
+                <Label Style="{StaticResource LabelStyle}">GPS Location</Label>
                 <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}" CommandParameter="{Binding SelectedPhoto}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">

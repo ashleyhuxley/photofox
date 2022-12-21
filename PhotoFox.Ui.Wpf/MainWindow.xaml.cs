@@ -37,14 +37,26 @@ namespace PhotoFox.Ui.Wpf
         {
             Log.Debug("Main window loaded");
 
+            SetupPhotoSort();
+            SetupAlbumSort();
+
+            await this.viewModel.Load();
+        }
+
+        private void SetupPhotoSort()
+        {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(PhotoList.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("GroupName");
             view.GroupDescriptions.Add(groupDescription);
 
             view.SortDescriptions.Add(new SortDescription("GroupSort", ListSortDirection.Descending));
-            view.SortDescriptions.Add(new SortDescription("UtcDate", ListSortDirection.Descending));
+            //view.SortDescriptions.Add(new SortDescription("UtcDate", ListSortDirection.Descending));
+        }
 
-            await this.viewModel.Load();
+        private void SetupAlbumSort()
+        {
+            var view = (CollectionView)CollectionViewSource.GetDefaultView(AlbumList.ItemsSource);
+            view.SortDescriptions.Add(new SortDescription("Title", ListSortDirection.Ascending));
         }
 
         private async void PhotoList_ScrollChanged(object sender, ScrollChangedEventArgs e)
