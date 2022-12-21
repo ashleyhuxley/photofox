@@ -14,6 +14,7 @@ using PhotoFox.Storage.Table;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System.Windows;
+using PhotoAlbum = PhotoFox.Model.PhotoAlbum;
 
 namespace PhotoFox.Ui.Wpf
 {
@@ -44,6 +45,12 @@ namespace PhotoFox.Ui.Wpf
                     .ForMember(dest => dest.RowKey, opt => opt.MapFrom(src => src.PhotoId))
                     .ForMember(dest => dest.UtcDate, opt => opt.MapFrom(src => src.DateTaken))
                     .ForMember(dest => dest.PartitionKey, opt => opt.MapFrom(src => src.DateTaken.ToPartitionKey()));
+                cfg.CreateMap<PhotoAlbum, Storage.Models.PhotoAlbum>()
+                    .ForMember(dest => dest.CoverPhotoId, opt => opt.MapFrom(src => src.CoverPhotoId))
+                    .ForMember(dest => dest.AlbumName, opt => opt.MapFrom(src => src.Title))
+                    .ForMember(dest => dest.AlbumDescription, opt => opt.MapFrom(src => src.Description))
+                    .ForMember(dest => dest.PartitionKey, opt => opt.MapFrom(src => src.AlbumId))
+                    .ForMember(dest => dest.RowKey, opt => opt.MapFrom(src => string.Empty));
             });
 
             var mapper = new Mapper(config);

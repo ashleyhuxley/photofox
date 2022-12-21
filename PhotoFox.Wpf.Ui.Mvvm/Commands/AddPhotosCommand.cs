@@ -42,11 +42,15 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             var message = new AddPhotosMessage();
             this.messenger.Send(message);
 
+            var i = 0;
+
             if (message.FileNames.Any())
             {
                 foreach (var file in message.FileNames)
                 {
+                    i++;
                     await UploadImage(file);
+                    this.messenger.Send(new SetStatusMessage($"Uploaded file {i} of {message.FileNames.Count}"));
                 }
             }
         }
@@ -66,7 +70,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             {
                 try
                 {
-                    var photo = await this.uploadService.UploadFromStreamAsync(stream, info.CreationTimeUtc, Path.GetFileNameWithoutExtension(fileName));
+                    var photo = await this.uploadService.UploadFromStreamAsync(stream, info.CreationTimeUtc, Path.GetFileName(fileName));
                     if (photo != null)
                     {
                         this.messenger.Send(new LoadPhotoMessage(photo));
@@ -75,8 +79,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 catch (Exception ex)
                 {
                     Log.Error(ex, $"Could not upload {fileName} - {ex.Message}");
+                    return;
                 }
             }
+            
+            File.Delete(fileName);
         }
     }
 }

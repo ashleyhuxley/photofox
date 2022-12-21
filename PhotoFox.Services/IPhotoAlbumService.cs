@@ -1,4 +1,5 @@
 ﻿using PhotoFox.Model;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace PhotoFox.Services
 
         Task AddAlbumAsync(PhotoAlbum album);
 
-        Task AddPhotoToAlbumAsync(string albumId, string photoId);
+        Task AddPhotoToAlbumAsync(string albumId, string photoId, DateTime utcDate);
 
         Task DeleteAlbumAsync(string albumId);
     }

@@ -26,6 +26,20 @@ namespace PhotoFox.Storage.Table
             return result.Value;
         }
 
+        public async Task<PhotoMetadata> GetPhotoMetadata(string photoId)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            var results = tableClient.QueryAsync<PhotoMetadata>(p => p.RowKey == photoId);
+
+            await foreach (var photo in results)
+            {
+                return photo;
+            }
+
+            return null;
+        }
+
         public AsyncPageable<PhotoMetadata> GetAllPhotos()
         {
             var client = new TableServiceClient(config.StorageConnectionString);

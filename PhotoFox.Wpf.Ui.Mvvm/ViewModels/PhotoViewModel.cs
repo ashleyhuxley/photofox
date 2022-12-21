@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using PhotoFox.Model;
-using System;
+using PhotoFox.Core.Extensions;
 using System.Windows.Media.Imaging;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
@@ -45,5 +45,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 this.OnPropertyChanged(nameof(IsSelected));
             }
         }
+
+        public string Dimensions => $"{this.Photo.DimensionWidth} x {this.Photo.DimensionHeight}";
+
+        public string FileSize => this.Photo.FileSize.HasValue ? this.Photo.FileSize.Value.ToFileSize() : "Unknown";
     }
 }

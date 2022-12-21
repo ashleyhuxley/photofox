@@ -11,8 +11,6 @@ namespace PhotoFox.Storage.Table
 
         private const string TableName = "PhotoAlbums";
 
-        private const string PartitionKey = "photoalbum";
-
         public PhotoAlbumDataStorage(IStorageConfig config)
         {
             this.config = config;
@@ -25,23 +23,18 @@ namespace PhotoFox.Storage.Table
             await tableClient.AddEntityAsync(album);
         }
 
-        public Task<PhotoAlbum> GetPhotoAlbum(int id)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public AsyncPageable<PhotoAlbum> GetPhotoAlbums()
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            return tableClient.QueryAsync<PhotoAlbum>(p => p.PartitionKey == PartitionKey);
+            return tableClient.QueryAsync<PhotoAlbum>();
         }
 
         public async Task DeleteAlbumAsync(string albumId)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.DeleteEntityAsync(PartitionKey, albumId);
+            await tableClient.DeleteEntityAsync(albumId, string.Empty);
         }
     }
 }

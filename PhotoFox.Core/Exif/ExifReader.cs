@@ -21,6 +21,19 @@ namespace PhotoFox.Core.Exif
             return new ExifReader(await ImageFile.FromStreamAsync(stream));
         }
 
+        public R? GetProperty<T, R>(ExifTag tag)
+            where T: ExifProperty
+            where R: struct
+        {
+            var prop = this.imageFile.Properties.Get<T>(tag);
+            if (prop == null)
+            {
+                return null;
+            }
+
+            return (R?)prop.Value;
+        }
+
         public string GetIso()
         {
             var iso = this.imageFile.Properties.Get<ExifUShort>(ExifTag.ISOSpeedRatings);
@@ -43,12 +56,34 @@ namespace PhotoFox.Core.Exif
             return null;
         }
 
+        public int? GetDimensionWidth()
+        {
+            var width = this.imageFile.Properties.Get<ExifUInt>(ExifTag.ImageWidth);
+            if (width != null)
+            {
+                return Convert.ToInt32(width.Value);
+            }
+
+            return null;
+        }
+
+        public int? GetDimensionHeight()
+        {
+            var width = this.imageFile.Properties.Get<ExifUInt>(ExifTag.ImageLength);
+            if (width != null)
+            {
+                return Convert.ToInt32(width.Value);
+            }
+
+            return null;
+        }
+
         public string GetApeture()
         {
             var apeture = this.imageFile.Properties.Get<ExifURational>(ExifTag.ApertureValue);
             if (apeture != null)
             {
-                return Math.Round(Math.Pow(2, apeture.GetValue() / 2), 1).ToString();
+                return $"F{Math.Round(Math.Pow(2, apeture.GetValue() / 2), 1)}";
             }
 
             return string.Empty;
@@ -59,7 +94,7 @@ namespace PhotoFox.Core.Exif
             var focalLength = this.imageFile.Properties.Get<ExifURational>(ExifTag.FocalLength);
             if (focalLength != null)
             {
-                return Math.Round((double)focalLength.Value.Numerator / focalLength.Value.Denominator, 2).ToString();
+                return $"{Math.Round((double)focalLength.Value.Numerator / focalLength.Value.Denominator, 1)} mm";
             }
 
             return string.Empty;
@@ -92,7 +127,7 @@ namespace PhotoFox.Core.Exif
             var exposure = this.imageFile.Properties.Get<ExifURational>(ExifTag.ExposureTime);
             if (exposure != null)
             {
-                return exposure.Value.Numerator.ToString() + " / " + exposure.Value.Denominator.ToString();
+                return $"{exposure.Value.Numerator}/{exposure.Value.Denominator} s";
             }
 
             return string.Empty;
@@ -144,6 +179,17 @@ namespace PhotoFox.Core.Exif
             //   plus seconds divided by 3600
 
             return degrees + minutes / 60 + seconds / 3600;
+        }
+
+        public string GetManufacturer()
+        {
+            var model = this.imageFile.Properties.Get<ExifAscii>(ExifTag.Make);
+            if (model != null)
+            {
+                return model.Value;
+            }
+
+            return string.Empty;
         }
     }
 }
