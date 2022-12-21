@@ -20,7 +20,6 @@ namespace PhotoFox.CmdLine
         private static PhotoFoxConfig config = new PhotoFoxConfig();
         private static PhotoMetadataStorage metaDataStorage = new PhotoMetadataStorage(config);
         private static PhotoHashStorage hashStorage = new PhotoHashStorage(config);
-        private static PhotoDupeKeyStorage keyStorage = new PhotoDupeKeyStorage(config);
         private static PhotoFileStorage fileStore = new PhotoFileStorage(config);
         private static StreamHashMD5 hasher = new StreamHashMD5();
         private static PhotoAlbumDataStorage albumDataStorage = new PhotoAlbumDataStorage(config);

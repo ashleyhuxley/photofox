@@ -11,5 +11,9 @@ namespace PhotoFox.Storage.Table
         Task AddPhotoAlbum(PhotoAlbum album);
 
         Task DeleteAlbumAsync(string albumId);
+
+        Task<PhotoAlbum> GetPhotoAlbum(string albumId);
+
+        Task ModifyAlbumAsync(PhotoAlbum album);
     }
 }

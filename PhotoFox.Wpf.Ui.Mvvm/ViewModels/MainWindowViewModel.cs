@@ -85,6 +85,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             SaveChangesCommand = saveChangesCommand;
             OpenPhotoCommand = new RelayCommand(OpenSelectedImage, OpenSelectedImageCanExecute);
             AddToAlbumCommand = new RelayCommand(AddToAlbumCommandExecute);
+            SetAlbumCoverCommand = new RelayCommand(SetAlbumCoverCommandExecute, () => this.SelectedPhoto != null);
 
             messenger.Register<RefreshAlbumsMessage>(this);
             messenger.Register<LoadPhotoMessage>(this);
@@ -127,6 +128,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand OpenPhotoCommand { get; }
 
         public ICommand AddToAlbumCommand { get; }
+
+        public ICommand SetAlbumCoverCommand { get; }
 
         public PhotoViewModel? SelectedPhoto
         {
@@ -198,6 +201,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
 
             var thumbnail = GetImageFromBytes(blob.ToArray());
+
+            if (photo.Orientation.HasValue)
+            {
+                thumbnail.Rotation = GetRotation(photo.Orientation.Value);
+            }
 
             var viewModel = new PhotoViewModel(thumbnail, photo);
 
@@ -305,11 +313,26 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 }
                 else
                 {
-                    
                     // TODO: Default Cover Image
                 }
 
                 this.Albums.Add(viewModel);
+            }
+        }
+
+        private Rotation GetRotation(int orientation)
+        {
+            switch(orientation)
+            {
+                case 1: return Rotation.Rotate0;
+                case 2: return Rotation.Rotate0;
+                case 3: return Rotation.Rotate180;
+                case 4: return Rotation.Rotate180;
+                case 5: return Rotation.Rotate270;
+                case 6: return Rotation.Rotate270;
+                case 7: return Rotation.Rotate90;
+                case 8: return Rotation.Rotate0;
+                default: throw new ArgumentOutOfRangeException(nameof(orientation));
             }
         }
 
@@ -397,6 +420,17 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public bool OpenSelectedImageCanExecute()
         {
             return this.Photos.Count(p => p.IsSelected) == 1;
+        }
+
+        private void SetAlbumCoverCommandExecute()
+        {
+            if (this.SelectedPhoto == null || this.SelectedAlbum == null)
+            {
+                return;
+            }
+
+            this.photoAlbumService.SetCoverImage(this.SelectedAlbum.AlbumId, this.SelectedPhoto.Photo.PhotoId);
+            this.SelectedAlbum.SetImage(this.SelectedPhoto.Image, this.SelectedPhoto.Image.Rotation);
         }
 
         public void AddToAlbumCommandExecute()
