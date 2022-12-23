@@ -18,5 +18,7 @@ namespace PhotoFox.Services
         Task DeletePhotoAsync(Photo photo);
 
         IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId);
+
+        Task<Photo> ReloadExifData(DateTime utcDate, string photoId);
     }
 }

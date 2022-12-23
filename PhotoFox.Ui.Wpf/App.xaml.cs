@@ -71,6 +71,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IThumbnailProvider>().To<ThumbnailProvider>();
             this.contianer.Bind<IStreamHash>().To<StreamHashMD5>();
             this.contianer.Bind<IMessageHandler>().To<MessageHandler>();
+            this.contianer.Bind<PhotoFox.Wpf.Ui.Mvvm.IContext>().To<WpfContext>();
 
             // Services
             this.contianer.Bind<IUploadService>().To<UploadService>();

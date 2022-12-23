@@ -9,15 +9,24 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
     {
         private bool isSelected;
 
+        private TransformedBitmap? image;
+
         public Photo Photo { get; private set; }
 
-        public PhotoViewModel(BitmapImage image, Photo photo)
+        public PhotoViewModel(Photo photo)
         {
-            Image = image;
             Photo = photo;
         }
 
-        public BitmapImage Image { get; }
+        public TransformedBitmap? Image
+        {
+            get => image;
+            set
+            {
+                image = value;
+                OnPropertyChanged(nameof(this.Image));
+            }
+        }
 
         public string GroupName => this.Photo.DateTaken.ToLongDateString();
 

@@ -113,10 +113,28 @@ namespace PhotoFox.Core.Exif
 
         public int? GetOrientation()
         {
-            var orientation = this.imageFile.Properties.Get<ExifUShort>(ExifTag.Orientation);
+            var orientation = this.imageFile.Properties.Get<ExifProperty>(ExifTag.Orientation);
             if (orientation != null)
             {
-                return orientation.Value;
+                switch (orientation.Value)
+                {
+                    case Orientation.Normal:
+                        return 1;
+                    case Orientation.Flipped:
+                        return 2;
+                    case Orientation.Rotated180:
+                        return 3;
+                    case Orientation.FlippedAndRotated180:
+                        return 4;
+                    case Orientation.FlippedAndRotatedLeft:
+                        return 5;
+                    case Orientation.RotatedLeft:
+                        return 6;
+                    case Orientation.FlippedAndRotatedRight:
+                        return 7;
+                    case Orientation.RotatedRight:
+                        return 8;
+                }
             }
 
             return null;

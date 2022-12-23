@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhotoFox.Core.Exif;
 using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
@@ -61,7 +62,6 @@ namespace PhotoFox.Services
                 this.photoFileStorage.DeleteThumbnailAsync(photo.PhotoId),
                 this.photoFileStorage.DeletePhotoAsync(photo.PhotoId),
                 this.photoMetadataStorage.DeletePhotoAsync(photo.DateTaken.ToPartitionKey(), photo.PhotoId),
-                this.photoHashStorage.DeleteHashAsync(photo.FileHash),
                 this.photoInAlbumStorage.RemoveFromAllAlbums(photo.PhotoId));
         }
 
@@ -83,6 +83,18 @@ namespace PhotoFox.Services
                 var photo = await this.photoMetadataStorage.GetPhotoMetadata(photoInAlbum.UtcDate, photoInAlbum.RowKey);
                 yield return mapper.Map<Photo>(photo);
             }
+        }
+
+        public async Task<Photo> ReloadExifData(DateTime utcDate, string photoId)
+        {
+            var photoData = await this.photoFileStorage.GetPhotoAsync(photoId);
+            var exifReader = await ExifReader.FromStreamAsync(photoData.ToStream());
+
+            var metadata = await this.photoMetadataStorage.GetPhotoMetadata(utcDate, photoId);
+            metadata.Orientation = exifReader.GetOrientation();
+            await this.photoMetadataStorage.SavePhotoAsync(metadata);
+
+            return mapper.Map<Photo>(metadata);
         }
     }
 }

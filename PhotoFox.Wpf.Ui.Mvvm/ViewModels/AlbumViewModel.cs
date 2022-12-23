@@ -8,14 +8,13 @@ namespace PhotoFox.Ui.Wpf.Mvvm.ViewModels
     {
         public string Title { get; set; }
 
-        public BitmapImage Image { get; set; }
+        public TransformedBitmap Image { get; set; }
 
         public string AlbumId { get; set; }
 
-        internal void SetImage(BitmapImage image, Rotation rotation)
+        internal void SetImage(TransformedBitmap image)
         {
             this.Image = image;
-            this.Image.Rotation = rotation;
 
             this.OnPropertyChanged(nameof(Image));
         }
