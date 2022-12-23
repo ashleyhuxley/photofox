@@ -17,11 +17,14 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using PhotoAlbum = PhotoFox.Model.PhotoAlbum;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
@@ -44,6 +47,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly IMessenger messenger;
 
+        private readonly IContext context;
+
         private DateTime batchId = DateTime.MinValue;
 
         private bool isLoading = false;
@@ -61,6 +66,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             IPhotoAlbumService photoAlbumService,
             IPhotoFileStorage photoFileStorage,
             IMessenger messenger,
+            IContext context,
             AddPhotosCommand addPhotosCommand,
             OpenGpsLocationCommand openGpsLocationCommand,
             DeletePhotoCommand deletePhotoCommand,
@@ -72,6 +78,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.photoAlbumService = photoAlbumService;
             this.photoFileStorage = photoFileStorage;
             this.messenger = messenger;
+            this.context = context;
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
@@ -86,6 +93,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             OpenPhotoCommand = new RelayCommand(OpenSelectedImage, OpenSelectedImageCanExecute);
             AddToAlbumCommand = new RelayCommand(AddToAlbumCommandExecute);
             SetAlbumCoverCommand = new RelayCommand(SetAlbumCoverCommandExecute, () => this.SelectedPhoto != null);
+            ReloadExifCommand = new RelayCommand(ReloadExifExecute, () => this.SelectedPhoto != null);
 
             messenger.Register<RefreshAlbumsMessage>(this);
             messenger.Register<LoadPhotoMessage>(this);
@@ -103,7 +111,10 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             if (e.PropertyName == nameof(this.SelectedAlbum))
             {
                 cancellationTokenSource.Cancel();
-                await LoadPhotos();
+
+                cancellationTokenSource = new CancellationTokenSource();
+
+                await LoadPhotos(cancellationTokenSource.Token);
             }
         }
 
@@ -112,24 +123,16 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ObservableCollection<PhotoViewModel> Photos { get; }
 
         public ICommand AddPhotosCommand { get; }
-
         public ICommand OpenGpsLink { get; }
-
         public ICommand DeletePhotoCommand { get; }
-
         public ICommand AddAlbumCommand { get; }
-
         public ICommand DeleteAlbumCommand { get; }
-
         public ICommand StopLoadingCommand { get; }
-
         public ICommand SaveChangesCommand { get; }
-
         public ICommand OpenPhotoCommand { get; }
-
         public ICommand AddToAlbumCommand { get; }
-
         public ICommand SetAlbumCoverCommand { get; }
+        public ICommand ReloadExifCommand { get; }
 
         public PhotoViewModel? SelectedPhoto
         {
@@ -163,7 +166,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
                 selectedAlbum = value;
                 OnPropertyChanged(nameof(SelectedAlbum));
-                cancellationTokenSource.Cancel();
             }
         }
 
@@ -179,53 +181,61 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public async Task Load()
         {
-            this.batchId = DateTime.SpecifyKind(new DateTime(2021, 6, 30).Date, DateTimeKind.Utc);
+            this.batchId = DateTime.SpecifyKind(new DateTime(2021, 6, 1).Date, DateTimeKind.Utc);
             //this.batchId = DateTime.UtcNow;
 
             // TODO: Can we Task.WhenAll this? Might need LoadPhotos refactor
             await LoadAlbums();
-            await LoadPhotos();
+            await LoadPhotos(cancellationTokenSource.Token);
         }
 
-        private async Task LoadPhoto(Photo photo)
+        private void LoadPhoto(Photo photo, CancellationToken token)
         {
             if (this.Photos.Any(p => p.Photo.PhotoId == photo.PhotoId))
             {
                 this.Photos.Remove(this.Photos.First(p => p.Photo.PhotoId == photo.PhotoId));
             }
 
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            var viewModel = new PhotoViewModel(photo);
+
+            Log.Trace($"Adding {photo.PhotoId}");
+
+            _ = Task.Run(() => LoadPhotoThumbnail(photo, viewModel));
+
+            this.Photos.Add(viewModel);
+            this.OnPropertyChanged(nameof(this.Photos.Count));
+        }
+
+        public async Task LoadPhotoThumbnail(Photo photo, PhotoViewModel viewModel)
+        {
             var blob = await this.photoFileStorage.GetThumbnailAsync(photo.PhotoId);
             if (blob == null)
             {
                 throw new InvalidOperationException($"Unable to find {photo.PhotoId} in thumbnail storage");
             }
 
-            var thumbnail = GetImageFromBytes(blob.ToArray());
+            var thumbnail = GetImageFromBytes(blob.ToArray(), photo.Orientation);
 
-            if (photo.Orientation.HasValue)
-            {
-                thumbnail.Rotation = GetRotation(photo.Orientation.Value);
-            }
-
-            var viewModel = new PhotoViewModel(thumbnail, photo);
-
-            Log.Trace($"Adding {photo.PhotoId}");
-
-            this.Photos.Add(viewModel);
+            context.BeginInvoke(() => viewModel.Image = thumbnail);
         }
 
-        public async Task LoadPhotos()
+        public async Task LoadPhotos(CancellationToken token)
         {
             this.Photos.Clear();
-            this.cancellationTokenSource = new CancellationTokenSource();
+            this.OnPropertyChanged(nameof(this.Photos.Count));
 
             if (this.SelectedAlbum != null && this.SelectedAlbum.AlbumId != string.Empty)
             {
-                await LoadPhotosFromAlbum(this.SelectedAlbum.AlbumId, cancellationTokenSource.Token);
+                await LoadPhotosFromAlbum(this.SelectedAlbum.AlbumId, token);
             }
             else
             {
-                await LoadPhotosWithoutAlbum(MinPhotosToLoad, cancellationTokenSource.Token);
+                await LoadPhotosWithoutAlbum(MinPhotosToLoad, token);
             }
         }
 
@@ -238,12 +248,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             await foreach (var photo in this.photoService.GetPhotosInAlbum(albumId))
             {
-                //if (token.IsCancellationRequested)
-                //{
-                //    break;
-                //}
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
 
-                await LoadPhoto(photo);
+                LoadPhoto(photo, token);
             }
         }
 
@@ -277,7 +287,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                         break;
                     }
 
-                    await LoadPhoto(photo);
+                    LoadPhoto(photo, token);
 
                     numPhotos++;
                 }
@@ -309,7 +319,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 var blob = await this.photoFileStorage.GetThumbnailAsync(coverId);
                 if (blob != null)
                 {
-                    viewModel.Image = GetImageFromBytes(blob.ToArray());
+                    // TODO: Exif rotate
+                    viewModel.Image = GetImageFromBytes(blob.ToArray(), 1);
                 }
                 else
                 {
@@ -317,21 +328,22 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 }
 
                 this.Albums.Add(viewModel);
+                this.OnPropertyChanged(nameof(this.Albums.Count));
             }
         }
 
-        private Rotation GetRotation(int orientation)
+        private Transform GetTransform(int orientation)
         {
             switch(orientation)
             {
-                case 1: return Rotation.Rotate0;
-                case 2: return Rotation.Rotate0;
-                case 3: return Rotation.Rotate180;
-                case 4: return Rotation.Rotate180;
-                case 5: return Rotation.Rotate270;
-                case 6: return Rotation.Rotate270;
-                case 7: return Rotation.Rotate90;
-                case 8: return Rotation.Rotate0;
+                case 1: return new RotateTransform(0);
+                case 2: throw new NotImplementedException();
+                case 3: return new RotateTransform(180);
+                case 4: throw new NotImplementedException();
+                case 5: throw new NotImplementedException();
+                case 6: return new RotateTransform(90);
+                case 7: throw new NotImplementedException();
+                case 8: return new RotateTransform(270);
                 default: throw new ArgumentOutOfRangeException(nameof(orientation));
             }
         }
@@ -341,7 +353,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             return new BitmapImage();
         }
 
-        private BitmapImage GetImageFromBytes(byte[] bytes)
+        private TransformedBitmap GetImageFromBytes(byte[] bytes, int? exifOrientation)
         {
             var stream = new MemoryStream();
 
@@ -360,7 +372,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             bitImage.StreamSource = ms;
             bitImage.EndInit();
 
-            return bitImage;
+            var tb = new TransformedBitmap();
+            tb.BeginInit();
+            tb.Source = bitImage;
+            tb.Transform = this.GetTransform(exifOrientation.GetValueOrDefault(1));
+            tb.EndInit();
+            tb.Freeze();
+
+            return tb;
         }
 
         public async void Receive(RefreshAlbumsMessage message)
@@ -370,15 +389,15 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public async Task LoadMore()
         {
-            //if (
-            //    (this.SelectedAlbum != null
-            //    && this.SelectedAlbum.AlbumId != string.Empty)
-            //    || cancellationTokenSource == null)
-            //{
-            //    return;
-            //}
+            if (
+                (this.SelectedAlbum != null
+                && this.SelectedAlbum.AlbumId != string.Empty)
+                || cancellationTokenSource == null)
+            {
+                return;
+            }
 
-            //await LoadPhotosWithoutAlbum(MinPhotosToLoad, cancellationTokenSource.Token);
+            await LoadPhotosWithoutAlbum(MinPhotosToLoad, cancellationTokenSource.Token);
         }
 
         private void StopLoadingExecute()
@@ -393,12 +412,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public async void Receive(LoadPhotoMessage message)
         {
-            await LoadPhoto(message.Photo);
+            LoadPhoto(message.Photo, cancellationTokenSource.Token);
         }
 
         public void Receive(UnloadPhotoMessage message)
         {
             this.Photos.Remove(message.ViewModel);
+            this.OnPropertyChanged(nameof(this.Photos.Count));
         }
 
         public void Receive(UpdateStatusMessage message)
@@ -424,13 +444,15 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private void SetAlbumCoverCommandExecute()
         {
-            if (this.SelectedPhoto == null || this.SelectedAlbum == null)
+            if (this.SelectedPhoto == null 
+                || this.SelectedAlbum == null 
+                || this.SelectedPhoto.Image == null)
             {
                 return;
             }
 
             this.photoAlbumService.SetCoverImage(this.SelectedAlbum.AlbumId, this.SelectedPhoto.Photo.PhotoId);
-            this.SelectedAlbum.SetImage(this.SelectedPhoto.Image, this.SelectedPhoto.Image.Rotation);
+            this.SelectedAlbum.SetImage(this.SelectedPhoto.Image);
         }
 
         public void AddToAlbumCommandExecute()
@@ -474,6 +496,19 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public void Receive(SetStatusMessage message)
         {
             this.LoadingStatusText = message.Message;
+        }
+
+        public async void ReloadExifExecute()
+        {
+            var photosToProcess = new List<PhotoViewModel>();
+            photosToProcess.AddRange(this.SelectedPhotos);
+
+            foreach (var photo in photosToProcess)
+            {
+                var newPhoto = await this.photoService.ReloadExifData(photo.Photo.DateTaken, photo.Photo.PhotoId);
+
+                this.LoadPhoto(newPhoto, cancellationTokenSource.Token);
+            }
         }
     }
 }

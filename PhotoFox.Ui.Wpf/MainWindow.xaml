@@ -32,7 +32,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="300" />
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
@@ -44,7 +44,16 @@
             <StatusBarItem Grid.Column="2">
                 <TextBlock Text="{Binding LoadingStatusText}" />
             </StatusBarItem>
-            
+            <Separator Grid.Column="3" />
+            <StatusBarItem Grid.Column="4">
+                <TextBlock>
+                    <Run>Photos: </Run>
+                    <Run Text="{Binding Photos.Count, Mode=OneWay}" />
+                    <Run> - </Run>
+                    <Run>Albums: </Run>
+                    <Run Text="{Binding Albums.Count, Mode=OneWay}" />
+                </TextBlock>
+            </StatusBarItem>
         </StatusBar>
 
         <Grid>
@@ -95,6 +104,7 @@
                         <MenuItem Header="Add image to album..." Command="{Binding AddToAlbumCommand}" />
                         <MenuItem Header="Delete image" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhotos}" />
                         <MenuItem Header="Set as album cover" Command="{Binding SetAlbumCoverCommand}" />
+                        <MenuItem Header="Reload EXIF" Command="{Binding ReloadExifCommand}" />
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemContainerStyle>
@@ -114,7 +124,7 @@
                     <DataTemplate>
                         <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
                             <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
-                            <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                            <TextBlock Text="{Binding Photo.Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -169,6 +179,8 @@
                 <TextBlock Text="{Binding SelectedPhoto.Photo.FocalLength}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">File Size</Label>
                 <TextBlock Text="{Binding SelectedPhoto.FileSize}" Style="{StaticResource PropertyStyle}" />
+                <Label Style="{StaticResource LabelStyle}">Orientation</Label>
+                <TextBlock Text="{Binding SelectedPhoto.Photo.Orientation}" Style="{StaticResource PropertyStyle}" />
 
                 <Label Style="{StaticResource LabelStyle}">GPS Location</Label>
                 <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}" CommandParameter="{Binding SelectedPhoto}">
