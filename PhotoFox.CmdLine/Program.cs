@@ -2,6 +2,7 @@
 using PhotoFox.Core.Extensions;
 using PhotoFox.Core.Hashing;
 using PhotoFox.Core.Imaging;
+using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
@@ -29,10 +30,25 @@ namespace PhotoFox.CmdLine
         private static StreamHashMD5 hasher = new StreamHashMD5();
         private static PhotoAlbumDataStorage albumDataStorage = new PhotoAlbumDataStorage(config);
         private static ThumbnailProvider thumbnailProvider = new ThumbnailProvider();
+        private static PhotoInAlbumStorage photoInAlbumStorage = new PhotoInAlbumStorage(config);
 
         private static async Task MainAsync()
         {
-            await foreach (var photo in metaDataStorage.GetAllPhotos())
+            await foreach (var photo in metaDataStorage.GetAllPhotosAsync())
+            {
+                if (!await photoInAlbumStorage.IsPhotoInAnAlbumAsync(photo.RowKey))
+                {
+                    Console.WriteLine($"Processing {photo.RowKey}");
+                    await photoInAlbumStorage.AddPhotoInAlbumAsync(Guid.Empty.ToString(), photo.RowKey, photo.UtcDate.Value);
+                }
+            }
+
+            Console.WriteLine($"Done.");
+        }
+
+        private static async Task RegenerateThumbnails()
+        {
+            await foreach (var photo in metaDataStorage.GetAllPhotosAsync())
             {
                 try
                 {
@@ -66,18 +82,18 @@ namespace PhotoFox.CmdLine
             Console.ReadLine();
         }
 
-        private static async Task MainAsync2()
+        private static async Task RegenerateHashes()
         {
-            await foreach (var photo in metaDataStorage.GetAllPhotos())
+            await foreach (var photo in metaDataStorage.GetAllPhotosAsync())
             {
-                await Process(photo, null);
+                await RegenerateHash(photo, null);
             }
 
             Console.WriteLine("Done.");
             Console.ReadLine();
         }
 
-        private static async Task Process(PhotoMetadata photo, ParallelLoopState state)
+        private static async Task RegenerateHash(PhotoMetadata photo, ParallelLoopState state)
         {
             var file = await fileStore.GetPhotoAsync(photo.RowKey);
             var hash = hasher.ComputeHash(file.ToStream());

@@ -53,19 +53,19 @@ namespace PhotoFox.Services
             var image = Image.FromStream(stream);
 
             stream.Seek(0, SeekOrigin.Begin);
-            var binaryData = await BinaryData.FromStreamAsync(stream);
+            var binaryData = await BinaryData.FromStreamAsync(stream).ConfigureAwait(false);
 
             var md5 = await Task.Run(() => this.streamHash.ComputeHash(stream));
-            if (await photoHashStorage.HashExistsAsync(md5) != null)
+            if (await photoHashStorage.HashExistsAsync(md5).ConfigureAwait(false) != null)
             {
                 return null;
             }
 
-            var exifReader = await ExifReader.FromStreamAsync(stream);
+            var exifReader = await ExifReader.FromStreamAsync(stream).ConfigureAwait(false);
             var metadata = new PhotoMetadata();
             metadata.Orientation = exifReader.GetOrientation();
 
-            var thumbnail = await Task.Run(() => this.thumbnailProvider.GenerateThumbnail(image, 250, metadata.Orientation.ToRotationDegrees()));
+            var thumbnail = await Task.Run(() => this.thumbnailProvider.GenerateThumbnail(image, 250, metadata.Orientation.ToRotationDegrees())).ConfigureAwait(false);
           
             metadata.FocalLength = exifReader.GetFocalLength();
             metadata.Device = exifReader.GetModel();
@@ -94,14 +94,14 @@ namespace PhotoFox.Services
                 thumbnail.Save(ms, ImageFormat.Jpeg);
 
                 ms.Seek(0, SeekOrigin.Begin);
-                var data = await BinaryData.FromStreamAsync(ms);
-                await this.photoFileStorage.PutThumbnailAsync(metadata.RowKey, data);
+                var data = await BinaryData.FromStreamAsync(ms).ConfigureAwait(false);
+                await this.photoFileStorage.PutThumbnailAsync(metadata.RowKey, data).ConfigureAwait(false);
             }
 
-            await this.photoFileStorage.PutPhotoAsync(metadata.RowKey, binaryData);
+            await this.photoFileStorage.PutPhotoAsync(metadata.RowKey, binaryData).ConfigureAwait(false);
 
-            await this.photoMetadataStorage.AddPhotoAsync(metadata);
-            await this.photoHashStorage.AddHashAsync(md5, metadata.PartitionKey, metadata.RowKey);
+            await this.photoMetadataStorage.AddPhotoAsync(metadata).ConfigureAwait(false);
+            await this.photoHashStorage.AddHashAsync(md5, metadata.PartitionKey, metadata.RowKey).ConfigureAwait(false);
 
             return mapper.Map<Photo>(metadata);
         }

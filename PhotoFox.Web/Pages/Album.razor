@@ -46,7 +46,7 @@ else
     private async Task LoadPhotos()
     {
         this.Photos.Clear();
-        await foreach(var photo in this.PhotoService.GetPhotosInAlbum(AlbumId))
+        await foreach(var photo in this.PhotoService.GetPhotosInAlbumAsync(AlbumId))
         {
             this.Photos.Add(photo);
         }

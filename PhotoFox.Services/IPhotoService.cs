@@ -7,9 +7,9 @@ namespace PhotoFox.Services
 {
     public interface IPhotoService
     {
-        IAsyncEnumerable<Photo> GetPhotosByDateTaken(DateTime dateTaken);
+        IAsyncEnumerable<Photo> GetPhotosByDateTakenAsync(DateTime dateTaken);
 
-        IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbum(DateTime dateTaken);
+        IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbumAsync(DateTime dateTaken);
 
         Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId);
 
@@ -17,8 +17,8 @@ namespace PhotoFox.Services
 
         Task DeletePhotoAsync(Photo photo);
 
-        IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId);
+        IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId);
 
-        Task<Photo> ReloadExifData(DateTime utcDate, string photoId);
+        Task<Photo> ReloadExifDataAsync(DateTime utcDate, string photoId);
     }
 }

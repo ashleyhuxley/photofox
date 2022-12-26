@@ -19,22 +19,22 @@ namespace PhotoFox.Storage.Blob
 
         public async Task<BinaryData> GetThumbnailAsync(string id)
         {
-            return await GetFileAsync(id, ThumbnailsContainer);
+            return await GetFileAsync(id, ThumbnailsContainer).ConfigureAwait(false);
         }
 
         public async Task<BinaryData> GetPhotoAsync(string id)
         {
-            return await GetFileAsync(id, PhotosContainer);
+            return await GetFileAsync(id, PhotosContainer).ConfigureAwait(false);
         }
 
         public async Task PutThumbnailAsync(string id, BinaryData data)
         {
-            await PutFileAsync(id, data, ThumbnailsContainer);
+            await PutFileAsync(id, data, ThumbnailsContainer).ConfigureAwait(false);
         }
 
         public async Task PutPhotoAsync(string id, BinaryData data)
         {
-            await PutFileAsync(id, data, PhotosContainer);
+            await PutFileAsync(id, data, PhotosContainer).ConfigureAwait(false);
         }
 
         private async Task<BinaryData> GetFileAsync(string id, string containerName)
@@ -49,7 +49,7 @@ namespace PhotoFox.Storage.Blob
                 return null;
             }
 
-            var res = await blob.DownloadContentAsync();
+            var res = await blob.DownloadContentAsync().ConfigureAwait(false);
             return res.Value.Content;
         }
 
@@ -58,17 +58,17 @@ namespace PhotoFox.Storage.Blob
             var client = new BlobServiceClient(this.config.StorageConnectionString);
             var container = client.GetBlobContainerClient(containerName);
 
-            await container.UploadBlobAsync(id, data);
+            await container.UploadBlobAsync(id, data).ConfigureAwait(false);
         }
 
         public async Task DeleteThumbnailAsync(string id)
         {
-            await this.DeleteFileAsync(id, ThumbnailsContainer);
+            await this.DeleteFileAsync(id, ThumbnailsContainer).ConfigureAwait(false);
         }
 
         public async Task DeletePhotoAsync(string id)
         {
-            await this.DeleteFileAsync(id, PhotosContainer);
+            await this.DeleteFileAsync(id, PhotosContainer).ConfigureAwait(false);
         }
 
         private async Task DeleteFileAsync(string id, string containerName)
@@ -76,7 +76,7 @@ namespace PhotoFox.Storage.Blob
             var client = new BlobServiceClient(this.config.StorageConnectionString);
             var container = client.GetBlobContainerClient(containerName);
 
-            await container.DeleteBlobIfExistsAsync(id);
+            await container.DeleteBlobIfExistsAsync(id).ConfigureAwait(false);
         }
     }
 }

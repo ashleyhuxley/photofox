@@ -6,13 +6,13 @@ namespace PhotoFox.Storage.Table
 {
     public interface IPhotoAlbumDataStorage
     {
-        AsyncPageable<PhotoAlbum> GetPhotoAlbums();
+        AsyncPageable<PhotoAlbum> GetPhotoAlbumsAsync();
 
-        Task AddPhotoAlbum(PhotoAlbum album);
+        Task AddPhotoAlbumAsync(PhotoAlbum album);
 
-        Task DeleteAlbumAsync(string albumId);
+        Task DeleteAlbumAsyncAsync(string albumId);
 
-        Task<PhotoAlbum> GetPhotoAlbum(string albumId);
+        Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId);
 
         Task ModifyAlbumAsync(PhotoAlbum album);
     }

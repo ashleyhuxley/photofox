@@ -101,7 +101,9 @@
                     <ContextMenu>
                         <MenuItem Header="Open Image" Command="{Binding OpenPhotoCommand}" />
                         <Separator />
-                        <MenuItem Header="Add image to album..." Command="{Binding AddToAlbumCommand}" />
+                        <MenuItem Header="Copy image to album..." Command="{Binding AddToAlbumCommand}" />
+                        <MenuItem Header="Move image to album..." Command="{Binding MoveToAlbumCommand}" />
+                        <Separator />
                         <MenuItem Header="Delete image" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhotos}" />
                         <MenuItem Header="Set as album cover" Command="{Binding SetAlbumCoverCommand}" />
                         <MenuItem Header="Reload EXIF" Command="{Binding ReloadExifCommand}" />
