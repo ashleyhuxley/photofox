@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
+using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
@@ -219,7 +220,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 throw new InvalidOperationException($"Unable to find {photo.PhotoId} in thumbnail storage");
             }
 
-            var thumbnail = GetImageFromBytes(blob.ToArray(), photo.Orientation);
+            var thumbnail = GetImageFromBytes(blob.ToArray());
 
             context.BeginInvoke(() => viewModel.Image = thumbnail);
         }
@@ -319,8 +320,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 var blob = await this.photoFileStorage.GetThumbnailAsync(coverId);
                 if (blob != null)
                 {
-                    // TODO: Exif rotate
-                    viewModel.Image = GetImageFromBytes(blob.ToArray(), 1);
+                    viewModel.Image = GetImageFromBytes(blob.ToArray());
                 }
                 else
                 {
@@ -332,28 +332,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
         }
 
-        private Transform GetTransform(int orientation)
-        {
-            switch(orientation)
-            {
-                case 1: return new RotateTransform(0);
-                case 2: throw new NotImplementedException();
-                case 3: return new RotateTransform(180);
-                case 4: throw new NotImplementedException();
-                case 5: throw new NotImplementedException();
-                case 6: return new RotateTransform(90);
-                case 7: throw new NotImplementedException();
-                case 8: return new RotateTransform(270);
-                default: throw new ArgumentOutOfRangeException(nameof(orientation));
-            }
-        }
-
         private BitmapImage GetDefaultImage()
         {
             return new BitmapImage();
         }
 
-        private TransformedBitmap GetImageFromBytes(byte[] bytes, int? exifOrientation)
+        private BitmapSource GetImageFromBytes(byte[] bytes)
         {
             var stream = new MemoryStream();
 
@@ -372,14 +356,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             bitImage.StreamSource = ms;
             bitImage.EndInit();
 
-            var tb = new TransformedBitmap();
-            tb.BeginInit();
-            tb.Source = bitImage;
-            tb.Transform = this.GetTransform(exifOrientation.GetValueOrDefault(1));
-            tb.EndInit();
-            tb.Freeze();
+            bitImage.Freeze();
 
-            return tb;
+            return bitImage;
         }
 
         public async void Receive(RefreshAlbumsMessage message)

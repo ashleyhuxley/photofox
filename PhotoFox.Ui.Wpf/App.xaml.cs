@@ -5,6 +5,7 @@ using Ninject.Activation;
 using PhotoFox.Core.Extensions;
 using PhotoFox.Core.Hashing;
 using PhotoFox.Core.Imaging;
+using PhotoFox.Mappings;
 using PhotoFox.Model;
 using PhotoFox.Services;
 using PhotoFox.Storage;
@@ -62,7 +63,7 @@ namespace PhotoFox.Ui.Wpf
         {
             this.contianer = new StandardKernel();
 
-            this.contianer.Bind<IMapper>().ToMethod(AutoMapper).InSingletonScope();
+            this.contianer.Bind<IMapper>().ToMethod(i => MapFactory.GetMap()).InSingletonScope();
 
             this.contianer.Bind<MainWindowViewModel>().ToSelf();
 

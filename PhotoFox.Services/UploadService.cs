@@ -61,16 +61,16 @@ namespace PhotoFox.Services
                 return null;
             }
 
-            var thumbnail = await Task.Run(() => this.thumbnailProvider.GenerateThumbnail(image, 250));
-
-            var metadata = new PhotoMetadata();
-
             var exifReader = await ExifReader.FromStreamAsync(stream);
+            var metadata = new PhotoMetadata();
+            metadata.Orientation = exifReader.GetOrientation();
+
+            var thumbnail = await Task.Run(() => this.thumbnailProvider.GenerateThumbnail(image, 250, metadata.Orientation.ToRotationDegrees()));
+          
             metadata.FocalLength = exifReader.GetFocalLength();
             metadata.Device = exifReader.GetModel();
             metadata.Aperture = exifReader.GetApeture();
             metadata.Exposure = exifReader.GetExposure();
-            metadata.Orientation = exifReader.GetOrientation();
             metadata.GeolocationLattitude = exifReader.GetGpsLatitude();
             metadata.GeolocationLongitude = exifReader.GetGpsLongitude();
             metadata.ISO = exifReader.GetIso();

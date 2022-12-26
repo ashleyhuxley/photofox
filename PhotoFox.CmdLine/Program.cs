@@ -9,7 +9,9 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace PhotoFox.CmdLine
 {
@@ -34,38 +36,25 @@ namespace PhotoFox.CmdLine
             {
                 try
                 {
-                    Console.WriteLine($"Processing {photo.RowKey}");
-
-                    var file = await fileStore.GetPhotoAsync(photo.RowKey);
-
-                    var image = Image.FromStream(file.ToStream());
-
-                    var exifReader = await ExifReader.FromStreamAsync(file.ToStream());
-                    var newThumb = thumbnailProvider.GenerateThumbnail(image, 250);
-
-                    await fileStore.DeleteThumbnailAsync(photo.RowKey);
-
-                    using (var ms = new MemoryStream())
+                    if (photo.Orientation.HasValue && photo.Orientation != 1)
                     {
-                        newThumb.Save(ms, ImageFormat.Jpeg);
+                        Console.WriteLine($"Processing {photo.RowKey}");
+                        var file = await fileStore.GetPhotoAsync(photo.RowKey);
+                        var image = Image.FromStream(file.ToStream());
 
-                        ms.Seek(0, SeekOrigin.Begin);
-                        var data = await BinaryData.FromStreamAsync(ms);
-                        await fileStore.PutThumbnailAsync(photo.RowKey, data);
+                        var thumb = thumbnailProvider.GenerateThumbnail(image, 250, photo.Orientation.ToRotationDegrees());
+
+                        await fileStore.DeleteThumbnailAsync(photo.RowKey);
+
+                        using (var ms = new MemoryStream())
+                        {
+                            thumb.Save(ms, ImageFormat.Jpeg);
+
+                            ms.Seek(0, SeekOrigin.Begin);
+                            var data = await BinaryData.FromStreamAsync(ms);
+                            await fileStore.PutThumbnailAsync(photo.RowKey, data);
+                        }
                     }
-
-                    photo.FocalLength = exifReader.GetFocalLength();
-                    photo.Device = exifReader.GetModel();
-                    photo.Aperture = exifReader.GetApeture();
-                    photo.Exposure = exifReader.GetExposure();
-                    photo.Orientation = exifReader.GetOrientation();
-                    photo.GeolocationLattitude = exifReader.GetGpsLatitude();
-                    photo.GeolocationLongitude = exifReader.GetGpsLongitude();
-                    photo.ISO = exifReader.GetIso();
-                    photo.DimensionWidth = exifReader.GetDimensionWidth() ?? image.Width;
-                    photo.DimensionHeight = exifReader.GetDimensionHeight() ?? image.Height;
-                    photo.Manufacturer = exifReader.GetManufacturer();
-                    await metaDataStorage.SavePhotoAsync(photo);
                 }
                 catch (Exception ex)
                 {

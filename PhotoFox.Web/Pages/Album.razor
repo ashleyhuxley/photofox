@@ -1,0 +1,79 @@
+﻿@page "/album/{albumid}"
+@using PhotoFox.Model
+@using PhotoFox.Services
+
+<h3>@title</h3>
+
+@if (loading)
+{
+    <div id="loading">Laden...</div>
+}
+else
+{
+    <div id="photos">
+        @{
+            var currentDate = DateTime.MinValue;
+        }
+        @foreach (var photo in Photos.OrderByDescending(p => p.DateTaken))
+        {
+            if (currentDate != photo.DateTaken.Date)
+            {
+                currentDate = photo.DateTaken.Date;
+                <div class="date-header" style="clear: both;">
+                    @currentDate.ToLongDateString()
+                </div>
+            }
+
+            <div class="photo-item">
+                <div class="photo-img"><img src="/thumbnail/@photo.PhotoId" alt="@photo.Title" /></div>
+                <div class="caption">@photo.Title</div>
+            </div>
+        }
+    </div>
+}
+
+@inject IPhotoService PhotoService;
+@inject IPhotoAlbumService AlbumService;
+
+@code {
+    private List<Photo> Photos { get; set; }
+
+    public Album()
+    {
+        this.Photos = new List<Photo>();
+    }
+
+    private async Task LoadPhotos()
+    {
+        this.Photos.Clear();
+        await foreach(var photo in this.PhotoService.GetPhotosInAlbum(AlbumId))
+        {
+            this.Photos.Add(photo);
+        }
+    }
+
+    [Parameter]
+    public string? AlbumId { get; set; }
+
+    public PhotoAlbum? LoadedAlbum { get; set; }
+
+    private string title = string.Empty;
+
+    private bool loading = false;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        this.LoadedAlbum = await this.AlbumService.GetPhotoAlbumAsync(AlbumId);
+        this.title = LoadedAlbum.Title;
+
+        loading = true;
+        StateHasChanged();
+
+        await this.LoadPhotos();
+        loading = false;
+
+        StateHasChanged();
+    }
+}

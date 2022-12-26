@@ -18,5 +18,7 @@ namespace PhotoFox.Services
         Task DeleteAlbumAsync(string albumId);
 
         Task SetCoverImage(string albumId, string photoId);
+
+        Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId);
     }
 }

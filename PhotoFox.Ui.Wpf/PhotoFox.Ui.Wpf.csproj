@@ -32,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PhotoFox.Mappings\PhotoFox.Mappings.csproj" />
     <ProjectReference Include="..\PhotoFox.Storage\PhotoFox.Storage.csproj" />
     <ProjectReference Include="..\PhotoFox.Wpf.Ui.Mvvm\PhotoFox.Wpf.Ui.Mvvm.csproj" />
   </ItemGroup>

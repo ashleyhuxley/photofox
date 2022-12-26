@@ -9,7 +9,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
     {
         private bool isSelected;
 
-        private TransformedBitmap? image;
+        private BitmapSource? image;
 
         public Photo Photo { get; private set; }
 
@@ -18,7 +18,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             Photo = photo;
         }
 
-        public TransformedBitmap? Image
+        public BitmapSource? Image
         {
             get => image;
             set
