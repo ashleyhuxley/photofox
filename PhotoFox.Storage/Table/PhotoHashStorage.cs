@@ -26,15 +26,15 @@ namespace PhotoFox.Storage.Table
                 RowKey = string.Empty,
                 PhotoPartitionKey = partitionKey,
                 PhotoRowKey = rowKey
-            });
+            }).ConfigureAwait(false);
         }
 
-        public async Task<Tuple<string, string>?> HashExistsAsync(string hash)
+        public async Task<Tuple<string, string>> HashExistsAsync(string hash)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
 
-            if (await tableClient.EntityExistsAsync<PhotoHash>(hash, string.Empty))
+            if (await tableClient.EntityExistsAsync<PhotoHash>(hash, string.Empty).ConfigureAwait(false))
             {
                 var hashResult = await tableClient.GetEntityAsync<PhotoHash>(hash, string.Empty);
                 return Tuple.Create(hashResult.Value.PhotoPartitionKey, hashResult.Value.PhotoRowKey);
@@ -49,7 +49,7 @@ namespace PhotoFox.Storage.Table
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.DeleteEntityAsync(hash, string.Empty);
+            await tableClient.DeleteEntityAsync(hash, string.Empty).ConfigureAwait(false);
         }
     }
 }

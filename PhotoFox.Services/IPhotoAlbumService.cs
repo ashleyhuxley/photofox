@@ -7,9 +7,9 @@ namespace PhotoFox.Services
 {
     public interface IPhotoAlbumService
     {
-        IAsyncEnumerable<PhotoAlbum> GetAllAlbums();
+        IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync();
 
-        IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId);
+        IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId);
 
         Task AddAlbumAsync(PhotoAlbum album);
 
@@ -17,8 +17,10 @@ namespace PhotoFox.Services
 
         Task DeleteAlbumAsync(string albumId);
 
-        Task SetCoverImage(string albumId, string photoId);
+        Task SetCoverImageAsync(string albumId, string photoId);
 
         Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId);
+
+        Task RemoveFromAlbumAsync(string albumId, string photoId);
     }
 }

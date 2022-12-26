@@ -29,9 +29,9 @@ namespace PhotoFox.Services
             this.mapper = mapper;
         }
 
-        public async IAsyncEnumerable<PhotoAlbum> GetAllAlbums()
+        public async IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync()
         {
-            await foreach (var album in this.photoAlbumDataStorage.GetPhotoAlbums())
+            await foreach (var album in this.photoAlbumDataStorage.GetPhotoAlbumsAsync())
             {
                 yield return new PhotoAlbum
                 {
@@ -43,11 +43,11 @@ namespace PhotoFox.Services
             }
         }
 
-        public async IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId)
+        public async IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId)
         {
-            await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbum(albumId))
+            await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbumAsync(albumId))
             {
-                var photo = await this.photoMetadataStorage.GetPhotoMetadata(photoInAlbum.UtcDate, photoInAlbum.RowKey);
+                var photo = await this.photoMetadataStorage.GetPhotoMetadataAsync(photoInAlbum.UtcDate, photoInAlbum.RowKey).ConfigureAwait(false);
 
                 yield return mapper.Map<Photo>(photo);
             }
@@ -56,30 +56,35 @@ namespace PhotoFox.Services
         public async Task AddAlbumAsync(PhotoAlbum album)
         {
             var storageAlbum = mapper.Map<Storage.Models.PhotoAlbum>(album);
-            await this.photoAlbumDataStorage.AddPhotoAlbum(storageAlbum);
+            await this.photoAlbumDataStorage.AddPhotoAlbumAsync(storageAlbum).ConfigureAwait(false);
         }
 
         public async Task AddPhotoToAlbumAsync(string albumId, string photoId, DateTime utcDate)
         {
-            await this.photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, photoId, utcDate);
+            await this.photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, photoId, utcDate).ConfigureAwait(false);
         }
 
         public async Task DeleteAlbumAsync(string albumId)
         {
-            await this.photoAlbumDataStorage.DeleteAlbumAsync(albumId);
+            await this.photoAlbumDataStorage.DeleteAlbumAsyncAsync(albumId).ConfigureAwait(false);
         }
 
-        public async Task SetCoverImage(string albumId, string photoId)
+        public async Task SetCoverImageAsync(string albumId, string photoId)
         {
-            var album = await this.photoAlbumDataStorage.GetPhotoAlbum(albumId);
+            var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId).ConfigureAwait(false);
             album.CoverPhotoId = photoId;
-            await this.photoAlbumDataStorage.ModifyAlbumAsync(album);
+            await this.photoAlbumDataStorage.ModifyAlbumAsync(album).ConfigureAwait(false);
         }
 
         public async Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId)
         {
-            var album = await this.photoAlbumDataStorage.GetPhotoAlbum(albumId);
+            var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId).ConfigureAwait(false);
             return mapper.Map<PhotoAlbum>(album);
+        }
+
+        public async Task RemoveFromAlbumAsync(string albumId, string photoId)
+        {
+            await this.photoInAlbumStorage.RemovePhotoFromAlbumAsync(albumId, photoId).ConfigureAwait(false);
         }
     }
 }

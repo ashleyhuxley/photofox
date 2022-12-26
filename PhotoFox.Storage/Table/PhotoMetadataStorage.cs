@@ -18,7 +18,7 @@ namespace PhotoFox.Storage.Table
             this.config = storageConfig;
         }
 
-        public async Task<PhotoMetadata> GetPhotoMetadata(DateTime utcDate, string photoId)
+        public async Task<PhotoMetadata> GetPhotoMetadataAsync(DateTime utcDate, string photoId)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
@@ -26,7 +26,7 @@ namespace PhotoFox.Storage.Table
             return result.Value;
         }
 
-        public async Task<PhotoMetadata> GetPhotoMetadata(string photoId)
+        public async Task<PhotoMetadata> GetPhotoMetadataAsync(string photoId)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
@@ -40,14 +40,14 @@ namespace PhotoFox.Storage.Table
             return null;
         }
 
-        public AsyncPageable<PhotoMetadata> GetAllPhotos()
+        public AsyncPageable<PhotoMetadata> GetAllPhotosAsync()
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
             return tableClient.QueryAsync<PhotoMetadata>();
         }
 
-        public AsyncPageable<PhotoMetadata> GetPhotosByDate(DateTime date)
+        public AsyncPageable<PhotoMetadata> GetPhotosByDateAsync(DateTime date)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
@@ -58,21 +58,21 @@ namespace PhotoFox.Storage.Table
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.AddEntityAsync(photo);
+            await tableClient.AddEntityAsync(photo).ConfigureAwait(false);
         }
 
         public async Task DeletePhotoAsync(string partitionKey, string rowKey)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.DeleteEntityAsync(partitionKey, rowKey);
+            await tableClient.DeleteEntityAsync(partitionKey, rowKey).ConfigureAwait(false);
         }
 
         public async Task SavePhotoAsync(PhotoMetadata metadata)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.UpdateEntityAsync(metadata, metadata.ETag, TableUpdateMode.Replace);
+            await tableClient.UpdateEntityAsync(metadata, metadata.ETag, TableUpdateMode.Replace).ConfigureAwait(false);
         }
     }
 }

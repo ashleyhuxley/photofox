@@ -69,7 +69,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             AlbumList.Add(emptyAlbum);
 
-            await foreach (var album in this.photoAlbumService.GetAllAlbums())
+            await foreach (var album in this.photoAlbumService.GetAllAlbumsAsync())
             {
                 var viewModel = new AlbumViewModel
                 {

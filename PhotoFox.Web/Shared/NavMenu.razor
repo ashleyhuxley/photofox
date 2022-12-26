@@ -39,7 +39,7 @@
     private async Task LoadAlbums()
     {
         this.Albums.Clear();
-        await foreach(var album in this.AlbumService.GetAllAlbums())
+        await foreach(var album in this.AlbumService.GetAllAlbumsAsync())
         {
             this.Albums.Add(album);
         }

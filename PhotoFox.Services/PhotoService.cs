@@ -37,9 +37,9 @@ namespace PhotoFox.Services
             this.mapper = mapper;
         }
 
-        public async IAsyncEnumerable<Photo> GetPhotosByDateTaken(DateTime dateTaken)
+        public async IAsyncEnumerable<Photo> GetPhotosByDateTakenAsync(DateTime dateTaken)
         {
-            await foreach (var photo in this.photoMetadataStorage.GetPhotosByDate(dateTaken))
+            await foreach (var photo in this.photoMetadataStorage.GetPhotosByDateAsync(dateTaken))
             {
                 yield return mapper.Map<Photo>(photo);
             }
@@ -47,13 +47,13 @@ namespace PhotoFox.Services
 
         public async Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId)
         {
-            var metadata = await this.photoMetadataStorage.GetPhotoMetadata(dateTaken, photoId);
+            var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(dateTaken, photoId).ConfigureAwait(false);
             return mapper.Map<Photo>(metadata);
         }
 
         public async Task SavePhotoAsync(Photo photo)
         {
-            await this.photoMetadataStorage.SavePhotoAsync(mapper.Map<PhotoMetadata>(photo));
+            await this.photoMetadataStorage.SavePhotoAsync(mapper.Map<PhotoMetadata>(photo)).ConfigureAwait(false);
         }
 
         public async Task DeletePhotoAsync(Photo photo)
@@ -62,37 +62,37 @@ namespace PhotoFox.Services
                 this.photoFileStorage.DeleteThumbnailAsync(photo.PhotoId),
                 this.photoFileStorage.DeletePhotoAsync(photo.PhotoId),
                 this.photoMetadataStorage.DeletePhotoAsync(photo.DateTaken.ToPartitionKey(), photo.PhotoId),
-                this.photoInAlbumStorage.RemoveFromAllAlbums(photo.PhotoId));
+                this.photoInAlbumStorage.RemoveFromAllAlbumsAsync(photo.PhotoId)).ConfigureAwait(false);
         }
 
-        public async IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbum(DateTime dateTaken)
+        public async IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbumAsync(DateTime dateTaken)
         {
-            await foreach (var photo in this.photoMetadataStorage.GetPhotosByDate(dateTaken))
+            await foreach (var photo in this.photoMetadataStorage.GetPhotosByDateAsync(dateTaken))
             {
-                if (! await this.photoInAlbumStorage.IsPhotoInAnAlbumAsync(photo.RowKey))
+                if (! await this.photoInAlbumStorage.IsPhotoInAnAlbumAsync(photo.RowKey).ConfigureAwait(false))
                 {
                     yield return mapper.Map<Photo>(photo);
                 }
             }
         }
 
-        public async IAsyncEnumerable<Photo> GetPhotosInAlbum(string albumId)
+        public async IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId)
         {
-            await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbum(albumId))
+            await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbumAsync(albumId))
             {
-                var photo = await this.photoMetadataStorage.GetPhotoMetadata(photoInAlbum.UtcDate, photoInAlbum.RowKey);
+                var photo = await this.photoMetadataStorage.GetPhotoMetadataAsync(photoInAlbum.UtcDate, photoInAlbum.RowKey).ConfigureAwait(false);
                 yield return mapper.Map<Photo>(photo);
             }
         }
 
-        public async Task<Photo> ReloadExifData(DateTime utcDate, string photoId)
+        public async Task<Photo> ReloadExifDataAsync(DateTime utcDate, string photoId)
         {
-            var photoData = await this.photoFileStorage.GetPhotoAsync(photoId);
-            var exifReader = await ExifReader.FromStreamAsync(photoData.ToStream());
+            var photoData = await this.photoFileStorage.GetPhotoAsync(photoId).ConfigureAwait(false);
+            var exifReader = await ExifReader.FromStreamAsync(photoData.ToStream()).ConfigureAwait(false);
 
-            var metadata = await this.photoMetadataStorage.GetPhotoMetadata(utcDate, photoId);
+            var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(utcDate, photoId).ConfigureAwait(false);
             metadata.Orientation = exifReader.GetOrientation();
-            await this.photoMetadataStorage.SavePhotoAsync(metadata);
+            await this.photoMetadataStorage.SavePhotoAsync(metadata).ConfigureAwait(false);
 
             return mapper.Map<Photo>(metadata);
         }

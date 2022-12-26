@@ -93,6 +93,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             SaveChangesCommand = saveChangesCommand;
             OpenPhotoCommand = new RelayCommand(OpenSelectedImage, OpenSelectedImageCanExecute);
             AddToAlbumCommand = new RelayCommand(AddToAlbumCommandExecute);
+            MoveToAlbumCommand = new RelayCommand(MoveToAlbumCommandExecute);
             SetAlbumCoverCommand = new RelayCommand(SetAlbumCoverCommandExecute, () => this.SelectedPhoto != null);
             ReloadExifCommand = new RelayCommand(ReloadExifExecute, () => this.SelectedPhoto != null);
 
@@ -132,6 +133,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand SaveChangesCommand { get; }
         public ICommand OpenPhotoCommand { get; }
         public ICommand AddToAlbumCommand { get; }
+        public ICommand MoveToAlbumCommand { get; }
         public ICommand SetAlbumCoverCommand { get; }
         public ICommand ReloadExifCommand { get; }
 
@@ -247,7 +249,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            await foreach (var photo in this.photoService.GetPhotosInAlbum(albumId))
+            await foreach (var photo in this.photoService.GetPhotosInAlbumAsync(albumId))
             {
                 if (token.IsCancellationRequested)
                 {
@@ -281,7 +283,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 string strDate = batchId.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
                 this.LoadingStatusText = $"Loading photos from {strDate}...";
 
-                await foreach (var photo in this.photoService.GetPhotosByDateNotInAlbum(this.batchId))
+                await foreach (var photo in this.photoService.GetPhotosByDateNotInAlbumAsync(this.batchId))
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -305,9 +307,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             this.Albums.Clear();
 
-            this.Albums.Add(new AlbumViewModel { AlbumId = string.Empty, Title = "[ No Album ]" });
+            this.Albums.Add(new AlbumViewModel { AlbumId = Guid.Empty.ToString(), Title = "[ No Album ]" });
 
-            await foreach (var album in this.photoAlbumService.GetAllAlbums())
+            await foreach (var album in this.photoAlbumService.GetAllAlbumsAsync())
             {
                 var viewModel = new AlbumViewModel
                 {
@@ -430,18 +432,18 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            this.photoAlbumService.SetCoverImage(this.SelectedAlbum.AlbumId, this.SelectedPhoto.Photo.PhotoId);
+            this.photoAlbumService.SetCoverImageAsync(this.SelectedAlbum.AlbumId, this.SelectedPhoto.Photo.PhotoId);
             this.SelectedAlbum.SetImage(this.SelectedPhoto.Image);
         }
 
-        public void AddToAlbumCommandExecute()
+        private string? GetAlbumIdForMove()
         {
             var selectAlbumMessage = new SelectAlbumMessage();
             SelectAlbumMessageResponse response = this.messenger.Send(selectAlbumMessage);
 
             if (!response.Result)
             {
-                return;
+                return null;
             }
 
             var albumId = response.SelectedAlbumId;
@@ -458,14 +460,40 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
                 this.photoAlbumService.AddAlbumAsync(album);
 
-                albumId = album.AlbumId;
+                return album.AlbumId;
+            }
+
+            return null;
+        }
+
+        public async void AddToAlbumCommandExecute()
+        {
+            var albumId = GetAlbumIdForMove();
+            if (albumId is null)
+            {
+                return;
+            }
+
+            foreach (var photo in this.Photos.Where(p => p.IsSelected))
+            {
+                await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.Photo.PhotoId, photo.Photo.DateTaken);
+            }
+        }
+
+        public async void MoveToAlbumCommandExecute()
+        {
+            var albumId = GetAlbumIdForMove();
+            if (albumId is null)
+            {
+                return;
             }
 
             var toRemove = new List<PhotoViewModel>();
 
             foreach (var photo in this.Photos.Where(p => p.IsSelected))
             {
-                this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.Photo.PhotoId, photo.Photo.DateTaken);
+                await this.photoAlbumService.RemoveFromAlbumAsync(albumId, photo.Photo.PhotoId);
+                await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.Photo.PhotoId, photo.Photo.DateTaken);
                 toRemove.Add(photo);
             }
 
@@ -484,7 +512,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             foreach (var photo in photosToProcess)
             {
-                var newPhoto = await this.photoService.ReloadExifData(photo.Photo.DateTaken, photo.Photo.PhotoId);
+                var newPhoto = await this.photoService.ReloadExifDataAsync(photo.Photo.DateTaken, photo.Photo.PhotoId);
 
                 this.LoadPhoto(newPhoto, cancellationTokenSource.Token);
             }

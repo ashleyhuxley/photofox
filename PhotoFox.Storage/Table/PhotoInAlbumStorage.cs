@@ -2,7 +2,6 @@
 using Azure.Data.Tables;
 using PhotoFox.Storage.Models;
 using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Table
@@ -18,7 +17,7 @@ namespace PhotoFox.Storage.Table
             this.config = config;
         }
 
-        public AsyncPageable<PhotoInAlbum> GetPhotosInAlbum(string albumId)
+        public AsyncPageable<PhotoInAlbum> GetPhotosInAlbumAsync(string albumId)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
@@ -29,7 +28,7 @@ namespace PhotoFox.Storage.Table
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.AddEntityAsync(new PhotoInAlbum { PartitionKey = albumId, RowKey = photoId, UtcDate = utcDate });
+            await tableClient.AddEntityAsync(new PhotoInAlbum { PartitionKey = albumId, RowKey = photoId, UtcDate = utcDate }).ConfigureAwait(false);
         }
 
         public async Task<bool> IsPhotoInAnAlbumAsync(string photoId)
@@ -46,14 +45,14 @@ namespace PhotoFox.Storage.Table
             return result;
         }
 
-        public async Task ModifyPhotoInAlbum(PhotoInAlbum photoInAlbum)
+        public async Task ModifyPhotoInAlbumAsync(PhotoInAlbum photoInAlbum)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            await tableClient.UpdateEntityAsync(photoInAlbum, ETag.All);
+            await tableClient.UpdateEntityAsync(photoInAlbum, ETag.All).ConfigureAwait(false);
         }
 
-        public async Task RemoveFromAllAlbums(string photoId)
+        public async Task RemoveFromAllAlbumsAsync(string photoId)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
@@ -61,8 +60,15 @@ namespace PhotoFox.Storage.Table
 
             await foreach (var item in items)
             {
-                await tableClient.DeleteEntityAsync(item.PartitionKey, item.RowKey);
+                await tableClient.DeleteEntityAsync(item.PartitionKey, item.RowKey).ConfigureAwait(false);
             }
+        }
+
+        public async Task RemovePhotoFromAlbumAsync(string albumId, string photoId)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            await tableClient.DeleteEntityAsync(albumId, photoId).ConfigureAwait(false);
         }
     }
 }
