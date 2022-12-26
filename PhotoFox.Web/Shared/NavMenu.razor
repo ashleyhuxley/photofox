@@ -1,0 +1,53 @@
+﻿@using PhotoFox.Model
+@using PhotoFox.Services
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @foreach (var album in Albums.OrderBy(a => a.Title))
+        {
+            <div class="nav-item px-3">
+                <a href="album/@album.AlbumId">
+                    <div>
+                        <img src="/thumbnail/@album.CoverPhotoId" style="width: 250px;" alt="@album.Title" />
+                        @album.Title
+                    </div>
+                </a>
+            </div>
+        }
+    </nav>
+</div>
+
+@inject IPhotoAlbumService AlbumService;
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private List<PhotoAlbum> Albums { get; set; }
+
+    public NavMenu()
+    {
+        this.Albums = new List<PhotoAlbum>();
+    }
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task LoadAlbums()
+    {
+        this.Albums.Clear();
+        await foreach(var album in this.AlbumService.GetAllAlbums())
+        {
+            this.Albums.Add(album);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await this.LoadAlbums();
+    }
+}

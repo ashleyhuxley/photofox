@@ -1,0 +1,30 @@
+﻿.date-header {
+    margin-top: 10px;
+    padding: 5px;
+    background-color: darkblue;
+    color: white;
+}
+
+.photo-item {
+    margin: 10px;
+    border: 1px solid #ccc;
+    float: left;
+}
+
+.photo-img {
+    padding: 5px;
+    display: table-cell;
+    height: 260px;
+    vertical-align: middle;
+}
+
+.caption {
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 5px;
+}
+
+.photo-item:hover {
+    border: 1px solid #777;
+}

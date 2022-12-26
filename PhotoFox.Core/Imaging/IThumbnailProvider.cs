@@ -4,6 +4,6 @@ namespace PhotoFox.Core.Imaging
 {
     public interface IThumbnailProvider
     {
-        Image GenerateThumbnail(Image input, int width);
+        Image GenerateThumbnail(Image input, int width, int rotationDegrees);
     }
 }
