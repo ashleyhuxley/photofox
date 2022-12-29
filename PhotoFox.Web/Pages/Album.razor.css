@@ -5,26 +5,43 @@
     color: white;
 }
 
-.photo-item {
-    margin: 10px;
-    border: 1px solid #ccc;
-    float: left;
+.gal-container {
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
-.photo-img {
-    padding: 5px;
-    display: table-cell;
-    height: 260px;
-    vertical-align: middle;
+.gal-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    list-style-type: none;
+    padding-left: 0;
 }
 
-.caption {
-    text-align: center;
-    font-weight: bold;
-    font-size: 0.8rem;
-    padding: 5px;
-}
+    .gal-list > li {
+        cursor: pointer;
+        position: relative;
+        border: 1px solid #ccc;
+        padding: 5px;
+    }
 
-.photo-item:hover {
-    border: 1px solid #777;
-}
+        .gal-list > li:hover {
+            border: 1px solid black;
+        }
+
+    .gal-list div.img {
+        height: 200px;
+    }
+
+    .gal-list li img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        vertical-align: middle;
+    }
+    .gal-list .caption {
+        text-align: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+        padding: 5px;
+    }

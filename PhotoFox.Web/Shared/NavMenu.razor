@@ -6,12 +6,10 @@
         @foreach (var album in Albums.OrderBy(a => a.Title))
         {
             <div class="nav-item px-3">
-                <a href="album/@album.AlbumId">
-                    <div>
-                        <img src="/thumbnail/@album.CoverPhotoId" style="width: 250px;" alt="@album.Title" />
-                        @album.Title
-                    </div>
-                </a>
+                <div>
+                    <div class="album-img"><a href="album/@album.AlbumId"><img src="/thumbnail/@album.CoverPhotoId" style="width: 250px;" alt="@album.Title" /></a></div>
+                    <div class="album-title"><a href="album/@album.AlbumId">@album.Title</a> <a href="map/@album.AlbumId">(View Map)</a></div>
+                </div>
             </div>
         }
     </nav>

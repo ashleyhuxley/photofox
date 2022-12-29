@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NLog;
-using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
@@ -18,13 +17,10 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using PhotoAlbum = PhotoFox.Model.PhotoAlbum;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
@@ -448,22 +444,22 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             var albumId = response.SelectedAlbumId;
 
-            if (albumId == string.Empty)
+            if (albumId != string.Empty)
             {
-                var album = new PhotoAlbum
-                {
-                    AlbumId = Guid.NewGuid().ToString(),
-                    Description = string.Empty,
-                    Title = response.NewAlbumName,
-                    CoverPhotoId = this.Photos.First(p => p.IsSelected).Photo.PhotoId
-                };
-
-                this.photoAlbumService.AddAlbumAsync(album);
-
-                return album.AlbumId;
+                return albumId;
             }
 
-            return null;
+            var album = new PhotoAlbum
+            {
+                AlbumId = Guid.NewGuid().ToString(),
+                Description = string.Empty,
+                Title = response.NewAlbumName,
+                CoverPhotoId = this.Photos.First(p => p.IsSelected).Photo.PhotoId
+            };
+
+            this.photoAlbumService.AddAlbumAsync(album);
+
+            return album.AlbumId;
         }
 
         public async void AddToAlbumCommandExecute()
@@ -482,6 +478,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public async void MoveToAlbumCommandExecute()
         {
+            if (this.SelectedAlbum is null)
+            {
+                return;
+            }
+
             var albumId = GetAlbumIdForMove();
             if (albumId is null)
             {
@@ -492,7 +493,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             foreach (var photo in this.Photos.Where(p => p.IsSelected))
             {
-                await this.photoAlbumService.RemoveFromAlbumAsync(albumId, photo.Photo.PhotoId);
+                await this.photoAlbumService.RemoveFromAlbumAsync(this.SelectedAlbum.AlbumId, photo.Photo.PhotoId);
                 await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.Photo.PhotoId, photo.Photo.DateTaken);
                 toRemove.Add(photo);
             }

@@ -1,0 +1,129 @@
+﻿@page "/photo/{date}/{id}"
+@using PhotoFox.Services
+@using PhotoFox.Core.Extensions
+@inject IPhotoService PhotoService;
+
+<div class="main">
+    <div class="left">
+        <div class="left-content">
+            <img src="/image/@Id" />
+        </div>
+    </div>
+    <div class="right">
+        <div class="meta-item">
+            <div class="meta-title">Name:</div>
+            <div class="meta-value">@Name</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Description:</div>
+            <div class="meta-value">@Description</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Dimensions:</div>
+            <div class="meta-value">@Dimension</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Date Taken:</div>
+            <div class="meta-value">@DateTaken</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Manufacturer:</div>
+            <div class="meta-value">@Manufacturer</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Device:</div>
+            <div class="meta-value">@Device</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Aperture:</div>
+            <div class="meta-value">@Aperture</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Exposure:</div>
+            <div class="meta-value">@Exposure</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">ISO:</div>
+            <div class="meta-value">@ISO</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Focal Length:</div>
+            <div class="meta-value">@FocalLength</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">File Size:</div>
+            <div class="meta-value">@FileSize</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-title">Orientation:</div>
+            <div class="meta-value">@Orientation</div>
+        </div>
+        @if (this.ShowMap)
+        {
+            <div class="meta-item">
+                <div class="meta-title">GPS Location:</div>
+                <div class="meta-value"><a href="@GpsLink" target="_blank">@GpsLocation</a></div>
+            </div>
+            <div>
+                <iframe width="450"
+                    height="450"
+                    style="border:0"
+                    loading="lazy"
+                    allowfullscreen
+                    referrerpolicy="no-referrer-when-downgrade"
+                    src="@MapLink">
+                </iframe>
+            </div>
+        }
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    [Parameter]
+    public string? Date { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Dimension { get; set; } = string.Empty;
+    public string DateTaken { get; set; } = string.Empty;
+    public string Manufacturer { get; set; } = string.Empty;
+    public string Device { get; set; } = string.Empty;
+    public string Aperture { get; set; } = string.Empty;
+    public string Exposure { get; set; } = string.Empty;
+    public string ISO { get; set; } = string.Empty;
+    public string FocalLength { get; set; } = string.Empty;
+    public string FileSize { get; set; } = string.Empty;
+    public string Orientation { get; set; } = string.Empty;
+    public string GpsLocation { get; set; } = string.Empty;
+    public string GpsLink { get; set; } = string.Empty;
+    public string MapLink { get; set; } = string.Empty;
+    public bool ShowMap { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        var metadata = await this.PhotoService.GetPhotoAsync(this.Date, this.Id);
+
+        string apiKey = "AIzaSyC_Mmr0ETT1iX3SQkQTl6pvlo7Ef3-K1E4";
+
+        this.Name = metadata.Title;
+        this.Description = metadata.Description;
+        this.Dimension = $"{metadata.DimensionWidth} x {metadata.DimensionHeight}";
+        this.DateTaken = metadata.DateTaken.ToString("dd MMMM yyyy HH:mm:ss");
+        this.Manufacturer = metadata.Manufacturer;
+        this.Device = metadata.Device;
+        this.Aperture = metadata.Aperture;
+        this.Exposure = metadata.Exposure;
+        this.ISO = metadata.ISO;
+        this.FocalLength = metadata.FocalLength;
+        this.FileSize = metadata.FileSize?.ToFileSize() ?? string.Empty;
+        this.Orientation = metadata.Orientation?.ToString() ?? string.Empty;
+        this.ShowMap = metadata.GeolocationLattitude.HasValue && metadata.GeolocationLongitude.HasValue;
+        this.GpsLocation = $"{metadata.GeolocationLattitude:0.#####}, {metadata.GeolocationLongitude:0.#####}";
+        this.GpsLink = $"https://maps.google.com/?q={metadata.GeolocationLattitude},{metadata.GeolocationLongitude}";
+        this.MapLink = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={metadata.GeolocationLattitude},{metadata.GeolocationLongitude}";
+    }
+}

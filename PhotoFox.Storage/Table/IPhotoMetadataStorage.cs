@@ -8,6 +8,7 @@ namespace PhotoFox.Storage.Table
     public interface IPhotoMetadataStorage
     {
         Task<PhotoMetadata> GetPhotoMetadataAsync(DateTime utcDate, string photoId);
+        Task<PhotoMetadata> GetPhotoMetadataAsync(string utcDate, string photoId);
         AsyncPageable<PhotoMetadata> GetAllPhotosAsync();
         AsyncPageable<PhotoMetadata> GetPhotosByDateAsync(DateTime date);
         Task AddPhotoAsync(PhotoMetadata photo);

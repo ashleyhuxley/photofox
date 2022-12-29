@@ -51,6 +51,12 @@ namespace PhotoFox.Services
             return mapper.Map<Photo>(metadata);
         }
 
+        public async Task<Photo> GetPhotoAsync(string dateTaken, string photoId)
+        {
+            var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(dateTaken, photoId).ConfigureAwait(false);
+            return mapper.Map<Photo>(metadata);
+        }
+
         public async Task SavePhotoAsync(Photo photo)
         {
             await this.photoMetadataStorage.SavePhotoAsync(mapper.Map<PhotoMetadata>(photo)).ConfigureAwait(false);

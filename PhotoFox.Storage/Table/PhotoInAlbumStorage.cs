@@ -17,6 +17,13 @@ namespace PhotoFox.Storage.Table
             this.config = config;
         }
 
+        public AsyncPageable<PhotoInAlbum> GetAlbumsForPhotoId(string photoId)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            return tableClient.QueryAsync<PhotoInAlbum>(p => p.RowKey == photoId);
+        }
+
         public AsyncPageable<PhotoInAlbum> GetPhotosInAlbumAsync(string albumId)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
@@ -56,7 +63,7 @@ namespace PhotoFox.Storage.Table
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            var items = tableClient.QueryAsync<PhotoAlbum>(p => p.PartitionKey == photoId);
+            var items = tableClient.QueryAsync<PhotoAlbum>(p => p.RowKey == photoId);
 
             await foreach (var item in items)
             {
