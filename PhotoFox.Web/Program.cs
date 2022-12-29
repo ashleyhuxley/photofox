@@ -3,6 +3,9 @@ using PhotoFox.Services;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
+using ElCamino.AspNetCore.Identity.AzureTable.Model;
+using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
+using PhotoFox.Web.Data;
 
 namespace PhotoFox.Web
 {
@@ -13,6 +16,18 @@ namespace PhotoFox.Web
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            //builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
+                {
+                    IdentityConfiguration idconfig = new IdentityConfiguration();
+                    idconfig.TablePrefix = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value;
+                    idconfig.StorageConnectionString = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value;
+                    idconfig.IndexTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:IndexTableName").Value; // default: AspNetIndex
+                    idconfig.RoleTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:RoleTableName").Value;   // default: AspNetRoles
+                    idconfig.UserTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:UserTableName").Value;   // default: AspNetUsers
+                    return idconfig;
+                })).CreateAzureTablesIfNotExists<ApplicationDbContext>();
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
 
@@ -42,6 +57,8 @@ namespace PhotoFox.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

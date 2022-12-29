@@ -7,9 +7,11 @@ using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
@@ -34,16 +36,29 @@ namespace PhotoFox.CmdLine
 
         private static async Task MainAsync()
         {
-            await foreach (var photo in metaDataStorage.GetAllPhotosAsync())
+            await foreach (var photoInAlbum in photoInAlbumStorage.GetPhotosInAlbumAsync(Guid.Empty.ToString()))
             {
-                if (!await photoInAlbumStorage.IsPhotoInAnAlbumAsync(photo.RowKey))
+                List<PhotoInAlbum> photoInAlbums = new List<PhotoInAlbum>();
+                await foreach(var album in photoInAlbumStorage.GetAlbumsForPhotoId(photoInAlbum.RowKey))
                 {
-                    Console.WriteLine($"Processing {photo.RowKey}");
-                    await photoInAlbumStorage.AddPhotoInAlbumAsync(Guid.Empty.ToString(), photo.RowKey, photo.UtcDate.Value);
+                    photoInAlbums.Add(album);
+                }
+
+                if (photoInAlbums.Any(Check))
+                {
+                    Console.WriteLine($"{photoInAlbum.RowKey} exists in {string.Join(',', photoInAlbums.Select(p => p.PartitionKey))}");
+                    await photoInAlbumStorage.RemovePhotoFromAlbumAsync(Guid.Empty.ToString(), photoInAlbum.RowKey);
                 }
             }
 
             Console.WriteLine($"Done.");
+        }
+
+        private static bool Check(PhotoInAlbum inStr)
+        {
+            var empty = Guid.Empty.ToString();
+            var result = inStr.PartitionKey != empty;
+            return result;
         }
 
         private static async Task RegenerateThumbnails()

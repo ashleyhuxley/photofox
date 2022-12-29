@@ -24,6 +24,8 @@ namespace PhotoFox.Services
 
         private readonly IThumbnailProvider thumbnailProvider;
 
+        private readonly IPhotoInAlbumStorage photoInAlbumStorage;
+
         private readonly IStreamHash streamHash;
 
         private readonly IPhotoFileStorage photoFileStorage;
@@ -35,6 +37,7 @@ namespace PhotoFox.Services
         public UploadService(
             IPhotoMetadataStorage photoMetadataStorage,
             IThumbnailProvider thumbnailProvider,
+            IPhotoInAlbumStorage photoInAlbumStorage,
             IStreamHash streamHash,
             IPhotoFileStorage photoFileStorage,
             IPhotoHashStorage photoHashStorage,
@@ -42,6 +45,7 @@ namespace PhotoFox.Services
         {
             this.photoMetadataStorage = photoMetadataStorage;
             this.thumbnailProvider = thumbnailProvider;
+            this.photoInAlbumStorage = photoInAlbumStorage;
             this.streamHash = streamHash;
             this.photoFileStorage = photoFileStorage;
             this.photoHashStorage = photoHashStorage;
@@ -102,6 +106,7 @@ namespace PhotoFox.Services
 
             await this.photoMetadataStorage.AddPhotoAsync(metadata).ConfigureAwait(false);
             await this.photoHashStorage.AddHashAsync(md5, metadata.PartitionKey, metadata.RowKey).ConfigureAwait(false);
+            await this.photoInAlbumStorage.AddPhotoInAlbumAsync(Guid.Empty.ToString(), metadata.RowKey, metadata.UtcDate.Value);
 
             return mapper.Map<Photo>(metadata);
         }

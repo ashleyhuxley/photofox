@@ -1,0 +1,52 @@
+﻿@page "/map/{id}"
+@using PhotoFox.Core.Extensions
+@using PhotoFox.Model
+@using PhotoFox.Services
+
+@inject IJSRuntime JSRuntime
+
+@inject IPhotoService PhotoService;
+@inject IPhotoAlbumService AlbumService;
+
+<h1>Display Google Map</h1>
+<div id="map" style="height:1000px;width:100%;">
+</div>
+
+@code {
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //if (firstRender)
+        {
+            var locations = new List<Location>();
+            await foreach (var photo in this.PhotoService.GetPhotosInAlbumAsync(Id))
+            {
+                if (photo.GeolocationLattitude.HasValue && photo.GeolocationLongitude.HasValue)
+                {
+                    locations.Add(new Location 
+                        { 
+                            Name = photo.Title, 
+                            Lat = photo.GeolocationLattitude.Value, 
+                            Lng = photo.GeolocationLongitude.Value,
+                            Thumb = $"/thumbnail/{photo.PhotoId}",
+                            Link = $"/photo/{photo.DateTaken.ToPartitionKey()}/{photo.PhotoId}"
+                        });
+                }
+            }
+
+            await JSRuntime.InvokeVoidAsync("initialize", locations);
+        }
+    }
+
+    public class Location
+    {
+        public string? Name { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+        public string? Thumb { get; set; }
+        public string? Link { get; set; }
+    }
+}

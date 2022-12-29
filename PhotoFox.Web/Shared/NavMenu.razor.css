@@ -23,9 +23,17 @@ nav {
     top: -2px;
 }
 
+.album-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 5px;
+}
+
 .nav-item {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
+    margin-bottom: 10px;
 }
 
     .nav-item img {
@@ -45,7 +53,7 @@ nav {
         border-radius: 4px;
         display: flex;
         align-items: center;
-        line-height: 3rem;
+        text-decoration: none;
     }
 
         .nav-item ::deep a.active {

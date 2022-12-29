@@ -12,6 +12,8 @@ namespace PhotoFox.Services
         IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbumAsync(DateTime dateTaken);
 
         Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId);
+        
+        Task<Photo> GetPhotoAsync(string dateTaken, string photoId);
 
         Task SavePhotoAsync(Photo photo);
 

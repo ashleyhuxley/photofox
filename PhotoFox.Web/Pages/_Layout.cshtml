@@ -12,6 +12,8 @@
     <link href="css/site.css" rel="stylesheet" />
     <link href="PhotoFox.Web.styles.css" rel="stylesheet" />
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <script type="text/javascript" src="scripts/index.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_Mmr0ETT1iX3SQkQTl6pvlo7Ef3-K1E4&callback=initMap"></script>
 </head>
 <body>
     @RenderBody()
@@ -26,7 +28,7 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-
     <script src="_framework/blazor.server.js"></script>
+
 </body>
 </html>

@@ -18,12 +18,29 @@ namespace PhotoFox.Storage.Table
             this.config = storageConfig;
         }
 
-        public async Task<PhotoMetadata> GetPhotoMetadataAsync(DateTime utcDate, string photoId)
+        public Task<bool> PhotoExistsAsync(DateTime utcDate, string photoId)
+        {
+            return PhotoExistsAsync(utcDate.ToPartitionKey(), photoId);
+        }
+
+        public async Task<bool> PhotoExistsAsync(string utcDate, string photoId)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            var result = await tableClient.GetEntityAsync<PhotoMetadata>(utcDate.ToPartitionKey(), photoId);
+            return await tableClient.EntityExistsAsync<PhotoMetadata>(utcDate, photoId).ConfigureAwait(false);
+        }
+
+        public async Task<PhotoMetadata> GetPhotoMetadataAsync(string utcDate, string photoId)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            var result = await tableClient.GetEntityAsync<PhotoMetadata>(utcDate, photoId).ConfigureAwait(false);
             return result.Value;
+        }
+
+        public Task<PhotoMetadata> GetPhotoMetadataAsync(DateTime utcDate, string photoId)
+        {
+            return this.GetPhotoMetadataAsync(utcDate.ToPartitionKey(), photoId);
         }
 
         public async Task<PhotoMetadata> GetPhotoMetadataAsync(string photoId)

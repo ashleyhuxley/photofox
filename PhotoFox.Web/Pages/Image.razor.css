@@ -1,0 +1,45 @@
+﻿.main {
+    position: relative;
+    overflow: hidden;
+}
+
+.left {
+    float: left;
+    width: 100%;
+}
+
+.left .left-content {
+    margin-right: 500px;
+    padding-right: 50px;
+}
+
+    .left .left-content img {
+        width: 100%;
+    }
+
+.right {
+    float: right;
+    width: 500px;
+    margin-left: -500px;
+    background-color: #DDD;
+    padding: 15px;
+}
+
+.meta-title {
+    font-weight: bold;
+}
+
+.meta-value {
+    padding-left: 10px;
+}
+
+@media only screen and (max-width: 320px) {
+    .left {
+        width: auto;
+    }
+
+    .right {
+        width: auto;
+        position: static;
+    }
+}

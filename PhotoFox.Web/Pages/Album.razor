@@ -1,8 +1,7 @@
 ﻿@page "/album/{albumid}"
+@using PhotoFox.Core.Extensions
 @using PhotoFox.Model
 @using PhotoFox.Services
-
-<h3>@title</h3>
 
 @if (loading)
 {
@@ -11,22 +10,29 @@
 else
 {
     <div id="photos">
-        @{
-            var currentDate = DateTime.MinValue;
-        }
-        @foreach (var photo in Photos.OrderByDescending(p => p.DateTaken))
+        @foreach (var group in Photos.GroupBy(p => p.DateTaken.Date).OrderByDescending(g => g.Key))
         {
-            if (currentDate != photo.DateTaken.Date)
-            {
-                currentDate = photo.DateTaken.Date;
-                <div class="date-header" style="clear: both;">
-                    @currentDate.ToLongDateString()
-                </div>
-            }
+            <div class="date-header" style="clear: both;">
+                @group.Key.ToLongDateString()
+            </div>
 
-            <div class="photo-item">
-                <div class="photo-img"><img src="/thumbnail/@photo.PhotoId" alt="@photo.Title" /></div>
-                <div class="caption">@photo.Title</div>
+            <div class="gal-container">
+                <ul class="gal-list">
+                    @foreach (var photo in group)
+                    {
+                        var dateKey = photo.DateTaken.ToPartitionKey();
+                        var idKey = photo.PhotoId;
+
+                        <li>
+                            <a href="/photo/@dateKey/@idKey">
+                                <div class="img">
+                                    <img src="/thumbnail/@photo.PhotoId" alt="@photo.Title" />
+                                </div>
+                                <div class="caption"><span>@photo.Title</span></div>
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
         }
     </div>
@@ -57,8 +63,6 @@ else
 
     public PhotoAlbum? LoadedAlbum { get; set; }
 
-    private string title = string.Empty;
-
     private bool loading = false;
 
     protected async override Task OnParametersSetAsync()
@@ -66,7 +70,6 @@ else
         await base.OnParametersSetAsync();
 
         this.LoadedAlbum = await this.AlbumService.GetPhotoAlbumAsync(AlbumId);
-        this.title = LoadedAlbum.Title;
 
         loading = true;
         StateHasChanged();

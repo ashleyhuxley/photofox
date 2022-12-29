@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAl6DqS5gGDk+a4B6u/NRqzAAAAAACAAAAAAAQZgAAAAEAACAAAAA3Nc1W1eHdfaxtYzr/ijylFZZRrwwv+CqLJgQtxwCp2wAAAAAOgAAAAAIAACAAAADsiNaqOwESIAElY/ludF31Ln/ltR/q1djfH+6ia1+Ck4AAAAAq48vPIrJNK1Lcx7Fukz4wZg1Z2RZc4nm6cXDfx1l/9KlBeoMctA8p9o0DHB1xHO6/HIc2lpSmSzkqblUyy3hORkeARZ6kv7D6e1ZOkuo63GwmATif7125sdTQy4Az45Q8TzVkbgSROyckHC5G7qy/C3vpNwOlFiWx8a04j53BJUAAAABDKsh84ltp9wc0JQ9Ku427rCUylX1dnAj3cT7i4ehtZOzJ6eBkDVe7/tlM65npi3hX3hfKjwUh/gChx5gi0hGl</EncryptedPassword>
+    <_PublishTargetUrl>ftps://waws-prod-ln1-077.ftp.azurewebsites.windows.net/site/wwwroot</_PublishTargetUrl>
+    <History>True|2022-12-27T00:06:34.1110236Z;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="appsettings.Development.json">
+      <publishTime>12/25/2022 10:57:58</publishTime>
+    </File>
+    <File Include="appsettings.json">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="AutoMapper.dll">
+      <publishTime>09/30/2022 10:45:38</publishTime>
+    </File>
+    <File Include="Azure.Core.dll">
+      <publishTime>06/30/2022 20:28:36</publishTime>
+    </File>
+    <File Include="Azure.Data.Tables.dll">
+      <publishTime>07/07/2022 16:29:16</publishTime>
+    </File>
+    <File Include="Azure.Storage.Blobs.dll">
+      <publishTime>08/23/2022 01:52:06</publishTime>
+    </File>
+    <File Include="Azure.Storage.Common.dll">
+      <publishTime>07/08/2022 01:13:22</publishTime>
+    </File>
+    <File Include="ExifLibrary.dll">
+      <publishTime>12/01/2020 08:08:06</publishTime>
+    </File>
+    <File Include="Microsoft.Bcl.AsyncInterfaces.dll">
+      <publishTime>04/14/2020 23:39:12</publishTime>
+    </File>
+    <File Include="Microsoft.Win32.SystemEvents.dll">
+      <publishTime>10/23/2021 00:40:24</publishTime>
+    </File>
+    <File Include="NLog.dll">
+      <publishTime>09/01/2022 22:27:30</publishTime>
+    </File>
+    <File Include="PhotoFox.Core.dll">
+      <publishTime>12/27/2022 00:05:51</publishTime>
+    </File>
+    <File Include="PhotoFox.Core.pdb">
+      <publishTime>12/27/2022 00:05:51</publishTime>
+    </File>
+    <File Include="PhotoFox.Mappings.dll">
+      <publishTime>12/27/2022 00:05:52</publishTime>
+    </File>
+    <File Include="PhotoFox.Mappings.pdb">
+      <publishTime>12/27/2022 00:05:52</publishTime>
+    </File>
+    <File Include="PhotoFox.Model.dll">
+      <publishTime>12/27/2022 00:05:51</publishTime>
+    </File>
+    <File Include="PhotoFox.Model.pdb">
+      <publishTime>12/27/2022 00:05:51</publishTime>
+    </File>
+    <File Include="PhotoFox.Services.dll">
+      <publishTime>12/27/2022 00:05:52</publishTime>
+    </File>
+    <File Include="PhotoFox.Services.pdb">
+      <publishTime>12/27/2022 00:05:52</publishTime>
+    </File>
+    <File Include="PhotoFox.Storage.dll">
+      <publishTime>12/27/2022 00:05:51</publishTime>
+    </File>
+    <File Include="PhotoFox.Storage.pdb">
+      <publishTime>12/27/2022 00:05:51</publishTime>
+    </File>
+    <File Include="PhotoFox.Web.deps.json">
+      <publishTime>12/27/2022 00:05:53</publishTime>
+    </File>
+    <File Include="PhotoFox.Web.dll">
+      <publishTime>12/27/2022 00:05:53</publishTime>
+    </File>
+    <File Include="PhotoFox.Web.exe">
+      <publishTime>12/27/2022 00:05:53</publishTime>
+    </File>
+    <File Include="PhotoFox.Web.pdb">
+      <publishTime>12/27/2022 00:05:53</publishTime>
+    </File>
+    <File Include="PhotoFox.Web.runtimeconfig.json">
+      <publishTime>12/27/2022 00:05:54</publishTime>
+    </File>
+    <File Include="runtimes/unix/lib/net6.0/System.Drawing.Common.dll">
+      <publishTime>10/23/2021 00:51:42</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll">
+      <publishTime>10/23/2021 00:40:18</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/net6.0/System.Drawing.Common.dll">
+      <publishTime>10/23/2021 00:48:10</publishTime>
+    </File>
+    <File Include="System.Drawing.Common.dll">
+      <publishTime>10/23/2021 00:49:12</publishTime>
+    </File>
+    <File Include="System.IO.Hashing.dll">
+      <publishTime>10/23/2021 00:47:54</publishTime>
+    </File>
+    <File Include="System.Memory.Data.dll">
+      <publishTime>04/08/2021 17:45:54</publishTime>
+    </File>
+    <File Include="web.config">
+      <publishTime>12/27/2022 00:05:55</publishTime>
+    </File>
+    <File Include="wwwroot/css/bootstrap/bootstrap.min.css">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/bootstrap/bootstrap.min.css.map">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/FONT-LICENSE">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/font/css/open-iconic-bootstrap.min.css">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/font/fonts/open-iconic.eot">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/font/fonts/open-iconic.otf">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/font/fonts/open-iconic.svg">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/font/fonts/open-iconic.ttf">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/font/fonts/open-iconic.woff">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/ICON-LICENSE">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/open-iconic/README.md">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/css/site.css">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/favicon.ico">
+      <publishTime>12/25/2022 10:57:59</publishTime>
+    </File>
+    <File Include="wwwroot/PhotoFox.Web.styles.css">
+      <publishTime>12/27/2022 00:05:53</publishTime>
+    </File>
+    <File Include="wwwroot/scripts/index.js">
+      <publishTime>12/26/2022 23:53:37</publishTime>
+    </File>
+  </ItemGroup>
+</Project>
