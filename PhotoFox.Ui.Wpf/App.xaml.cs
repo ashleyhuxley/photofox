@@ -86,6 +86,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IPhotoInAlbumStorage>().To<PhotoInAlbumStorage>();
             this.contianer.Bind<IPhotoHashStorage>().To<PhotoHashStorage>();
             this.contianer.Bind<IAlbumPermissionStorage>().To<AlbumPermissionStorage>();
+            this.contianer.Bind<IUserStorage>().To<UserStorage>();
 
             // Commands
             this.contianer.Bind<AddPhotosCommand>().ToSelf();

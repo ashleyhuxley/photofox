@@ -24,5 +24,11 @@ namespace PhotoFox.Services
         Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId);
 
         Task RemoveFromAlbumAsync(string albumId, string photoId);
+
+        Task<bool> UserHasPermissionAsync(string albumId, string username);
+
+        Task AddPermissionAsync(string albumId, string username);
+
+        Task RemovePermissionAsync(string albumId, string username);
     }
 }
