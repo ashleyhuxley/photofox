@@ -9,6 +9,8 @@ namespace PhotoFox.Services
     {
         IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync();
 
+        IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync(string username);
+
         IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId);
 
         Task AddAlbumAsync(PhotoAlbum album);

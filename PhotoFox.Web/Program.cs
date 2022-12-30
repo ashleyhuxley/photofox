@@ -6,6 +6,7 @@ using PhotoFox.Storage.Table;
 using ElCamino.AspNetCore.Identity.AzureTable.Model;
 using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
 using PhotoFox.Web.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace PhotoFox.Web
 {
@@ -20,14 +21,19 @@ namespace PhotoFox.Web
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
                 {
-                    IdentityConfiguration idconfig = new IdentityConfiguration();
-                    idconfig.TablePrefix = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value;
-                    idconfig.StorageConnectionString = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value;
-                    idconfig.IndexTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:IndexTableName").Value; // default: AspNetIndex
-                    idconfig.RoleTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:RoleTableName").Value;   // default: AspNetRoles
-                    idconfig.UserTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:UserTableName").Value;   // default: AspNetUsers
+                    IdentityConfiguration idconfig = new()
+                    {
+                        TablePrefix = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value,
+                        StorageConnectionString = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value,
+                        IndexTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:IndexTableName").Value, // default: AspNetIndex
+                        RoleTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:RoleTableName").Value,   // default: AspNetRoles
+                        UserTableName = builder.Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:UserTableName").Value   // default: AspNetUsers
+                    };
                     return idconfig;
-                })).CreateAzureTablesIfNotExists<ApplicationDbContext>();
+                }))
+                .CreateAzureTablesIfNotExists<ApplicationDbContext>()
+                .AddSignInManager<UsernameSignInManager>();
+
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
 
@@ -40,6 +46,8 @@ namespace PhotoFox.Web
             builder.Services.AddSingleton(i => MapFactory.GetMap());
             builder.Services.AddSingleton<IPhotoService, PhotoService>();
             builder.Services.AddSingleton<IPhotoHashStorage, PhotoHashStorage>();
+            builder.Services.AddSingleton<IAlbumPermissionStorage, AlbumPermissionStorage>();
+            builder.Services.AddSingleton<IAuthService, AuthService>();
 
             var app = builder.Build();
 

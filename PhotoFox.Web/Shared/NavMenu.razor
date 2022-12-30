@@ -1,19 +1,26 @@
 ﻿@using PhotoFox.Model
 @using PhotoFox.Services
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        @foreach (var album in Albums.OrderBy(a => a.Title))
-        {
-            <div class="nav-item px-3">
-                <div>
-                    <div class="album-img"><a href="album/@album.AlbumId"><img src="/thumbnail/@album.CoverPhotoId" style="width: 250px;" alt="@album.Title" /></a></div>
-                    <div class="album-title"><a href="album/@album.AlbumId">@album.Title</a> <a href="map/@album.AlbumId">(View Map)</a></div>
-                </div>
-            </div>
-        }
-    </nav>
-</div>
+<AuthorizeView>
+    <Authorized>
+        <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+            <nav class="flex-column">
+                @foreach (var album in Albums.OrderBy(a => a.Title))
+                {
+                    <div class="nav-item px-3">
+                        <div>
+                            <div class="album-img"><a href="album/@album.AlbumId"><img src="/thumbnail/@album.CoverPhotoId" style="width: 250px;" alt="@album.Title" /></a></div>
+                            <div class="album-title"><a href="album/@album.AlbumId">@album.Title</a> <a href="map/@album.AlbumId">(View Map)</a></div>
+                        </div>
+                    </div>
+                }
+            </nav>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+
+    </NotAuthorized>
+</AuthorizeView>
 
 @inject IPhotoAlbumService AlbumService;
 
@@ -23,6 +30,9 @@
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private List<PhotoAlbum> Albums { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     public NavMenu()
     {
@@ -36,8 +46,20 @@
 
     private async Task LoadAlbums()
     {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user?.Identity is null || string.IsNullOrEmpty(user.Identity.Name))
+        {
+            return;
+        }
+
+        var lookup = user.Identity.Name == "fiona" 
+         ? this.AlbumService.GetAllAlbumsAsync() 
+         : this.AlbumService.GetAllAlbumsAsync(user.Identity.Name);
+
         this.Albums.Clear();
-        await foreach(var album in this.AlbumService.GetAllAlbumsAsync())
+        await foreach(var album in lookup)
         {
             this.Albums.Add(album);
         }

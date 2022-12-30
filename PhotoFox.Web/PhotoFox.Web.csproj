@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -12,8 +12,10 @@
     <ProjectReference Include="..\PhotoFox.Core\PhotoFox.Core.csproj" />
     <ProjectReference Include="..\PhotoFox.Mappings\PhotoFox.Mappings.csproj" />
     <ProjectReference Include="..\PhotoFox.Services\PhotoFox.Services.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.12" />
     <ProjectReference Include="..\PhotoFox.Storage\PhotoFox.Storage.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties properties_4servicedependencies_1json__JsonSchema="https://gitlab.com/sbenv/veroxis/docker-seq/-/raw/HEAD/docker-seq.schema.json" /></VisualStudio></ProjectExtensions>
 
 </Project>
