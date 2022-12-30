@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
-        mc:Ignorable="d"
+        mc:Ignorable="d" Icon="Images/picture.png"
         Loaded="Window_Loaded"
         Title="PhotoFox" Height="800" Width="1200"
         SizeChanged="Window_SizeChanged">
@@ -19,6 +19,9 @@
                 <RibbonGroup Header="Albums">
                     <RibbonButton Label="Add Album" LargeImageSource="/Images/add_album.png" Command="{Binding AddAlbumCommand}" CommandParameter="{Binding SelectedPhoto}" />
                     <RibbonButton Label="Delete Album" LargeImageSource="/Images/delete.png" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}"/>
+                </RibbonGroup>
+                <RibbonGroup Header="Permissions">
+                    <RibbonButton Label="Set Permissions" LargeImageSource="/Images/add_photo.png" Command="{Binding SetPermissionsCommand}" />
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>
@@ -204,12 +207,9 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Width="130" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0" Command="{Binding SaveChangesCommand}" CommandParameter="{Binding SelectedPhoto}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Width="20" Height="20" Margin="0,0,10,0" Source="/Images/yes.png" />
-                        <TextBlock>Save Changes</TextBlock>
-                    </StackPanel>
-                </Button>
+                <wpf:ImageButton Width="130" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0" Command="{Binding SaveChangesCommand}" CommandParameter="{Binding SelectedPhoto}" ImageSource="/Images/accept.png" ImageWidth="16" >
+                    <Label>Save Changes</Label>
+                </wpf:ImageButton>
             </StackPanel>
         </Grid>
     </DockPanel>

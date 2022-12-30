@@ -9,19 +9,33 @@
 
   <ItemGroup>
     <None Remove="add.png" />
+    <None Remove="Images\accept.png" />
     <None Remove="Images\add_album.png" />
     <None Remove="Images\add_photo.png" />
+    <None Remove="Images\arrow_left.png" />
+    <None Remove="Images\arrow_right.png" />
+    <None Remove="Images\cancel.png" />
     <None Remove="Images\delete.png" />
+    <None Remove="Images\images.png" />
     <None Remove="Images\no.png" />
+    <None Remove="Images\picture.png" />
+    <None Remove="Images\picture_key.png" />
     <None Remove="Images\stop.png" />
     <None Remove="Images\yes.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\accept.png" />
+    <Resource Include="Images\arrow_left.png" />
+    <Resource Include="Images\arrow_right.png" />
+    <Resource Include="Images\cancel.png" />
+    <Resource Include="Images\delete.png" />
+    <Resource Include="Images\images.png" />
     <Resource Include="Images\add_album.png" />
     <Resource Include="Images\add_photo.png" />
-    <Resource Include="Images\delete.png" />
     <Resource Include="Images\no.png" />
+    <Resource Include="Images\picture.png" />
+    <Resource Include="Images\picture_key.png" />
     <Resource Include="Images\stop.png" />
   </ItemGroup>
 

@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm"
+        xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:SelectAlbumViewModel}"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="WidthAndHeight" Icon="/Images/images.png"
         Title="Select Album" Height="168" Width="450" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" ResizeMode="NoResize">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -25,18 +25,12 @@
         <TextBox Grid.Column="1" Grid.Row="1" Height="23" IsEnabled="{Binding NewAlbumTextIsEnabled}" Text="{Binding NewAlbumName}" />
 
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-            <Button Height="30" Width="100" Margin="0,0,20,0" Click="Button_Click">
-                <StackPanel Orientation="Horizontal">
-                    <Image Width="16" Height="16" Margin="0,0,20,0" Source="Images/yes.png"></Image>
-                    <TextBlock>OK</TextBlock>
-                </StackPanel>
-            </Button>
-            <Button Height="30" Width="100" Click="Button_Click_1">
-                <StackPanel Orientation="Horizontal">
-                    <Image Width="16" Height="16" Margin="0,0,20,0" Source="Images/no.png"></Image>
-                    <TextBlock>Cancel</TextBlock>
-                </StackPanel>
-            </Button>
+            <wpf:ImageButton Height="30" Width="100" Margin="0,0,20,0" Click="Button_Click" ImageSource="/Images/accept.png" ImageWidth="16">
+                <Label>OK</Label>
+            </wpf:ImageButton>
+            <wpf:ImageButton Height="30" Width="100" Click="Button_Click_1" ImageSource="/Images/cancel.png" ImageWidth="16">
+                <Label>Cancel</Label>
+            </wpf:ImageButton>
         </StackPanel>
     </Grid>
 </Window>

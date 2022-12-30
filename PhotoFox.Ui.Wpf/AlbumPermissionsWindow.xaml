@@ -1,0 +1,45 @@
+﻿<Window x:Class="PhotoFox.Ui.Wpf.AlbumPermissionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf"
+        mc:Ignorable="d" Icon="/Images/picture_key.png"
+        Title="Album Permissions" Height="450" Width="606">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="60" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel>
+            <Label FontWeight="Bold">Select User:</Label>
+            <ComboBox ItemsSource="{Binding Users}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <Label FontWeight="Bold">Allowed Albums:</Label>
+            <ListBox ItemsSource="{Binding AllowedAlbums}" Height="270" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2">
+            <Label FontWeight="Bold">Available Albums:</Label>
+            <ListBox ItemsSource="{Binding DisallowedAlbums}" Height="270" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,50,0,0">
+            <wpf:ImageButton Width="40" Height="40" Margin="0,0,0,10" ImageSource="/Images/arrow_left.png" ImageWidth="16" ImageHeight="16"></wpf:ImageButton>
+            <wpf:ImageButton Width="40" Height="40" Margin="0,0,0,10" ImageSource="/Images/arrow_right.png" ImageWidth="16" ImageHeight="16"></wpf:ImageButton>
+        </StackPanel>
+
+        <wpf:ImageButton Grid.Row="2" Width="140" Height="30" ImageSource="/Images/accept.png" ImageWidth="16" ImageHeight="16" ImageLocation="Left">
+            <Label>Save Changes</Label>
+        </wpf:ImageButton>
+        <wpf:ImageButton Grid.Row="2" Grid.Column="2" Width="140" Height="30" ImageSource="/Images/cancel.png" ImageWidth="16" ImageHeight="16" ImageLocation="Left">
+            <Label>Cancel</Label>
+        </wpf:ImageButton>
+    </Grid>
+</Window>
