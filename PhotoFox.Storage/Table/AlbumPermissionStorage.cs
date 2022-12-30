@@ -30,5 +30,19 @@ namespace PhotoFox.Storage.Table
             var tableClient = client.GetTableClient(TableName);
             return tableClient.QueryAsync<AlbumPermission>(p => p.PartitionKey == username);
         }
+
+        public async Task AddPermissionAsync(string albumId, string username)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            await tableClient.AddEntityAsync<AlbumPermission>(new AlbumPermission { PartitionKey = username, RowKey = albumId }).ConfigureAwait(false);
+        }
+
+        public async Task RemovePermissionAsync(string albumId, string username)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            await tableClient.DeleteEntityAsync(username, albumId).ConfigureAwait(false);
+        }
     }
 }

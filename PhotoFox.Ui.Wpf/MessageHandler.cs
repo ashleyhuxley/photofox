@@ -168,9 +168,14 @@ namespace PhotoFox.Ui.Wpf
 
         public void Receive(ShowPermissionsWindowMessage message)
         {
+            var viewModel = this.kernel.Get<AlbumPermissionsViewModel>();
+
+            viewModel.Load();
+
             var window = new AlbumPermissionsWindow
             {
-                Owner = this.ownerWindow
+                Owner = this.ownerWindow,
+                DataContext = viewModel
             };
 
             window.ShowDialog();

@@ -113,5 +113,20 @@ namespace PhotoFox.Services
         {
             await this.photoInAlbumStorage.RemovePhotoFromAlbumAsync(albumId, photoId).ConfigureAwait(false);
         }
+
+        public async Task<bool> UserHasPermissionAsync(string albumId, string username)
+        {
+            return await this.albumPermissionStorage.HasPermissionAsync(albumId, username).ConfigureAwait(false);
+        }
+
+        public async Task AddPermissionAsync(string albumId, string username)
+        {
+            await this.albumPermissionStorage.AddPermissionAsync(albumId, username).ConfigureAwait(false);
+        }
+
+        public async Task RemovePermissionAsync(string albumId, string username)
+        {
+            await this.albumPermissionStorage.RemovePermissionAsync(albumId, username).ConfigureAwait(false);
+        }
     }
 }
