@@ -19,7 +19,8 @@ namespace PhotoFox.Ui.Wpf
         IRecipient<AddAlbumMessage>,
         IRecipient<UserConfirmMessage>,
         IRecipient<OpenPhotoMessage>,
-        IRecipient<SelectAlbumMessage>
+        IRecipient<SelectAlbumMessage>,
+        IRecipient<ShowPermissionsWindowMessage>
     {
         private readonly IMessenger messenger;
 
@@ -48,6 +49,7 @@ namespace PhotoFox.Ui.Wpf
             messenger.Register<UserConfirmMessage>(this);
             messenger.Register<OpenPhotoMessage>(this);
             messenger.Register<SelectAlbumMessage>(this);
+            messenger.Register<ShowPermissionsWindowMessage>(this);
         }
 
         public void Receive(AddPhotosMessage message)
@@ -162,6 +164,16 @@ namespace PhotoFox.Ui.Wpf
                 Result = result.HasValue && result.Value,
                 NewAlbumName = viewModel.NewAlbumName
             });
+        }
+
+        public void Receive(ShowPermissionsWindowMessage message)
+        {
+            var window = new AlbumPermissionsWindow
+            {
+                Owner = this.ownerWindow
+            };
+
+            window.ShowDialog();
         }
     }
 }

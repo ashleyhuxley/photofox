@@ -69,7 +69,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             DeletePhotoCommand deletePhotoCommand,
             AddAlbumCommand addAlbumCommand,
             DeleteAlbumCommand deleteAlbumCommand,
-            SaveChangesCommand saveChangesCommand)
+            SaveChangesCommand saveChangesCommand,
+            SetPermissionsCommand setPermissionsCommand)
         {
             this.photoService = photoService;
             this.photoAlbumService = photoAlbumService;
@@ -92,6 +93,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             MoveToAlbumCommand = new RelayCommand(MoveToAlbumCommandExecute);
             SetAlbumCoverCommand = new RelayCommand(SetAlbumCoverCommandExecute, () => this.SelectedPhoto != null);
             ReloadExifCommand = new RelayCommand(ReloadExifExecute, () => this.SelectedPhoto != null);
+            SetPermissionsCommand = setPermissionsCommand;
 
             messenger.Register<RefreshAlbumsMessage>(this);
             messenger.Register<LoadPhotoMessage>(this);
@@ -132,6 +134,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand MoveToAlbumCommand { get; }
         public ICommand SetAlbumCoverCommand { get; }
         public ICommand ReloadExifCommand { get; }
+        public ICommand SetPermissionsCommand { get; }
 
         public PhotoViewModel? SelectedPhoto
         {
