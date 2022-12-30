@@ -15,17 +15,21 @@ namespace PhotoFox.Services
 
         private readonly IPhotoMetadataStorage photoMetadataStorage;
 
+        private readonly IAlbumPermissionStorage albumPermissionStorage;
+
         private readonly IMapper mapper;
 
         public PhotoAlbumService(
             IPhotoAlbumDataStorage photoAlbumDataStorage,
             IPhotoInAlbumStorage photoInAlbumStorage,
             IPhotoMetadataStorage photoMetadataStorage,
+            IAlbumPermissionStorage albumPermissionStorage,
             IMapper mapper)
         {
             this.photoAlbumDataStorage = photoAlbumDataStorage;
             this.photoInAlbumStorage = photoInAlbumStorage;
             this.photoMetadataStorage = photoMetadataStorage;
+            this.albumPermissionStorage = albumPermissionStorage;
             this.mapper = mapper;
         }
 
@@ -40,6 +44,29 @@ namespace PhotoFox.Services
                     Description = album.AlbumDescription,
                     Title = album.AlbumName
                 };
+            }
+        }
+
+        public async IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync(string username)
+        {
+            var validAlbums = new List<string>();
+            await foreach (var albumPermission in this.albumPermissionStorage.GetPermissionsByUsernameAsync(username))
+            {
+                validAlbums.Add(albumPermission.RowKey);
+            }
+
+            await foreach (var album in this.photoAlbumDataStorage.GetPhotoAlbumsAsync())
+            {
+                if (validAlbums.Contains(album.PartitionKey))
+                {
+                    yield return new PhotoAlbum
+                    {
+                        AlbumId = album.PartitionKey,
+                        CoverPhotoId = album.CoverPhotoId,
+                        Description = album.AlbumDescription,
+                        Title = album.AlbumName
+                    };
+                }
             }
         }
 
