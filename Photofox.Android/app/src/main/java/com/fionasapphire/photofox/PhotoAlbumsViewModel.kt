@@ -30,7 +30,9 @@ class PhotoAlbumsViewModel
         state.value = State.LOADING
         try {
             val entities = withContext(Dispatchers.IO) { photoAlbumStorage.getPhotoAlbums() }
-            val albums = entities.map { PhotoAlbum(it.AlbumId, it.AlbumName, it.AlbumDescription, getBitmap(it.CoverPhotoId)) }
+            val albums = entities
+                .sortedBy { it.AlbumName }
+                .map { PhotoAlbum(it.AlbumId, it.AlbumName, it.AlbumDescription, getBitmap(it.CoverPhotoId)) }
             state.value = State.SUCCESS(albums)
         } catch (e: Exception) {
             state.value = State.FAILURE(e.localizedMessage)
