@@ -14,7 +14,7 @@ import javax.inject.Inject
 class PhotoAlbumsViewModel
 @Inject constructor(private val photoAlbumStorage: PhotoAlbumStorage) : ViewModel() {
 
-    private val state = MutableStateFlow<State>(State.START)
+    val state = MutableStateFlow<State>(State.START)
 
     init {
         loadAlbums()
@@ -24,7 +24,9 @@ class PhotoAlbumsViewModel
         state.value = State.LOADING
         try {
             val albums = withContext(Dispatchers.IO) { photoAlbumStorage.getPhotoAlbums() }
-            state.value = State.SUCCESS(albums)
+            state.value = State.SUCCESS(albums.map {
+                PhotoAlbum(it.AlbumId, it.AlbumName, it.AlbumDescription )
+            })
         } catch (e: Exception) {
             state.value = State.FAILURE(e.localizedMessage)
         }
