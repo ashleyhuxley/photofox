@@ -16,7 +16,6 @@ class PhotoAlbumStorage
         table.createIfNotExists();
         val query = TableQuery.from(PhotoAlbumEntity::class.java)
 
-
         val res = table.execute(query)
         return res.toList()
     }

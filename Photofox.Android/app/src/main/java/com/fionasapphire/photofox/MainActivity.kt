@@ -1,9 +1,11 @@
 package com.fionasapphire.photofox
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,16 +50,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-@Preview(showBackground = true)
-fun Preview() {
-    //FailureView(message = "Test message")
-    val items = List(5) { index ->
-        PhotoAlbum("1", "Album $index", "Test Album")
-    }
 
-    AlbumsListScreen(items)
-}
 
 @Composable
 fun MainView() {
@@ -101,14 +95,9 @@ fun AlbumsListScreen(users: List<PhotoAlbum>) {
                 verticalAlignment = Alignment.CenterVertically) {
 
                 Box(modifier = Modifier
-                    .background(Color.Black, CircleShape)
                     .size(50.dp),
                     contentAlignment = Alignment.Center ){
-                    Text(
-                        text = item.title.substring(0, 1),
-                        color = Color.White,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold)
+                    Image(item.image.asImageBitmap(), item.title)
                 }
                 Column(
                     modifier = Modifier
