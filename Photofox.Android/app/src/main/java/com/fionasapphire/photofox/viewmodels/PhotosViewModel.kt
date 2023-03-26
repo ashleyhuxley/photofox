@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.DateFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,13 +43,11 @@ class PhotosViewModel
         try {
             val entities = withContext(Dispatchers.IO) { photoInAlbumStorage.getPhotosInAlbum(albumId) }
             val photos = entities.map {
-//                val metadata = withContext(Dispatchers.IO) { photoMetadataStorage.getPhotoMetadata(it.rowKey) }
-//                if (metadata == null)
-//                {
-//                    state.value = PhotosViewModelState.FAILURE("Unable to find photo with ID ${it.rowKey}")
-//                }
 
-                Photo(it.rowKey, "Test", ImageReference(false, it.rowKey))
+                val metadata = withContext(Dispatchers.IO) { photoMetadataStorage.getPhotoMetadata(it.rowKey, it.getDateAsKey()) }
+                    ?: throw Exception("Unable to find photo with partition ${it.getDateAsKey()} and ID ${it.rowKey}")
+
+                Photo(metadata.rowKey, metadata.Title, ImageReference(false, it.rowKey))
             }
             state.value = PhotosViewModelState.SUCCESS(photos)
         } catch (e: Exception) {

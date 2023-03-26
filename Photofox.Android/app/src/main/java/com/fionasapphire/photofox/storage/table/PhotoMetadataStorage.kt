@@ -11,15 +11,21 @@ import javax.inject.Inject
 class PhotoMetadataStorage
     @Inject constructor(connectionString: String) : StorageBase(connectionString, TableName.PhotoMetadata.name) {
 
-    fun getPhotoMetadata(photoId: String): PhotoMetadataEntity? {
+    fun getPhotoMetadata(photoId: String, partitionKey: String): PhotoMetadataEntity? {
         val table = getTableReference()
 
-        val filter = TableQuery.generateFilterCondition(
+        val partitionKeyFilter = TableQuery.generateFilterCondition(
+            FieldName.PartitionKey.name, QueryComparisons.EQUAL, partitionKey
+        )
+
+        val rowKeyFilter = TableQuery.generateFilterCondition(
             FieldName.RowKey.name, QueryComparisons.EQUAL, photoId
         )
 
+        val filter = TableQuery.combineFilters(partitionKeyFilter, TableQuery.Operators.AND, rowKeyFilter)
+
         val query = TableQuery.from(PhotoMetadataEntity::class.java).where(filter)
 
-        return table.execute(query).first()
+        return table.execute(query).firstOrNull()
     }
 }
