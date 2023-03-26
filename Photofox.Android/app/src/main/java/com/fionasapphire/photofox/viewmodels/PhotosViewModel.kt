@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fionasapphire.photofox.ImageReference
 import com.fionasapphire.photofox.model.Photo
 import com.fionasapphire.photofox.storage.blob.ImageStorage
 import com.fionasapphire.photofox.storage.table.PhotoInAlbumStorage
@@ -41,22 +42,17 @@ class PhotosViewModel
         try {
             val entities = withContext(Dispatchers.IO) { photoInAlbumStorage.getPhotosInAlbum(albumId) }
             val photos = entities.map {
-                val metadata = withContext(Dispatchers.IO) { photoMetadataStorage.getPhotoMetadata(it.rowKey) }
-                if (metadata == null)
-                {
-                    state.value = PhotosViewModelState.FAILURE("Unable to find photo with ID ${it.rowKey}")
-                }
+//                val metadata = withContext(Dispatchers.IO) { photoMetadataStorage.getPhotoMetadata(it.rowKey) }
+//                if (metadata == null)
+//                {
+//                    state.value = PhotosViewModelState.FAILURE("Unable to find photo with ID ${it.rowKey}")
+//                }
 
-                Photo(metadata!!.rowKey, metadata!!.Title, getBitmap(metadata!!.rowKey))
+                Photo(it.rowKey, "Test", ImageReference(false, it.rowKey))
             }
             state.value = PhotosViewModelState.SUCCESS(photos)
         } catch (e: Exception) {
             state.value = PhotosViewModelState.FAILURE(e.localizedMessage)
         }
-    }
-
-    private suspend fun getBitmap(photoId: String): Bitmap {
-        val bytes = withContext(Dispatchers.IO) { imageStorage.getThumbnail(photoId) }
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 }

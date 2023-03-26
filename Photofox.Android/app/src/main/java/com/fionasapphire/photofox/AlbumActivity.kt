@@ -19,13 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.fionasapphire.photofox.model.Photo
+import com.fionasapphire.photofox.storage.blob.ImageStorage
 import com.fionasapphire.photofox.viewmodels.PhotosViewModel
 import com.fionasapphire.photofox.viewmodels.PhotosViewModelState
 
@@ -72,9 +76,10 @@ fun AlbumView(onHome: () -> Unit, albumId: String?) {
         }
         is PhotosViewModelState.SUCCESS -> {
             val photos = (state as PhotosViewModelState.SUCCESS).photos
-            AlbumListView(photos = photos) {
-
-            }
+            AlbumListView(
+                photos = photos,
+                onHome = {},
+            )
         }
     }
 
@@ -88,6 +93,7 @@ fun AlbumListView(photos: List<Photo>, onHome: () -> Unit) {
         .fillMaxHeight()
         .fillMaxWidth()
     ) {
+
         items(items = photos) { item ->
             Card(
                 modifier = Modifier
@@ -103,32 +109,24 @@ fun AlbumListView(photos: List<Photo>, onHome: () -> Unit) {
                     .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(modifier = Modifier.fillMaxWidth())
                     {
-                        if (item.image == null) {
-                            Image(
-                                painterResource(id = R.drawable.placeholder),
-                                "Placeholder",
-                                contentScale = ContentScale.FillWidth,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp)
-                            )
-                        } else {
-                            Image(
-                                item.image.asImageBitmap(),
-                                item.title,
-                                contentScale = ContentScale.FillWidth,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp)
-                            )
-                        }
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(item.image)
+                                .crossfade(true)
+                                .fetcherFactory(ImageStoreFetcherFactory())
+                                .build(),
+                            contentDescription = item.title,
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier.fillMaxWidth().padding(5.dp),
+                            placeholder = painterResource(R.drawable.placeholder)
+                        )
                     }
-                    Text(
-                        text = item.title,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black,
-                    )
+//                    Text(
+//                        text = item.title,
+//                        fontSize = 20.sp,
+//                        fontWeight = FontWeight.Bold,
+//                        color = Color.Black,
+//                    )
                 }
             }
         }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fionasapphire.photofox.ImageReference
 import com.fionasapphire.photofox.model.PhotoAlbum
 import com.fionasapphire.photofox.storage.blob.ImageStorage
 import com.fionasapphire.photofox.storage.table.PhotoAlbumStorage
@@ -34,17 +35,12 @@ class PhotoAlbumsViewModel
             val albums = entities
                 .sortedBy { it.AlbumName }
                 .map {
-                    PhotoAlbum(it.partitionKey, it.AlbumName, it.AlbumDescription, getBitmap(it.CoverPhotoId))
+                    PhotoAlbum(it.partitionKey, it.AlbumName, it.AlbumDescription, ImageReference(false, it.CoverPhotoId))
                 }
             state.value = PhotoAlbumsViewModelState.SUCCESS(albums)
         } catch (e: Exception) {
             state.value = PhotoAlbumsViewModelState.FAILURE(e.localizedMessage)
         }
-    }
-
-    private suspend fun getBitmap(photoId: String): Bitmap {
-        val bytes = withContext(Dispatchers.IO) { imageStorage.getThumbnail(photoId) }
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
 }
