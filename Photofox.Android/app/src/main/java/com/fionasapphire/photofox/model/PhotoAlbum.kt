@@ -1,4 +1,4 @@
-package com.fionasapphire.photofox
+package com.fionasapphire.photofox.model
 
 import android.graphics.Bitmap
 

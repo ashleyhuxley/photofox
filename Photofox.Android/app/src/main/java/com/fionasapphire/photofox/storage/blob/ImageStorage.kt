@@ -1,4 +1,4 @@
-package com.fionasapphire.photofox.storage
+package com.fionasapphire.photofox.storage.blob
 
 import com.microsoft.azure.storage.CloudStorageAccount
 import java.io.ByteArrayOutputStream

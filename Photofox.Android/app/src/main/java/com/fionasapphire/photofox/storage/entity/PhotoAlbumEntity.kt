@@ -1,9 +1,8 @@
-package com.fionasapphire.photofox.storage
+package com.fionasapphire.photofox.storage.entity
 
 import com.microsoft.azure.storage.table.TableServiceEntity
 
 class PhotoAlbumEntity : TableServiceEntity {
-    var AlbumId: String = ""
     var AlbumName: String = ""
     var AlbumDescription: String = ""
     var CoverPhotoId: String = ""
@@ -13,7 +12,7 @@ class PhotoAlbumEntity : TableServiceEntity {
     }
 
     constructor(albumId : String, title: String) {
-        AlbumId = albumId
+        rowKey = albumId
         AlbumName = title;
     }
 }

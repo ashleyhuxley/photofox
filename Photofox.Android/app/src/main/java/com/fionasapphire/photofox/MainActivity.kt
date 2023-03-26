@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,9 +27,17 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.fionasapphire.photofox.model.PhotoAlbum
 import com.fionasapphire.photofox.ui.theme.PhotoFoxTheme
+import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModel
+import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModelState
+import com.fionasapphire.photofox.viewmodels.PhotosViewModelState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.round
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -48,7 +55,7 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                 ) {
-                    MainView()
+                    Navi()
                 }
             }
         }
@@ -66,29 +73,47 @@ class SampleAlbumProvider: PreviewParameterProvider<List<PhotoAlbum>> {
 }
 
 @Composable
+fun Navi() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            MainView(navController)
+        }
+        composable(
+            route = "album/{albumId}",
+            ) { entry: NavBackStackEntry ->
+            AlbumView(
+                onHome = { navController.popBackStack() },
+                albumId = entry.arguments?.getString("albumId")
+            )
+        }
+    }
+}
+
+@Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun Preview(@PreviewParameter(SampleAlbumProvider::class) items: List<PhotoAlbum>) {
     //FailureView(message = "Test message")
     //AlbumsListScreen(items.toList())
-    LoadingView()
+    LoadingView("Things")
 }
 
 @Composable
-fun MainView() {
+fun MainView(navController: NavHostController) {
     val viewModel = hiltViewModel<PhotoAlbumsViewModel>()
     val state by viewModel.state.collectAsState()
     when (state) {
-        State.START -> {
+        PhotoAlbumsViewModelState.START -> {
         }
-        State.LOADING -> {
-            LoadingView()
+        PhotoAlbumsViewModelState.LOADING -> {
+            LoadingView("Albums")
         }
-        is State.FAILURE -> {
-            FailureView(message = (state as State.FAILURE).message)
+        is PhotoAlbumsViewModelState.FAILURE -> {
+            FailureView(message = (state as PhotoAlbumsViewModelState.FAILURE).message)
         }
-        is State.SUCCESS -> {
-            val albums = (state as State.SUCCESS).albums
-            AlbumsListScreen(albums)
+        is PhotoAlbumsViewModelState.SUCCESS -> {
+            val albums = (state as PhotoAlbumsViewModelState.SUCCESS).albums
+            AlbumsListScreen(albums, navController)
         }
     }
 }
@@ -102,26 +127,28 @@ fun FailureView(message: String) {
 }
 
 @Composable
-fun LoadingView() {
+fun LoadingView(entity: String) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Column (horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()
-            Text(text = "Loading Albums...", modifier = Modifier.padding(20.dp))
+            Text(text = "Loading ${entity}...", modifier = Modifier.padding(20.dp))
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AlbumsListScreen(users: List<PhotoAlbum>) {
+fun AlbumsListScreen(users: List<PhotoAlbum>, navController: NavHostController) {
     LazyColumn(modifier = Modifier
         .fillMaxHeight()
         .fillMaxWidth()
             ) {
         items(items = users) { item ->
             Card(
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                modifier = Modifier.fillMaxWidth().padding(10.dp).clickable {  },
                 shape = RoundedCornerShape(10.dp),
-                elevation = 5.dp
+                elevation = 5.dp,
+                onClick = { navController.navigate("album/${item.albumId}") }
             ) {
                 Column (modifier = Modifier.fillMaxWidth().padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(modifier = Modifier.fillMaxWidth())
