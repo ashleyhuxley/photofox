@@ -37,14 +37,6 @@ namespace PhotoFox.Services
             this.mapper = mapper;
         }
 
-        public async IAsyncEnumerable<Photo> GetPhotosByDateTakenAsync(DateTime dateTaken)
-        {
-            await foreach (var photo in this.photoMetadataStorage.GetPhotosByDateAsync(dateTaken))
-            {
-                yield return mapper.Map<Photo>(photo);
-            }
-        }
-
         public async Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId)
         {
             var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(dateTaken, photoId).ConfigureAwait(false);
