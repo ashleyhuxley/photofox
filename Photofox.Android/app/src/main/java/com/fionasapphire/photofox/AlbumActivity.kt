@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -51,8 +53,8 @@ fun AlbumView(onHome: () -> Unit, albumId: String?) {
             val successState = (state as PhotosViewModelState.SUCCESS)
             val photos = successState.photos
             AlbumListView(
-                photos = photos,
-                onHome = onHome,
+                photos = photos.sortedByDescending { it.date },
+                openImage = { viewModel.openImage(it) },
                 albumName = successState.albumName
             )
         }
@@ -60,9 +62,12 @@ fun AlbumView(onHome: () -> Unit, albumId: String?) {
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AlbumListView(photos: List<PhotoAlbumEntry>, onHome: () -> Unit, albumName: String) {
+fun AlbumListView(
+    photos: List<PhotoAlbumEntry>,
+    albumName: String,
+    openImage: (PhotoAlbumEntry) -> Unit) {
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -72,43 +77,40 @@ fun AlbumListView(photos: List<PhotoAlbumEntry>, onHome: () -> Unit, albumName: 
             )
         },
     ) {
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(
+                start = 12.dp,
+                top = 16.dp,
+                end = 12.dp,
+                bottom = 16.dp
+            ),
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth()
         ) {
-            items(items = photos) { item ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        .clickable { },
-                    shape = RoundedCornerShape(10.dp),
-                    elevation = 5.dp,
-                    onClick = onHome
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Box(modifier = Modifier.fillMaxWidth())
-                        {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(item.image)
-                                    .crossfade(true)
-                                    .fetcherFactory(ImageStoreFetcherFactory())
-                                    .build(),
-                                contentDescription = "",
-                                contentScale = ContentScale.FillWidth,
-                                modifier = Modifier.fillMaxWidth().padding(5.dp),
-                                placeholder = painterResource(R.drawable.placeholder)
-                            )
-                        }
-                    }
-                }
+            items(photos.size) {
+                    index -> ImageCard(photos[index], openImage)
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ImageCard(item: PhotoAlbumEntry, openImage: (PhotoAlbumEntry) -> Unit) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(item.image)
+            .crossfade(true)
+            .fetcherFactory(ImageStoreFetcherFactory())
+            .build(),
+        contentDescription = "",
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .clickable{ openImage(item) },
+        placeholder = painterResource(R.drawable.placeholder)
+    )
 }
