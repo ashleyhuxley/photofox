@@ -1,3 +1,4 @@
 bin
 obj
 .vs
+/PhotoFox.Web/Properties/PublishProfiles/PhotoFoxWeb - FTP.pubxml.user
