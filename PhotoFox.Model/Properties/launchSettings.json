@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "PhotoFox.Model": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50045;http://localhost:50054"
+    }
+  }
+}
