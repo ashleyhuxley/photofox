@@ -132,7 +132,7 @@ fun LoadingView(entity: String) {
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AlbumsListScreen(users: List<PhotoAlbum>, navController: NavHostController) {
+fun AlbumsListScreen(albums: List<PhotoAlbum>, navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -147,7 +147,7 @@ fun AlbumsListScreen(users: List<PhotoAlbum>, navController: NavHostController) 
                 .fillMaxHeight()
                 .fillMaxWidth()
         ) {
-            items(items = users) { item ->
+            items(items = albums) { item ->
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(10.dp).clickable { },
                     shape = RoundedCornerShape(10.dp),
