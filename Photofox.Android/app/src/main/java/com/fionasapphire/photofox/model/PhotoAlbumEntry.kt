@@ -2,8 +2,7 @@ package com.fionasapphire.photofox.model
 
 import com.fionasapphire.photofox.ImageReference
 
-data class Photo(
+data class PhotoAlbumEntry (
     val photoId: String,
-    val title: String,
     val image: ImageReference
 )
