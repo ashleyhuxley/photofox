@@ -45,22 +45,11 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             PhotoFoxTheme {
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = { Text("PhotoFox") },
-                            backgroundColor = Color.Black,
-                            contentColor = Color.White
-                        )
-                    },
-                ) {
-                    Navi()
-                }
+                Navi()
             }
         }
     }
@@ -140,41 +129,56 @@ fun LoadingView(entity: String) {
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AlbumsListScreen(users: List<PhotoAlbum>, navController: NavHostController) {
-    LazyColumn(modifier = Modifier
-        .fillMaxHeight()
-        .fillMaxWidth()
-            ) {
-        items(items = users) { item ->
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(10.dp).clickable {  },
-                shape = RoundedCornerShape(10.dp),
-                elevation = 5.dp,
-                onClick = { navController.navigate("album/${item.albumId}") }
-            ) {
-                Column (modifier = Modifier.fillMaxWidth().padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(modifier = Modifier.fillMaxWidth())
-                    {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(item.image)
-                                .crossfade(true)
-                                .fetcherFactory(ImageStoreFetcherFactory())
-                                .build(),
-                            contentDescription = item.title,
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier.fillMaxWidth().padding(5.dp),
-                            placeholder = painterResource(R.drawable.placeholder)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("PhotoFox") },
+                backgroundColor = Color.Black,
+                contentColor = Color.White
+            )
+        },
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+        ) {
+            items(items = users) { item ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp).clickable { },
+                    shape = RoundedCornerShape(10.dp),
+                    elevation = 5.dp,
+                    onClick = { navController.navigate("album/${item.albumId}") }
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth())
+                        {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(item.image)
+                                    .crossfade(true)
+                                    .fetcherFactory(ImageStoreFetcherFactory())
+                                    .build(),
+                                contentDescription = item.title,
+                                contentScale = ContentScale.FillWidth,
+                                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                                placeholder = painterResource(R.drawable.placeholder)
+                            )
+                        }
+                        Text(
+                            text = item.title,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
                         )
                     }
-                    Text(
-                        text = item.title,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black,
-                    )
                 }
             }
         }
