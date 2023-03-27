@@ -7,8 +7,6 @@ namespace PhotoFox.Services
 {
     public interface IPhotoService
     {
-        IAsyncEnumerable<Photo> GetPhotosByDateTakenAsync(DateTime dateTaken);
-
         IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbumAsync(DateTime dateTaken);
 
         Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId);
