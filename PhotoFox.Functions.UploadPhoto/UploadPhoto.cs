@@ -41,9 +41,17 @@ namespace PhotoFox.Functions.UploadPhoto
         }
 
         [FunctionName("Upload")]
-        public async Task Run([QueueTrigger("uploads", Connection = "AzureWebJobsStorage")]string photoId, ILogger log)
+        public async Task Run([QueueTrigger("uploads", Connection = "AzureWebJobsStorage")]string message, ILogger log)
         {
-            log.LogInformation($"Processing image ID: {photoId}");
+            string albumId = Guid.Empty.ToString();
+            var items = message.Split(',');
+            string photoId = items[0];
+            if (items.Length > 1)
+            {
+                albumId = items[1];
+            }
+
+            log.LogInformation($"Processing image ID: {photoId} into album {albumId}");
 
             // Get the photo from storage
             var blob = await photoFileStorage.GetPhotoAsync(photoId);
@@ -107,7 +115,7 @@ namespace PhotoFox.Functions.UploadPhoto
             // Store table items
             await photoMetadataStorage.AddPhotoAsync(metadata);
             await photoHashStorage.AddHashAsync(md5, metadata.PartitionKey, metadata.RowKey);
-            await photoInAlbumStorage.AddPhotoInAlbumAsync(Guid.Empty.ToString(), metadata.RowKey, metadata.UtcDate.Value);
+            await photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, metadata.RowKey, metadata.UtcDate.Value);
 
         }
     }
