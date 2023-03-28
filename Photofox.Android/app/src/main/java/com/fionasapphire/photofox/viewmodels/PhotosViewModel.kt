@@ -1,6 +1,7 @@
 package com.fionasapphire.photofox.viewmodels
 
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -48,9 +49,8 @@ class PhotosViewModel
         loadPhotos(albumId = albumId!!)
     }
 
-    fun openImage(photo: PhotoAlbumEntry) {
+    fun openImage(photo: PhotoAlbumEntry, context: Context) {
         viewModelScope.launch {
-            val context = PhotoFoxApplication.getAppContext() ?: throw Exception("Application context not found")
             val filename = "${context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)}/${photo.image.imageId}.jpg"
             val file = File(filename)
 

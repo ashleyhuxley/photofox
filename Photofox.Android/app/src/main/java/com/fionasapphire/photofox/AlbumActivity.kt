@@ -30,8 +30,9 @@ fun AlbumViewPreview() {
 }
 
 @Composable
-fun AlbumView(onHome: () -> Unit, albumId: String?) {
+fun AlbumView() {
     val viewModel = hiltViewModel<PhotosViewModel>()
+    val context = LocalContext.current
 
     val state by viewModel.state.collectAsState()
     when (state) {
@@ -48,7 +49,7 @@ fun AlbumView(onHome: () -> Unit, albumId: String?) {
             val photos = successState.photos
             AlbumListView(
                 photos = photos.sortedByDescending { it.date },
-                openImage = { viewModel.openImage(it) },
+                openImage = { viewModel.openImage(it, context) },
                 albumName = successState.albumName
             )
         }
@@ -96,7 +97,7 @@ fun ImageCard(item: PhotoAlbumEntry, openImage: (PhotoAlbumEntry) -> Unit) {
         model = ImageRequest.Builder(LocalContext.current)
             .data(item.image)
             .crossfade(true)
-            .fetcherFactory(ImageStoreFetcherFactory())
+            .fetcherFactory(ImageStoreFetcherFactory(LocalContext.current))
             .build(),
         contentDescription = "",
         contentScale = ContentScale.FillWidth,

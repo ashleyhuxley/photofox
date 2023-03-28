@@ -36,7 +36,7 @@ class PhotoAlbumsViewModel
                 }
             state.value = PhotoAlbumsViewModelState.SUCCESS(albums)
         } catch (e: Exception) {
-            state.value = PhotoAlbumsViewModelState.FAILURE(e.localizedMessage)
+            state.value = PhotoAlbumsViewModelState.FAILURE(e.localizedMessage ?: "Unknown Error")
         }
     }
 

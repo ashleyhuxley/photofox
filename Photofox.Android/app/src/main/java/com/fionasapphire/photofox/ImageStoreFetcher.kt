@@ -1,6 +1,7 @@
 package com.fionasapphire.photofox
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.util.Log
 import coil.ImageLoader
 import coil.decode.DataSource
@@ -18,23 +19,22 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileOutputStream
 
-class ImageStoreFetcherFactory: Fetcher.Factory<ImageReference> {
+class ImageStoreFetcherFactory(private val context: Context): Fetcher.Factory<ImageReference> {
     override fun create(data: ImageReference, options: Options, imageLoader: ImageLoader): Fetcher? {
-        return ImageStoreFetcher(data, options)
+        return ImageStoreFetcher(data, options, context)
     }
 
 }
 
 class ImageStoreFetcher(
     private val image: ImageReference,
-    private val options: Options): Fetcher {
+    private val options: Options,
+    private val context: Context): Fetcher {
 
     private val connectionString = "DefaultEndpointsProtocol=https;AccountName=photofox;AccountKey=9HImTKLoDlh09Th4bo8xobaTXJe3mpPOASiVpnpLwsr5ox+QmnD7ZtMUaNnyqA0MKf99tkqYv3Zt+AStgHyEXw==;EndpointSuffix=core.windows.net"
     private val imageStorage: ImageStorage = ImageStorage(connectionString)
 
     override suspend fun fetch(): FetchResult? {
-
-        val context = PhotoFoxApplication.getAppContext() ?: throw Exception("Application context not found")
 
         val filename = "${context.externalCacheDir}/thumbs/${image.imageId}.jpg"
 

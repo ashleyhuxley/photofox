@@ -49,8 +49,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
 }
 
 class SampleAlbumProvider: PreviewParameterProvider<List<PhotoAlbum>> {
@@ -70,11 +68,8 @@ fun Navi() {
         }
         composable(
             route = "album/{albumId}",
-            ) { entry: NavBackStackEntry ->
-            AlbumView(
-                onHome = { navController.popBackStack() },
-                albumId = entry.arguments?.getString("albumId")
-            )
+            ) {
+            AlbumView( )
         }
     }
 }
@@ -160,7 +155,7 @@ fun AlbumsListScreen(albums: List<PhotoAlbum>, navController: NavHostController)
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(item.image)
                                     .crossfade(true)
-                                    .fetcherFactory(ImageStoreFetcherFactory())
+                                    .fetcherFactory(ImageStoreFetcherFactory(LocalContext.current))
                                     .build(),
                                 contentDescription = item.title,
                                 contentScale = ContentScale.FillWidth,
