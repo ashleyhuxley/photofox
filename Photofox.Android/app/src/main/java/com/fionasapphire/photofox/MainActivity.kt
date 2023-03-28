@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,13 +32,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fionasapphire.photofox.model.PhotoAlbum
 import com.fionasapphire.photofox.ui.theme.PhotoFoxTheme
 import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModel
 import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModelState
-import com.fionasapphire.photofox.viewmodels.PhotosViewModelState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

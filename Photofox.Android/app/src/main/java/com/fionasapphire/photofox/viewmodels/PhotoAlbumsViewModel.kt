@@ -1,7 +1,5 @@
 package com.fionasapphire.photofox.viewmodels
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fionasapphire.photofox.ImageReference
@@ -18,8 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PhotoAlbumsViewModel
 @Inject constructor(
-    private val photoAlbumStorage: PhotoAlbumStorage,
-    private val imageStorage: ImageStorage
+    private val photoAlbumStorage: PhotoAlbumStorage
     ) : ViewModel() {
 
     val state = MutableStateFlow<PhotoAlbumsViewModelState>(PhotoAlbumsViewModelState.START)
@@ -35,7 +32,7 @@ class PhotoAlbumsViewModel
             val albums = entities
                 .sortedBy { it.AlbumName }
                 .map {
-                    PhotoAlbum(it.partitionKey, it.AlbumName, it.AlbumDescription, ImageReference(false, it.CoverPhotoId))
+                    PhotoAlbum(it.partitionKey, it.AlbumName, it.AlbumDescription, ImageReference(true, it.CoverPhotoId))
                 }
             state.value = PhotoAlbumsViewModelState.SUCCESS(albums)
         } catch (e: Exception) {

@@ -2,7 +2,6 @@ package com.fionasapphire.photofox.storage.table
 
 import com.fionasapphire.photofox.storage.StorageBase
 import com.fionasapphire.photofox.storage.entity.PhotoAlbumEntity
-import com.fionasapphire.photofox.storage.entity.PhotoMetadataEntity
 import com.fionasapphire.photofox.storage.enums.FieldName
 import com.fionasapphire.photofox.storage.enums.TableName
 import com.microsoft.azure.storage.table.TableQuery

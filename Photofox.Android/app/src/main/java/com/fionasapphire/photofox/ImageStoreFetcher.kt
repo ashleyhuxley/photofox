@@ -1,7 +1,6 @@
 package com.fionasapphire.photofox
 
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.util.Log
 import coil.ImageLoader
 import coil.decode.DataSource
@@ -18,7 +17,6 @@ import okio.Path.Companion.toPath
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.io.use
 
 class ImageStoreFetcherFactory: Fetcher.Factory<ImageReference> {
     override fun create(data: ImageReference, options: Options, imageLoader: ImageLoader): Fetcher? {
