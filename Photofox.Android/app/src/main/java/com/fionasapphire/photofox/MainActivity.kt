@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,7 +28,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,12 +38,15 @@ import com.fionasapphire.photofox.model.PhotoAlbum
 import com.fionasapphire.photofox.ui.theme.PhotoFoxTheme
 import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModel
 import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModelState
+import com.fionasapphire.photofox.views.AddAlbumView
+import com.fionasapphire.photofox.views.SelectPhotos
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             PhotoFoxTheme {
                 Navi()
@@ -69,8 +73,10 @@ fun Navi() {
         composable(
             route = "album/{albumId}",
             ) {
-            AlbumView( )
+            AlbumView(navController)
         }
+        composable("addAlbum") { AddAlbumView() }
+        composable("addPhotos") { SelectPhotos() }
     }
 }
 
@@ -86,6 +92,7 @@ fun Preview(@PreviewParameter(SampleAlbumProvider::class) items: List<PhotoAlbum
 fun MainView(navController: NavHostController) {
     val viewModel = hiltViewModel<PhotoAlbumsViewModel>()
     val state by viewModel.state.collectAsState()
+
     when (state) {
         PhotoAlbumsViewModelState.START -> {
         }
@@ -127,10 +134,16 @@ fun AlbumsListScreen(albums: List<PhotoAlbum>, navController: NavHostController)
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("PhotoFox") },
-                backgroundColor = Color.Black,
-                contentColor = Color.White
-            )
+                elevation = 4.dp,
+                title = {
+                    Text("PhotoFox")
+                },
+                backgroundColor =  MaterialTheme.colors.primarySurface,
+                actions = {
+                    IconButton(onClick = { navController.navigate("addAlbum") }) {
+                        Icon(Icons.Filled.Add, null)
+                    }
+                })
         },
     ) {
         LazyColumn(
@@ -140,13 +153,18 @@ fun AlbumsListScreen(albums: List<PhotoAlbum>, navController: NavHostController)
         ) {
             items(items = albums) { item ->
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp).clickable { },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .clickable { },
                     shape = RoundedCornerShape(10.dp),
                     elevation = 5.dp,
                     onClick = { navController.navigate("album/${item.albumId}") }
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Box(modifier = Modifier.fillMaxWidth())
@@ -159,7 +177,9 @@ fun AlbumsListScreen(albums: List<PhotoAlbum>, navController: NavHostController)
                                     .build(),
                                 contentDescription = item.title,
                                 contentScale = ContentScale.FillWidth,
-                                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp),
                                 placeholder = painterResource(R.drawable.placeholder)
                             )
                         }
@@ -175,3 +195,4 @@ fun AlbumsListScreen(albums: List<PhotoAlbum>, navController: NavHostController)
         }
     }
 }
+

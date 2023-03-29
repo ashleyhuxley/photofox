@@ -8,6 +8,7 @@ plugins {
 android {
     namespace 'com.fionasapphire.photofox'
     compileSdk 33
+    compileSdkPreview 'UpsideDownCake'
 
     defaultConfig {
         applicationId "com.fionasapphire.photofox"
@@ -80,4 +81,6 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:2.5.3"
 
     implementation 'io.coil-kt:coil-compose:2.3.0'
+
+    implementation 'androidx.activity:activity-compose:1.8.0-alpha02'
 }
