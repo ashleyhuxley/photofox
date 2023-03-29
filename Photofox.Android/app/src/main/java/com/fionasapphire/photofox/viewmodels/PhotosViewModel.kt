@@ -8,14 +8,11 @@ import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.res.Resources.NotFoundException
 import android.os.Environment
 import android.util.Log
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fionasapphire.photofox.ImageReference
-import com.fionasapphire.photofox.PhotoFoxApplication
+import com.fionasapphire.photofox.model.ImageReference
 import com.fionasapphire.photofox.atMidnight
 import com.fionasapphire.photofox.model.PhotoAlbumEntry
 import com.fionasapphire.photofox.storage.blob.ImageStorage

@@ -10,6 +10,7 @@ import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.fetch.SourceResult
 import coil.request.Options
+import com.fionasapphire.photofox.model.ImageReference
 import com.fionasapphire.photofox.storage.blob.ImageStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

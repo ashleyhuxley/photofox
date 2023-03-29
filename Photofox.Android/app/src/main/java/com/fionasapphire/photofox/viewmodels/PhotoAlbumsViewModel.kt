@@ -2,9 +2,8 @@ package com.fionasapphire.photofox.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fionasapphire.photofox.ImageReference
+import com.fionasapphire.photofox.model.ImageReference
 import com.fionasapphire.photofox.model.PhotoAlbum
-import com.fionasapphire.photofox.storage.blob.ImageStorage
 import com.fionasapphire.photofox.storage.table.PhotoAlbumStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

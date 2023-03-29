@@ -34,6 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.fionasapphire.photofox.model.ImageReference
 import com.fionasapphire.photofox.model.PhotoAlbum
 import com.fionasapphire.photofox.ui.theme.PhotoFoxTheme
 import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModel

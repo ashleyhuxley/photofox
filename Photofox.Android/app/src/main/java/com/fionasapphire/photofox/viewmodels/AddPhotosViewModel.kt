@@ -2,6 +2,8 @@ package com.fionasapphire.photofox.viewmodels
 
 import android.content.Context
 import android.net.Uri
+import androidx.core.net.toFile
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fionasapphire.photofox.storage.blob.ImageStorage
@@ -15,6 +17,7 @@ import kotlinx.coroutines.withContext
 import java.io.*
 import java.util.*
 import javax.inject.Inject
+
 
 @HiltViewModel
 class AddPhotosViewModel
@@ -31,7 +34,7 @@ class AddPhotosViewModel
 
     fun uploadAndQueue(uris: List<Uri>, albumId: String, context: Context) = viewModelScope.launch {
 
-        val uploadStates = List<MutableStateFlow<PhotoUploadState>>(uris.size) {
+        val uploadStates = List(uris.size) {
             MutableStateFlow<PhotoUploadState>(
                 PhotoUploadState.UPLOADING
             )
@@ -49,6 +52,7 @@ class AddPhotosViewModel
                 withContext(Dispatchers.IO) {
                     imageStorage.uploadImage(photoId, BlobType.images.name, bytes)
                     queueStorage.enqueue(photoId, albumId)
+
                     uploadStates[i].value = PhotoUploadState.SUCCESS
                 }
             }
