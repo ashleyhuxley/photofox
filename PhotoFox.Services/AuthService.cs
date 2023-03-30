@@ -1,4 +1,5 @@
 ﻿using PhotoFox.Storage.Table;
+using System;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Services
@@ -9,7 +10,7 @@ namespace PhotoFox.Services
 
         public AuthService(IAlbumPermissionStorage albumPermissionStorage)
         {
-            this.albumPermissionStorage = albumPermissionStorage;
+            this.albumPermissionStorage = albumPermissionStorage ?? throw new ArgumentNullException(nameof(albumPermissionStorage));
         }
 
         public async Task<bool> HasPermission(string albumId, string username)
