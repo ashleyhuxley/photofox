@@ -8,7 +8,7 @@ namespace PhotoFox.Core.Exif
 {
     public class ExifReader
     {
-        private ImageFile imageFile;
+        private readonly ImageFile imageFile;
 
         private ExifReader(ImageFile imageFile)
         {
@@ -156,7 +156,7 @@ namespace PhotoFox.Core.Exif
             var gpsLat = this.imageFile.Properties.Get<GPSLatitudeLongitude>(ExifTag.GPSLatitude);
             var gpsLatRef = this.imageFile.Properties.Get<ExifEnumProperty<GPSLatitudeRef>>(ExifTag.GPSLatitudeRef);
 
-            if (gpsLatRef != null && gpsLatRef != null)
+            if (gpsLatRef is not null and not null)
             {
                 var latDecimal = ConvertDegreeAngleToDouble(gpsLat) * (gpsLatRef.Value == GPSLatitudeRef.North ? 1 : -1);
                 if (latDecimal != 0)
