@@ -12,6 +12,7 @@ using PhotoFox.Core.Imaging;
 using System.Drawing;
 using PhotoFox.Core.Extensions;
 using System.Drawing.Imaging;
+using LogLevel = PhotoFox.Storage.Models.LogLevel;
 
 namespace PhotoFox.Functions.UploadPhoto
 {
@@ -23,6 +24,9 @@ namespace PhotoFox.Functions.UploadPhoto
         private IThumbnailProvider thumbnailProvider;
         private IPhotoMetadataStorage photoMetadataStorage;
         private IPhotoInAlbumStorage photoInAlbumStorage;
+        private ILogStorage logStorage;
+
+        private const string source = "UploadFunction";
 
         public UploadPhoto(
             IPhotoFileStorage photoFileStorage,
@@ -30,7 +34,8 @@ namespace PhotoFox.Functions.UploadPhoto
             IPhotoHashStorage photoHashStorage,
             IThumbnailProvider thumbnailProvider,
             IPhotoMetadataStorage photoMetadataStorage,
-            IPhotoInAlbumStorage photoInAlbumStorage)
+            IPhotoInAlbumStorage photoInAlbumStorage,
+            ILogStorage logStorage)
         {
             this.photoFileStorage = photoFileStorage;
             this.streamHash = streamHash;
@@ -38,10 +43,11 @@ namespace PhotoFox.Functions.UploadPhoto
             this.thumbnailProvider = thumbnailProvider;
             this.photoMetadataStorage = photoMetadataStorage;
             this.photoInAlbumStorage= photoInAlbumStorage;
+            this.logStorage = logStorage;
         }
 
         [FunctionName("Upload")]
-        public async Task Run([QueueTrigger("uploads", Connection = "AzureWebJobsStorage")]string message, ILogger log)
+        public async Task Run([QueueTrigger("uploads", Connection = "PhotoFoxStorage")]string message, ILogger log)
         {
             string albumId = Guid.Empty.ToString();
             var items = message.Split(',');
@@ -69,6 +75,9 @@ namespace PhotoFox.Functions.UploadPhoto
             if (await photoHashStorage.HashExistsAsync(md5).ConfigureAwait(false) != null)
             {
                 log.LogWarning($"An image with the same hash as {photoId} already exists");
+
+                await logStorage.Log("An image with this hash already exists", source, photoId, albumId, LogLevel.Warn, md5);
+
                 await photoFileStorage.DeletePhotoAsync(photoId);
                 return;
             }
@@ -114,8 +123,13 @@ namespace PhotoFox.Functions.UploadPhoto
 
             // Store table items
             await photoMetadataStorage.AddPhotoAsync(metadata);
+            await logStorage.Log("Metadata entry added", source, photoId, "", LogLevel.Info, md5);
+
             await photoHashStorage.AddHashAsync(md5, metadata.PartitionKey, metadata.RowKey);
+            await logStorage.Log("Photo hash added", source, photoId, "", LogLevel.Info, md5);
+
             await photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, metadata.RowKey, metadata.UtcDate.Value);
+            await logStorage.Log("Photo added to album", source, photoId, albumId, LogLevel.Info, md5);
 
         }
     }

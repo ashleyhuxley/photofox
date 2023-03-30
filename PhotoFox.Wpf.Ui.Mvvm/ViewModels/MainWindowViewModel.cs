@@ -306,8 +306,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             this.Albums.Clear();
 
-            this.Albums.Add(new AlbumViewModel { AlbumId = Guid.Empty.ToString(), Title = "[ No Album ]" });
-
             await foreach (var album in this.photoAlbumService.GetAllAlbumsAsync())
             {
                 var viewModel = new AlbumViewModel

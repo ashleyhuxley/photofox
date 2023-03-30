@@ -16,6 +16,6 @@
     <ProjectReference Include="..\PhotoFox.Storage\PhotoFox.Storage.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties properties_4servicedependencies_1json__JsonSchema="https://gitlab.com/sbenv/veroxis/docker-seq/-/raw/HEAD/docker-seq.schema.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>
