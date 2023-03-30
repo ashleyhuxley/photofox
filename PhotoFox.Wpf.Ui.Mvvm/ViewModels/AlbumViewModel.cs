@@ -7,11 +7,11 @@ namespace PhotoFox.Ui.Wpf.Mvvm.ViewModels
     {
         private bool isSelected;
 
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
-        public BitmapSource Image { get; set; }
+        public BitmapSource? Image { get; set; }
 
-        public string AlbumId { get; set; }
+        public string? AlbumId { get; set; }
 
         public bool IsSelected
         {

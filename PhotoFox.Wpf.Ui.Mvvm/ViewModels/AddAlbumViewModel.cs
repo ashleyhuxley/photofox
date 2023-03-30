@@ -2,6 +2,6 @@
 {
     public class AddAlbumViewModel
     {
-        public string AlbumName { get; set; }
+        public string? AlbumName { get; set; }
     }
 }

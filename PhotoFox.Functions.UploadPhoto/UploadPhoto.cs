@@ -13,18 +13,19 @@ using System.Drawing;
 using PhotoFox.Core.Extensions;
 using System.Drawing.Imaging;
 using LogLevel = PhotoFox.Storage.Models.LogLevel;
+using System.Runtime.Versioning;
 
 namespace PhotoFox.Functions.UploadPhoto
 {
     public class UploadPhoto
     {
-        private IPhotoFileStorage photoFileStorage;
-        private IStreamHash streamHash;
-        private IPhotoHashStorage photoHashStorage;
-        private IThumbnailProvider thumbnailProvider;
-        private IPhotoMetadataStorage photoMetadataStorage;
-        private IPhotoInAlbumStorage photoInAlbumStorage;
-        private ILogStorage logStorage;
+        private readonly IPhotoFileStorage photoFileStorage;
+        private readonly IStreamHash streamHash;
+        private readonly IPhotoHashStorage photoHashStorage;
+        private readonly IThumbnailProvider thumbnailProvider;
+        private readonly IPhotoMetadataStorage photoMetadataStorage;
+        private readonly IPhotoInAlbumStorage photoInAlbumStorage;
+        private readonly ILogStorage logStorage;
 
         private const string source = "UploadFunction";
 
@@ -47,6 +48,7 @@ namespace PhotoFox.Functions.UploadPhoto
         }
 
         [FunctionName("Upload")]
+        [SupportedOSPlatform("windows")]
         public async Task Run([QueueTrigger("uploads", Connection = "PhotoFoxStorage")]string message, ILogger log)
         {
             string albumId = Guid.Empty.ToString();

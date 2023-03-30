@@ -50,7 +50,6 @@ namespace PhotoFox.Ui.Wpf
             view.GroupDescriptions.Add(groupDescription);
 
             view.SortDescriptions.Add(new SortDescription("GroupSort", ListSortDirection.Descending));
-            //view.SortDescriptions.Add(new SortDescription("UtcDate", ListSortDirection.Descending));
         }
 
         private void SetupAlbumSort()
@@ -80,38 +79,6 @@ namespace PhotoFox.Ui.Wpf
             {
                 await viewModel.LoadMore();
             }
-        }
-
-        private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            //var sv = FindVisualChild<ScrollViewer>(PhotoList);
-            //while (!sv.CanContentScroll)
-            //{
-            //    await this.viewModel.LoadPhotos();
-            //}
-        }
-
-        public static T FindVisualChild<T>(DependencyObject obj)
-            where T : DependencyObject
-        {
-            // Iterate through all immediate children
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-
-                if (child != null && child is T)
-                    return (T)child;
-
-                else
-                {
-                    var childOfChild = FindVisualChild<T>(child);
-
-                    if (childOfChild != null)
-                        return childOfChild;
-                }
-            }
-
-            return null;
         }
 
         private void ItemDoubleClicked(object sender, MouseButtonEventArgs e)

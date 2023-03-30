@@ -24,7 +24,7 @@ namespace PhotoFox.Ui.Wpf
     /// </summary>
     public partial class App : Application
     {
-        private IKernel contianer;
+        private IKernel? contianer;
 
         protected override void OnStartup(StartupEventArgs e)
         {

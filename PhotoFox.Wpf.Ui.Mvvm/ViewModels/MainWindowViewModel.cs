@@ -86,7 +86,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             DeletePhotoCommand = deletePhotoCommand;
             AddAlbumCommand = addAlbumCommand;
             DeleteAlbumCommand = deleteAlbumCommand;
-            StopLoadingCommand = new RelayCommand(StopLoadingExecute, StopLoadingCanExecute);
+            StopLoadingCommand = new RelayCommand(StopLoadingExecute, () => true);
             SaveChangesCommand = saveChangesCommand;
             OpenPhotoCommand = new RelayCommand(OpenSelectedImage, OpenSelectedImageCanExecute);
             AddToAlbumCommand = new RelayCommand(AddToAlbumCommandExecute);
@@ -207,7 +207,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             Log.Trace($"Adding {photo.PhotoId}");
 
-            _ = Task.Run(() => LoadPhotoThumbnail(photo, viewModel));
+            _ = Task.Run(() => LoadPhotoThumbnail(photo, viewModel), token);
 
             this.Photos.Add(viewModel);
             this.OnPropertyChanged(nameof(this.Photos.Count));
@@ -231,7 +231,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.Photos.Clear();
             this.OnPropertyChanged(nameof(this.Photos.Count));
 
-            if (this.SelectedAlbum != null && this.SelectedAlbum.AlbumId != string.Empty)
+            if (this.SelectedAlbum != null && !string.IsNullOrEmpty(this.SelectedAlbum.AlbumId))
             {
                 await LoadPhotosFromAlbum(this.SelectedAlbum.AlbumId, token);
             }
@@ -331,12 +331,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
         }
 
-        private BitmapImage GetDefaultImage()
-        {
-            return new BitmapImage();
-        }
-
-        private BitmapSource GetImageFromBytes(byte[] bytes)
+        private static BitmapSource GetImageFromBytes(byte[] bytes)
         {
             var stream = new MemoryStream();
 
@@ -383,12 +378,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             cancellationTokenSource.Cancel();
         }
 
-        private bool StopLoadingCanExecute()
-        {
-            return true;
-        }
-
-        public async void Receive(LoadPhotoMessage message)
+        public void Receive(LoadPhotoMessage message)
         {
             LoadPhoto(message.Photo, cancellationTokenSource.Token);
         }

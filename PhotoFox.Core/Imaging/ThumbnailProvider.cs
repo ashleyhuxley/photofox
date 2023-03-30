@@ -2,9 +2,11 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.Versioning;
 
 namespace PhotoFox.Core.Imaging
 {
+    [SupportedOSPlatform("windows")]
     public class ThumbnailProvider : IThumbnailProvider
     {
         public Image GenerateThumbnail(Image original, int width)
@@ -12,12 +14,19 @@ namespace PhotoFox.Core.Imaging
             return GenerateThumbnail(original, width, 0);
         }
 
-        public Image GenerateThumbnail(Image original, int width, int rotateDegrees)
+        public Image GenerateThumbnail(Image input, int width, int rotationDegrees)
         {
-            var factor = (double)original.Width / width;
-            var newHeight = original.Height / factor;
+            var factor = (double)input.Width / width;
+            var newHeight = input.Height / factor;
 
-            return ResizeImage(original, width, Convert.ToInt32(newHeight), rotateDegrees);
+            return ResizeImage(input, width, Convert.ToInt32(newHeight), rotationDegrees);
+        }
+
+        private static void Swap(ref int a, ref int b)
+        {
+            a = a + b;     
+            b = a - b;     
+            a = a - b;
         }
 
         /// <summary>
@@ -27,6 +36,7 @@ namespace PhotoFox.Core.Imaging
         /// <param name="width">The width to resize to.</param>
         /// <param name="height">The height to resize to.</param>
         /// <returns>The resized image.</returns>
+        [SupportedOSPlatform("windows")]
         private static Bitmap ResizeImage(Image image, int width, int height, int rotateDegrees)
         {
             var srcRect = new Rectangle(0, 0, image.Width, image.Height);
@@ -35,12 +45,10 @@ namespace PhotoFox.Core.Imaging
             Bitmap destImage;
             if (rotateDegrees == 90 || rotateDegrees == 270)
             {
-                destImage = new Bitmap(height, width);
+                Swap(ref width, ref height);
             }
-            else
-            {
-                destImage = new Bitmap(width, height);
-            }
+
+            destImage = new Bitmap(width, height);
 
             destImage.SetResolution(image.VerticalResolution, image.HorizontalResolution);
 
