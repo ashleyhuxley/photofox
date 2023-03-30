@@ -7,8 +7,7 @@
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         mc:Ignorable="d" Icon="Images/photofox.png"
         Loaded="Window_Loaded"
-        Title="PhotoFox" Height="800" Width="1200"
-        SizeChanged="Window_SizeChanged">
+        Title="PhotoFox" Height="800" Width="1200">
     <DockPanel>
         <Ribbon DockPanel.Dock="Top">
             <RibbonTab Header="Photos">

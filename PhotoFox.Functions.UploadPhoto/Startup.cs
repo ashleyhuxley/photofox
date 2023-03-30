@@ -6,6 +6,7 @@ using PhotoFox.Functions.UploadPhoto;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
+using System.Runtime.Versioning;
 
 [assembly: FunctionsStartup(typeof(MyNamespace.Startup))]
 
@@ -13,6 +14,7 @@ namespace MyNamespace
 {
     public class Startup : FunctionsStartup
     {
+        [SupportedOSPlatform("windows")]
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddSingleton<IPhotoFileStorage, PhotoFileStorage>();

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using AutoMapper;
 using NLog;
@@ -52,6 +53,7 @@ namespace PhotoFox.Services
             this.mapper = mapper;
         }
 
+        [SupportedOSPlatform("windows")]
         public async Task<Photo> UploadFromStreamAsync(Stream stream, DateTime fallbackTime, string fallbackTitle)
         {
             var image = Image.FromStream(stream);
