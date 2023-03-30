@@ -13,10 +13,5 @@ namespace PhotoFox.Core.Extensions
 
             return value.ToString("yyyyMMdd");
         }
-
-        public static string ToDupeKeyPartitionKey(this DateTime key)
-        {
-            return key.ToString("yyyyMMddHHmmssfff");
-        }
     }
 }

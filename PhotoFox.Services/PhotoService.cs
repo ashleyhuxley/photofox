@@ -17,8 +17,6 @@ namespace PhotoFox.Services
 
         private readonly IPhotoFileStorage photoFileStorage;
 
-        private readonly IPhotoHashStorage photoHashStorage;
-
         private readonly IPhotoInAlbumStorage photoInAlbumStorage;
 
         private readonly IMapper mapper;
@@ -26,13 +24,11 @@ namespace PhotoFox.Services
         public PhotoService(
             IPhotoMetadataStorage photoMetadataStorage,
             IPhotoFileStorage photoFileStorage,
-            IPhotoHashStorage photoHashStorage,
             IPhotoInAlbumStorage photoInAlbumStorage,
             IMapper mapper)
         {
             this.photoMetadataStorage = photoMetadataStorage;
             this.photoFileStorage = photoFileStorage;
-            this.photoHashStorage = photoHashStorage;
             this.photoInAlbumStorage = photoInAlbumStorage;
             this.mapper = mapper;
         }
