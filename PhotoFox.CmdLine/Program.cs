@@ -38,16 +38,14 @@ namespace PhotoFox.CmdLine
         {
             await foreach (var photoInAlbum in photoInAlbumStorage.GetPhotosInAlbumAsync(Guid.Empty.ToString()))
             {
-                List<PhotoInAlbum> photoInAlbums = new List<PhotoInAlbum>();
-                await foreach(var album in photoInAlbumStorage.GetAlbumsForPhotoId(photoInAlbum.RowKey))
+                try
                 {
-                    photoInAlbums.Add(album);
+                    var photo = await metaDataStorage.GetPhotoMetadataAsync(photoInAlbum.UtcDate, photoInAlbum.RowKey);
                 }
-
-                if (photoInAlbums.Any(Check))
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"{photoInAlbum.RowKey} exists in {string.Join(',', photoInAlbums.Select(p => p.PartitionKey))}");
-                    await photoInAlbumStorage.RemovePhotoFromAlbumAsync(Guid.Empty.ToString(), photoInAlbum.RowKey);
+                    Console.WriteLine($"{photoInAlbum.UtcDate.ToPartitionKey()} - {photoInAlbum.RowKey}");
+                    Console.WriteLine(ex.Message);
                 }
             }
 

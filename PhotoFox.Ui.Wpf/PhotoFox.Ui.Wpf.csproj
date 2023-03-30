@@ -5,6 +5,8 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <PackageIcon>ic_launcher.png</PackageIcon>
+    <ApplicationIcon>ic_launcher.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,10 +20,22 @@
     <None Remove="Images\delete.png" />
     <None Remove="Images\images.png" />
     <None Remove="Images\no.png" />
+    <None Remove="Images\photofox.png" />
     <None Remove="Images\picture.png" />
     <None Remove="Images\picture_key.png" />
     <None Remove="Images\stop.png" />
     <None Remove="Images\yes.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ic_launcher.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\photofox.mobile\app\src\main\res\mipmap-xxxhdpi\ic_launcher.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +48,7 @@
     <Resource Include="Images\add_album.png" />
     <Resource Include="Images\add_photo.png" />
     <Resource Include="Images\no.png" />
+    <Resource Include="Images\photofox.png" />
     <Resource Include="Images\picture.png" />
     <Resource Include="Images\picture_key.png" />
     <Resource Include="Images\stop.png" />
