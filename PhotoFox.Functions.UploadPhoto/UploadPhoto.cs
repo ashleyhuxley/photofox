@@ -54,9 +54,15 @@ namespace PhotoFox.Functions.UploadPhoto
             string albumId = Guid.Empty.ToString();
             var items = message.Split(',');
             string photoId = items[0];
+            string title = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
             if (items.Length > 1)
             {
                 albumId = items[1];
+            }
+            if (items.Length > 2)
+            {
+                title = items[2];
             }
 
             log.LogInformation($"Processing image ID: {photoId} into album {albumId}");
@@ -98,7 +104,7 @@ namespace PhotoFox.Functions.UploadPhoto
             metadata.GeolocationLattitude = exifReader.GetGpsLatitude();
             metadata.GeolocationLongitude = exifReader.GetGpsLongitude();
             metadata.ISO = exifReader.GetIso();
-            metadata.Title = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+            metadata.Title = title;
             metadata.DimensionWidth = exifReader.GetDimensionWidth() ?? image.Width;
             metadata.DimensionHeight = exifReader.GetDimensionHeight() ?? image.Height;
             metadata.Manufacturer = exifReader.GetManufacturer();
