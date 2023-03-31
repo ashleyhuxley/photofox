@@ -64,8 +64,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
             Log.Debug($"Uploading {fileName}");
 
-            var info = new FileInfo(fileName);
-
             using (var stream = File.Open(fileName, FileMode.Open))
             {
                 try

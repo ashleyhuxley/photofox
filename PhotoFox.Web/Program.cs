@@ -10,14 +10,13 @@ using Microsoft.AspNetCore.Identity;
 
 namespace PhotoFox.Web
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            //builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddAzureTableStores<ApplicationDbContext>(new Func<IdentityConfiguration>(() =>
                 {
@@ -70,8 +69,6 @@ namespace PhotoFox.Web
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapBlazorHub();
-                //endpoints.MapFallbackToPage("/_Host");
             });
 
             app.MapBlazorHub();

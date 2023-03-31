@@ -1,9 +1,10 @@
 ﻿using PhotoFox.Storage;
+using System.Configuration;
 
 namespace PhotoFox.Web
 {
     public class Config : IStorageConfig
     {
-        public string StorageConnectionString => "DefaultEndpointsProtocol=https;AccountName=photofox;AccountKey=LTIetKvBGKAqSvnpnqNe05ObOWoLW6P+uMXgd01DEN26eekmgJtFB8MTi+jjZshXh/RXb6i2weQoiosBjlMq7A==;EndpointSuffix=core.windows.net";
+        public string StorageConnectionString => Environment.GetEnvironmentVariable("PhotoFoxStorage") ?? throw new ConfigurationErrorsException("Storage account connection string is missing from config");
     }
 }

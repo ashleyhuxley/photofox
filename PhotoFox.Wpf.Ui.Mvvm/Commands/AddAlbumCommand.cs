@@ -30,7 +30,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
         public bool CanExecute(object? parameter)
         {
-            return parameter != null && parameter is PhotoViewModel;
+            return parameter is PhotoViewModel;
         }
 
         public void Execute(object? parameter)
