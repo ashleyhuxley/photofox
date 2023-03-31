@@ -26,11 +26,11 @@ namespace PhotoFox.Services
             IAlbumPermissionStorage albumPermissionStorage,
             IMapper mapper)
         {
-            this.photoAlbumDataStorage = photoAlbumDataStorage;
-            this.photoInAlbumStorage = photoInAlbumStorage;
-            this.photoMetadataStorage = photoMetadataStorage;
-            this.albumPermissionStorage = albumPermissionStorage;
-            this.mapper = mapper;
+            this.photoAlbumDataStorage = photoAlbumDataStorage ?? throw new ArgumentNullException(nameof(photoAlbumDataStorage));
+            this.photoInAlbumStorage = photoInAlbumStorage ?? throw new ArgumentNullException(nameof(photoInAlbumStorage));
+            this.photoMetadataStorage = photoMetadataStorage ?? throw new ArgumentNullException(nameof(photoMetadataStorage));
+            this.albumPermissionStorage = albumPermissionStorage ?? throw new ArgumentNullException(nameof(albumPermissionStorage));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync()
@@ -47,7 +47,17 @@ namespace PhotoFox.Services
             }
         }
 
-        public async IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync(string username)
+        public IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentNullException(nameof(username));
+            }
+
+            return GetAlbumsAsyncIterator(username);
+        }
+
+        private async IAsyncEnumerable<PhotoAlbum> GetAlbumsAsyncIterator(string username)
         {
             var validAlbums = new List<string>();
             await foreach (var albumPermission in this.albumPermissionStorage.GetPermissionsByUsernameAsync(username))
@@ -55,7 +65,8 @@ namespace PhotoFox.Services
                 validAlbums.Add(albumPermission.RowKey);
             }
 
-            await foreach (var album in this.photoAlbumDataStorage.GetPhotoAlbumsAsync())
+#pragma warning disable S3267 // Loops should be simplified with "LINQ" expressions
+            await foreach (var album in photoAlbumDataStorage.GetPhotoAlbumsAsync())
             {
                 if (validAlbums.Contains(album.PartitionKey))
                 {
@@ -68,6 +79,7 @@ namespace PhotoFox.Services
                     };
                 }
             }
+#pragma warning restore S3267 // Loops should be simplified with "LINQ" expressions
         }
 
         public async IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId)
