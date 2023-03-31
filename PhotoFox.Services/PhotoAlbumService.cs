@@ -82,7 +82,17 @@ namespace PhotoFox.Services
 #pragma warning restore S3267 // Loops should be simplified with "LINQ" expressions
         }
 
-        public async IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId)
+        public IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId)
+        {
+            if (string.IsNullOrEmpty(albumId))
+            {
+                throw new ArgumentNullException(nameof(albumId));
+            }
+
+            return GetPhotosInAlbumAsyncIterator(albumId);
+        }
+
+        private async IAsyncEnumerable<Photo> GetPhotosInAlbumAsyncIterator(string albumId)
         {
             await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbumAsync(albumId))
             {
@@ -94,12 +104,27 @@ namespace PhotoFox.Services
 
         public async Task AddAlbumAsync(PhotoAlbum album)
         {
+            if (album == null)
+            {
+                throw new ArgumentNullException(nameof(album));
+            }
+
             var storageAlbum = mapper.Map<Storage.Models.PhotoAlbum>(album);
             await this.photoAlbumDataStorage.AddPhotoAlbumAsync(storageAlbum).ConfigureAwait(false);
         }
 
         public async Task AddPhotoToAlbumAsync(string albumId, string photoId, DateTime utcDate)
         {
+            if (string.IsNullOrEmpty(albumId))
+            {
+                throw new ArgumentNullException(nameof(albumId));
+            }
+
+            if (string.IsNullOrEmpty(photoId))
+            {
+                throw new ArgumentNullException(nameof(photoId));
+            }
+
             await this.photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, photoId, utcDate).ConfigureAwait(false);
         }
 
