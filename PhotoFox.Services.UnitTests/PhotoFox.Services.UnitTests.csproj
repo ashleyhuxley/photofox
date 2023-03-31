@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PhotoFox.Mappings\PhotoFox.Mappings.csproj" />
     <ProjectReference Include="..\PhotoFox.Services\PhotoFox.Services.csproj" />
   </ItemGroup>
 
