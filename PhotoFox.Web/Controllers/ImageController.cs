@@ -8,9 +8,7 @@ namespace PhotoFox.Web.Controllers
     {
         private readonly IPhotoFileStorage photoFileStorage;
 
-        public ImageController(
-            IPhotoFileStorage photoFileStorage,
-            IPhotoMetadataStorage metadataStorage)
+        public ImageController(IPhotoFileStorage photoFileStorage)
         {
             this.photoFileStorage = photoFileStorage;
         }
