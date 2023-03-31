@@ -49,13 +49,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 foreach (var file in message.FileNames)
                 {
                     i++;
-                    await UploadImage(file);
+                    await UploadImage(file, message.AlbumId);
                     this.messenger.Send(new SetStatusMessage($"Uploaded file {i} of {message.FileNames.Count}"));
                 }
             }
         }
 
-        private async Task UploadImage(string fileName)
+        private async Task UploadImage(string fileName, string albumId)
         {
             if (!File.Exists(fileName))
             {
@@ -70,11 +70,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             {
                 try
                 {
-                    var photo = await this.uploadService.UploadFromStreamAsync(stream, info.CreationTimeUtc, Path.GetFileName(fileName));
-                    if (photo != null)
-                    {
-                        this.messenger.Send(new LoadPhotoMessage(photo));
-                    }
+                    await this.uploadService.UploadFromStreamAsync(stream, albumId, Path.GetFileName(fileName));
                 }
                 catch (Exception ex)
                 {
