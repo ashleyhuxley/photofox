@@ -2,12 +2,10 @@
 using PhotoFox.Core.Extensions;
 using PhotoFox.Services;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
-using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
@@ -15,7 +13,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
     {
         private readonly IPhotoAlbumService photoAlbumService;
 
-        private AlbumViewModel emptyAlbum = new AlbumViewModel { Title = "New Album...", AlbumId = string.Empty };
+        private readonly AlbumViewModel emptyAlbum = new AlbumViewModel { Title = "New Album...", AlbumId = string.Empty };
 
         private AlbumViewModel selectedAlbum;
 

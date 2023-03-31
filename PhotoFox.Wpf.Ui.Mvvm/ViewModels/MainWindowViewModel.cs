@@ -184,7 +184,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public async Task Load()
         {
             this.batchId = DateTime.SpecifyKind(new DateTime(2021, 6, 1).Date, DateTimeKind.Utc);
-            //this.batchId = DateTime.UtcNow;
 
             // TODO: Can we Task.WhenAll this? Might need LoadPhotos refactor
             await LoadAlbums();
@@ -335,29 +334,25 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             var stream = new MemoryStream();
 
-            Image img;
             stream.Write(bytes, 0, bytes.Length);
             stream.Position = 0;
-            img = Image.FromStream(stream);
+            using (var img = Image.FromStream(stream))
+            {
+                var bitImage = new BitmapImage();
+                bitImage.BeginInit();
 
-            var bitImage = new BitmapImage();
-            bitImage.BeginInit();
+                var ms = new MemoryStream();
 
-            var ms = new MemoryStream();
+                img.Save(ms, ImageFormat.Jpeg);
 
-            img.Save(ms, ImageFormat.Jpeg);
-            ms.Seek(0, SeekOrigin.Begin);
-            bitImage.StreamSource = ms;
-            bitImage.EndInit();
+                ms.Seek(0, SeekOrigin.Begin);
+                bitImage.StreamSource = ms;
+                bitImage.EndInit();
 
-            bitImage.Freeze();
+                bitImage.Freeze();
 
-            return bitImage;
-        }
-
-        public async void Receive(RefreshAlbumsMessage message)
-        {
-            await this.LoadAlbums();
+                return bitImage;
+            }
         }
 
         public async Task LoadMore()
@@ -378,22 +373,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             cancellationTokenSource.Cancel();
         }
 
-        public void Receive(LoadPhotoMessage message)
-        {
-            LoadPhoto(message.Photo, cancellationTokenSource.Token);
-        }
-
-        public void Receive(UnloadPhotoMessage message)
-        {
-            this.Photos.Remove(message.ViewModel);
-            this.OnPropertyChanged(nameof(this.Photos.Count));
-        }
-
-        public void Receive(UpdateStatusMessage message)
-        {
-            this.LoadingStatusText = message.Message;
-        }
-
         public void OpenSelectedImage()
         {
             if (this.Photos.Count(p => p.IsSelected) != 1)
@@ -401,8 +380,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            var selectedPhoto = this.Photos.Single(p => p.IsSelected);
-            this.messenger.Send(new OpenPhotoMessage(selectedPhoto.Photo.PhotoId));
+            var selected = this.Photos.Single(p => p.IsSelected);
+            this.messenger.Send(new OpenPhotoMessage(selected.Photo.PhotoId));
         }
 
         public bool OpenSelectedImageCanExecute()
@@ -461,9 +440,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            foreach (var photo in this.Photos.Where(p => p.IsSelected))
+            foreach (var photo in this.Photos.Where(p => p.IsSelected).Select(p => p.Photo))
             {
-                await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.Photo.PhotoId, photo.Photo.DateTaken);
+                await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.PhotoId, photo.DateTaken);
             }
         }
 
@@ -497,14 +476,35 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.LoadingStatusText = message.Message;
         }
 
+        public void Receive(LoadPhotoMessage message)
+        {
+            LoadPhoto(message.Photo, cancellationTokenSource.Token);
+        }
+
+        public void Receive(UnloadPhotoMessage message)
+        {
+            this.Photos.Remove(message.ViewModel);
+            this.OnPropertyChanged(nameof(this.Photos.Count));
+        }
+
+        public async void Receive(RefreshAlbumsMessage message)
+        {
+            await this.LoadAlbums();
+        }
+
+        public void Receive(UpdateStatusMessage message)
+        {
+            this.LoadingStatusText = message.Message;
+        }
+
         public async void ReloadExifExecute()
         {
             var photosToProcess = new List<PhotoViewModel>();
             photosToProcess.AddRange(this.SelectedPhotos);
 
-            foreach (var photo in photosToProcess)
+            foreach (var photo in photosToProcess.Select(p => p.Photo))
             {
-                var newPhoto = await this.photoService.ReloadExifDataAsync(photo.Photo.DateTaken, photo.Photo.PhotoId);
+                var newPhoto = await this.photoService.ReloadExifDataAsync(photo.DateTaken, photo.PhotoId);
 
                 this.LoadPhoto(newPhoto, cancellationTokenSource.Token);
             }
