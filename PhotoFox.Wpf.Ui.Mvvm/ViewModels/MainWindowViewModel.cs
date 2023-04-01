@@ -34,8 +34,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
-        private const int MinPhotosToLoad = 50;
-
         private readonly IPhotoService photoService;
 
         private readonly IPhotoAlbumService photoAlbumService;
@@ -45,10 +43,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         private readonly IMessenger messenger;
 
         private readonly IContext context;
-
-        private DateTime batchId = DateTime.MinValue;
-
-        private bool isLoading = false;
 
         private string loadingStatusText = string.Empty;
 
@@ -183,9 +177,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public async Task Load()
         {
-            this.batchId = DateTime.SpecifyKind(new DateTime(2021, 6, 1).Date, DateTimeKind.Utc);
-
-            // TODO: Can we Task.WhenAll this? Might need LoadPhotos refactor
             await LoadAlbums();
             await LoadPhotos(cancellationTokenSource.Token);
         }
@@ -234,10 +225,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             {
                 await LoadPhotosFromAlbum(this.SelectedAlbum.AlbumId, token);
             }
-            else
-            {
-                await LoadPhotosWithoutAlbum(MinPhotosToLoad, token);
-            }
         }
 
         private async Task LoadPhotosFromAlbum(string albumId, CancellationToken token)
@@ -256,49 +243,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
                 LoadPhoto(photo, token);
             }
-        }
-
-        public async Task LoadPhotosWithoutAlbum(int minLoadCount, CancellationToken token)
-        {
-            if (isLoading 
-                || batchId == DateTime.MinValue
-                || token.IsCancellationRequested)
-            {
-                return;
-            }
-
-            isLoading = true;
-            var numPhotos = 0;
-
-            while (numPhotos < minLoadCount)
-            {
-                if (token.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                Log.Trace($"Loading photos. Batch ID is {batchId}");
-                string strDate = batchId.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
-                this.LoadingStatusText = $"Loading photos from {strDate}...";
-
-                await foreach (var photo in this.photoService.GetPhotosByDateNotInAlbumAsync(this.batchId))
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    LoadPhoto(photo, token);
-
-                    numPhotos++;
-                }
-
-                batchId = batchId.AddDays(-1);
-            }
-
-            isLoading = false;
-
-            LoadingStatusText = "Loading complete.";
         }
 
         private async Task LoadAlbums()
@@ -353,19 +297,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
                 return bitImage;
             }
-        }
-
-        public async Task LoadMore()
-        {
-            if (
-                (this.SelectedAlbum != null
-                && this.SelectedAlbum.AlbumId != string.Empty)
-                || cancellationTokenSource == null)
-            {
-                return;
-            }
-
-            await LoadPhotosWithoutAlbum(MinPhotosToLoad, cancellationTokenSource.Token);
         }
 
         private void StopLoadingExecute()
