@@ -11,6 +11,7 @@ using PhotoFox.Services;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
+using PhotoFox.Storage.Queue;
 using PhotoFox.Storage.Table;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
@@ -62,6 +63,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IPhotoHashStorage>().To<PhotoHashStorage>();
             this.contianer.Bind<IAlbumPermissionStorage>().To<AlbumPermissionStorage>();
             this.contianer.Bind<IUserStorage>().To<UserStorage>();
+            this.contianer.Bind<IUploadQueue>().To<UploadQueue>();
 
             // Commands
             this.contianer.Bind<AddPhotosCommand>().ToSelf();

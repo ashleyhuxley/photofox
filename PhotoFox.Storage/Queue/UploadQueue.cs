@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Queue
 {
-    public class UploadQueue
+    public class UploadQueue : IUploadQueue
     {
         private const string QueueName = "uploads";
 
