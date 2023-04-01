@@ -99,11 +99,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.cancellationTokenSource = new CancellationTokenSource();
         }
 
-        /// <summary>
-        /// Event handler to handle all property changes on this ViewModel
-        /// </summary>
-        /// <param name="sender">The object that raised the event</param>
-        /// <param name="e">Any parameters associated with the event</param>
         private async void MainWindowViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(this.SelectedAlbum))
@@ -112,10 +107,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
         }
 
-        /// <summary>
-        /// Occurs when the selected album has changed
-        /// </summary>
-        /// <returns>A task representing the work to be done</returns>
         private async Task OnSelectedAlbumChanged()
         {
             cancellationTokenSource.Cancel();
@@ -142,9 +133,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand ReloadExifCommand { get; }
         public ICommand SetPermissionsCommand { get; }
 
-        /// <summary>
-        /// The currently selected photo
-        /// </summary>
         public PhotoViewModel? SelectedPhoto
         {
             get => selectedPhoto;
