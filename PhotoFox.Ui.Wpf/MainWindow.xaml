@@ -96,7 +96,6 @@
                         HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch" 
                         ScrollViewer.VerticalScrollBarVisibility="Visible" 
-                        ScrollViewer.ScrollChanged="PhotoList_ScrollChanged" 
                         ItemsSource="{Binding Photos}"
                         SelectedItem="{Binding SelectedPhoto}">
                 <ListView.ContextMenu>
