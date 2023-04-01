@@ -14,7 +14,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -100,16 +99,29 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.cancellationTokenSource = new CancellationTokenSource();
         }
 
+        /// <summary>
+        /// Event handler to handle all property changes on this ViewModel
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">Any parameters associated with the event</param>
         private async void MainWindowViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(this.SelectedAlbum))
             {
-                cancellationTokenSource.Cancel();
-
-                cancellationTokenSource = new CancellationTokenSource();
-
-                await LoadPhotos(cancellationTokenSource.Token);
+                await OnSelectedAlbumChanged();
             }
+        }
+
+        /// <summary>
+        /// Occurs when the selected album has changed
+        /// </summary>
+        /// <returns>A task representing the work to be done</returns>
+        private async Task OnSelectedAlbumChanged()
+        {
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
+            await LoadPhotos(cancellationTokenSource.Token);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -130,6 +142,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand ReloadExifCommand { get; }
         public ICommand SetPermissionsCommand { get; }
 
+        /// <summary>
+        /// The currently selected photo
+        /// </summary>
         public PhotoViewModel? SelectedPhoto
         {
             get => selectedPhoto;
@@ -208,6 +223,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             var blob = await this.photoFileStorage.GetThumbnailAsync(photo.PhotoId);
             if (blob == null)
             {
+                // TODO: This will be swallowed as it's in Fire and Forget - better to replace with an "Error" image
                 throw new InvalidOperationException($"Unable to find {photo.PhotoId} in thumbnail storage");
             }
 
