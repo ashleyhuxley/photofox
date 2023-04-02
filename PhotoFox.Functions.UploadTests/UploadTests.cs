@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
 using Moq;
-using NLog.LayoutRenderers.Wrappers;
 using PhotoFox.Core.Hashing;
 using PhotoFox.Core.Imaging;
 using PhotoFox.Functions.UploadPhoto;
+using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
@@ -71,7 +71,7 @@ namespace PhotoFox.Functions.UploadTests
         }
 
         [Test]
-        public void Upload_FileNotInStorage_ThrowsFileNotFoundException()
+        public void UploadPhoto_FileNotInStorage_ThrowsFileNotFoundException()
         {
             string photoId = "photoId";
 
@@ -88,7 +88,7 @@ namespace PhotoFox.Functions.UploadTests
         }
 
         [Test]
-        public void Upload_HashExists_DoesNotThrow()
+        public void UploadPhoto_HashExists_DoesNotThrow()
         {
             string photoId = "photoId";
             string hash = "hash";
@@ -114,7 +114,7 @@ namespace PhotoFox.Functions.UploadTests
         }
 
         [Test]
-        public async Task Upload_HashExists_MessageIsLogged()
+        public async Task UploadPhoto_HashExists_MessageIsLogged()
         {
             string photoId = "photoId";
             string hash = "hash";
@@ -145,7 +145,7 @@ namespace PhotoFox.Functions.UploadTests
         }
 
         [Test]
-        public async Task Upload_HashExists_DuplicateIsDeleted()
+        public async Task UploadPhoto_HashExists_DuplicateIsDeleted()
         {
             string photoId = "photoId";
             string hash = "hash";
@@ -173,7 +173,7 @@ namespace PhotoFox.Functions.UploadTests
         }
 
         [Test]
-        public async Task Upload_HashExists_PhotoNotSaved()
+        public async Task UploadPhoto_HashExists_PhotoNotSaved()
         {
             string photoId = "photoId";
             string hash = "hash";
@@ -204,7 +204,7 @@ namespace PhotoFox.Functions.UploadTests
         }
 
         [Test]
-        public async Task Upload_HashDoesNotExist_PhotoDataSaved()
+        public async Task UploadPhoto_HashDoesNotExist_PhotoDataSaved()
         {
             string photoId = "photoId";
 
@@ -235,6 +235,47 @@ namespace PhotoFox.Functions.UploadTests
             photoMetadataStorage.Verify(s => s.AddPhotoAsync(It.IsAny<PhotoMetadata>()), Times.Once);
             photoHashStorage.Verify(s => s.AddHashAsync(It.IsAny<string>(), It.IsAny<string>(), photoId), Times.Once);
             photoInAlbumStorage.Verify(s => s.AddPhotoInAlbumAsync(It.IsAny<string>(), photoId, It.IsAny<DateTime>()), Times.Once);
+        }
+
+        [Test]
+        public async Task UploadVideo_VideoIdSpecified_GetsVideoFromStorage()
+        {
+            string videoId = "videoId";
+
+            var videoStorage = new Mock<IVideoStorage>();
+            videoStorage.Setup(v => v.GetVideoAsync(videoId)).Returns(Task.FromResult(BinaryData.FromBytes(new byte[] { })));
+
+            var function = new UploadFunctionBuilder()
+                .WithVideoStorage(videoStorage.Object)
+                .Build();
+
+            string message = "{\"Type\": \"VIDEO\", \"EntityId\": \"" + videoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
+
+            await function.Run(message, Mock.Of<ILogger>());
+
+            videoStorage.Verify(v => v.GetVideoAsync(videoId), Times.Once);
+        }
+
+        [Test]
+        public async Task UploadVideo_VideoIdSpecified_VideoIsAddedToAlbum()
+        {
+            string videoId = "videoId";
+
+            var videoStorage = new Mock<IVideoStorage>();
+            videoStorage.Setup(v => v.GetVideoAsync(videoId)).Returns(Task.FromResult(BinaryData.FromBytes(new byte[] { })));
+
+            var videoInAlbumStorage = new Mock<IVideoInAlbumStorage>();
+
+            var function = new UploadFunctionBuilder()
+                .WithVideoStorage(videoStorage.Object)
+                .WithVideoInAlbumStorage(videoInAlbumStorage.Object)
+                .Build();
+
+            string message = "{\"Type\": \"VIDEO\", \"EntityId\": \"" + videoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
+
+            await function.Run(message, Mock.Of<ILogger>());
+
+            videoInAlbumStorage.Verify(v => v.AddVideoInAlbumAsync(It.Is<VideoInAlbum>(v => v.RowKey == videoId)), Times.Once);
         }
     }
 

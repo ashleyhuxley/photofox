@@ -163,7 +163,7 @@ namespace PhotoFox.Functions.UploadPhoto
             var blob = await videoStorage.GetVideoAsync(videoId);
             if (blob == null)
             {
-                var errorMessage = $"Image not found in blob storage: {videoId}";
+                var errorMessage = $"Video not found in blob storage: {videoId}";
                 log.LogError(errorMessage);
                 throw new FileNotFoundException(errorMessage);
             }

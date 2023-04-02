@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Core.UnitTests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Services.UnitTests", "PhotoFox.Services.UnitTests\PhotoFox.Services.UnitTests.csproj", "{9B64BCFC-A35F-414D-8F3B-8FBB0FF22F35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoFox.Functions.UploadTests", "PhotoFox.Functions.UploadTests\PhotoFox.Functions.UploadTests.csproj", "{019F03AD-AB78-479C-A487-47FA94F80BF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Functions.Upload.UnitTests", "PhotoFox.Functions.UploadTests\PhotoFox.Functions.Upload.UnitTests.csproj", "{019F03AD-AB78-479C-A487-47FA94F80BF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
