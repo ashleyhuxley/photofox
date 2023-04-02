@@ -48,12 +48,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 {
                     AlbumId = Guid.NewGuid().ToString(),
                     Title = message.ViewModel.AlbumName,
-                    CoverPhotoId = selectedPhoto.Photo.PhotoId
+                    CoverPhotoId = selectedPhoto.Item.PhotoId
                 };
 
                 this.photoAlbumService.AddAlbumAsync(album);
 
-                this.photoAlbumService.AddPhotoToAlbumAsync(album.AlbumId, selectedPhoto.Photo.PhotoId, selectedPhoto.Photo.DateTaken);
+                this.photoAlbumService.AddPhotoToAlbumAsync(album.AlbumId, selectedPhoto.Item.PhotoId, selectedPhoto.Item.DateTaken);
             }
 
             this.messenger.Send(new RefreshAlbumsMessage());

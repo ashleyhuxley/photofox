@@ -41,9 +41,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 return;
             }
 
-            await this.photoService.SavePhotoAsync(selectedPhoto.Photo);
+            await this.photoService.SavePhotoAsync(selectedPhoto.Item);
 
-            var newMetadata = await this.photoService.GetPhotoAsync(selectedPhoto.Photo.DateTaken, selectedPhoto.Photo.PhotoId);
+            var newMetadata = await this.photoService.GetPhotoAsync(selectedPhoto.Item.DateTaken, selectedPhoto.Item.PhotoId);
 
             this.messenger.Send(new UpdateStatusMessage("Image updated."));
             this.messenger.Send(new LoadPhotoMessage(newMetadata));

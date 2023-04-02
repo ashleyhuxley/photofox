@@ -34,7 +34,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 return;
             }
 
-            this.messenger.Send(new OpenLinkMessage($"https://maps.google.com/?q={selectedPhoto.Photo.GeolocationLattitude},{selectedPhoto.Photo.GeolocationLongitude}"));
+            this.messenger.Send(new OpenLinkMessage($"https://maps.google.com/?q={selectedPhoto.Item.GeolocationLatitude},{selectedPhoto.Item.GeolocationLongitude}"));
         }
     }
 }

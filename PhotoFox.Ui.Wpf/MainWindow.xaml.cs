@@ -56,9 +56,14 @@ namespace PhotoFox.Ui.Wpf
             view.SortDescriptions.Add(new SortDescription("Title", ListSortDirection.Ascending));
         }
 
-        private void ItemDoubleClicked(object sender, MouseButtonEventArgs e)
+        private void PhotoDoubleClicked(object sender, MouseButtonEventArgs e)
         {
             viewModel.OpenSelectedImage();
+        }
+
+        private void VideoItemDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            viewModel.OpenSelectedVideo();
         }
     }
 }
