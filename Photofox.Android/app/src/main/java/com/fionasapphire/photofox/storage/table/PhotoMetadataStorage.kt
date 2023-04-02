@@ -11,6 +11,12 @@ import javax.inject.Inject
 class PhotoMetadataStorage
     @Inject constructor(connectionString: String) : StorageBase(connectionString, TableName.PhotoMetadata.name) {
 
+    /**
+     * Get metadata relating to a specified photo
+     * @param photoId The ID of the photo for which to get the metadata
+     * @param partitionKey The partition key that contains the photo (the date in the format YYYYMMDD)
+     * @return The photo metadata entity
+     */
     fun getPhotoMetadata(photoId: String, partitionKey: String): PhotoMetadataEntity? {
         val table = getTableReference()
 

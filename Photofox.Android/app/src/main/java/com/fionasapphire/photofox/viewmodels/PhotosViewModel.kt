@@ -48,12 +48,17 @@ class PhotosViewModel
         loadPhotos(albumId = albumId!!)
     }
 
-
+    /**
+     * Open a specified image in the default photo viewer
+     * @param photo The photo to open
+     * @param context An Android Context used to launch the viewer
+     */
     fun openImage(photo: PhotoAlbumEntry, context: Context) {
         viewModelScope.launch {
             val filename = "${context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)}/${photo.image.imageId}.jpg"
             val file = File(filename)
 
+            // Download the main image file from storage
             withContext(Dispatchers.IO) {
                 val bytes = imageStorage.getImage(photo.image.imageId)
 
@@ -69,6 +74,7 @@ class PhotosViewModel
                 }
             }
 
+            // Start a new Action to open the image
             val intent = Intent(Intent.ACTION_VIEW)
             val uri = FileProvider.getUriForFile(
                 context,

@@ -15,6 +15,10 @@ class AddAlbumViewModel
     private val albumStorage: PhotoAlbumStorage
 ) : ViewModel() {
 
+    /**
+     * Add a photo album to storage
+     * @param albumName The name of the album to add
+     */
     fun addAlbum(albumName: String) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             albumStorage.addAlbum(albumName)

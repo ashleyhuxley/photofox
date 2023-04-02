@@ -27,6 +27,9 @@ class ImageStoreFetcherFactory(private val context: Context): Fetcher.Factory<Im
 
 }
 
+/**
+ * Coil fetcher to fetch images from blob storage
+ */
 class ImageStoreFetcher(
     private val image: ImageReference,
     private val options: Options,
@@ -40,6 +43,7 @@ class ImageStoreFetcher(
 
         val source: BufferedSource
 
+        // If the file does not exist in the cache, get it from storage and save it
         val file = File(filename)
         if (!file.exists()) {
             val bytes = withContext(Dispatchers.IO) {

@@ -24,6 +24,9 @@ class PhotoAlbumsViewModel
         loadAlbums()
     }
 
+    /**
+     * Load a list of available photo albums
+     */
     private fun loadAlbums() = viewModelScope.launch {
         state.value = PhotoAlbumsViewModelState.LOADING
         try {

@@ -32,6 +32,12 @@ class AddPhotosViewModel
 
     }
 
+    /**
+     * Upload a list of photos to a particular album
+     * @param uris A list of content URIs containing the photos to be uploaded
+     * @param albumId The ID of the album in which to place the photos
+     * @param context An Android Context used to resolve the URIs
+     */
     fun uploadAndQueue(uris: List<Uri>, albumId: String, context: Context) = viewModelScope.launch {
 
         val uploadStates = List(uris.size) {
@@ -43,15 +49,23 @@ class AddPhotosViewModel
         state.value = AddPhotosViewModelState.UPLOADING(uploadStates)
         for ((i, uri) in uris.withIndex()) {
             try {
+                // New photo ID is a random GUID
                 val photoId = UUID.randomUUID().toString()
 
+                // Get image contents
                 val iStream = context.contentResolver.openInputStream(uri)
                     ?: throw Exception("Unable to open file $uri")
                 val bytes = getBytes(iStream)
 
+                // Extract filename
+                val name = uri.toString().substring(uri.toString().lastIndexOf('/'))
+
+                val date = Date()
+
+                // Upload the content to storage and queue a message for it to be processed
                 withContext(Dispatchers.IO) {
                     imageStorage.uploadImage(photoId, BlobType.images.name, bytes)
-                    queueStorage.enqueue(photoId, albumId)
+                    queueStorage.enqueue(photoId, albumId, name, date)
 
                     uploadStates[i].value = PhotoUploadState.SUCCESS
                 }

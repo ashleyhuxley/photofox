@@ -13,6 +13,11 @@ import javax.inject.Inject
 class PhotoInAlbumStorage
     @Inject constructor(connectionString: String) : StorageBase(connectionString, TableName.PhotoInAlbum.name) {
 
+    /**
+     * Get a list of photos in a particular album
+     * @param albumId The ID of the album from which to return photos
+     * @return A list of PhotoInAlbum entities that are in the specified album
+     */
         fun getPhotosInAlbum(albumId: String): List<PhotoInAlbumEntity> {
             val table = getTableReference()
 

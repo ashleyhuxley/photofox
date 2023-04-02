@@ -11,6 +11,11 @@ import javax.inject.Inject
 
 class PhotoAlbumStorage
     @Inject constructor(connectionString: String) : StorageBase(connectionString, TableName.PhotoAlbums.name) {
+
+    /**
+     * Gets a list of available photo albums
+     * @return A list of photo album entities
+     */
     fun getPhotoAlbums(): List<PhotoAlbumEntity> {
         val table = getTableReference()
 
@@ -20,6 +25,11 @@ class PhotoAlbumStorage
         return res.toList()
     }
 
+    /**
+     * Gets an album by its unique ID
+     * @param albumId THe unique ID of the album to return
+     * @return The album represented by the specified ID, or null if not found
+     */
     fun getAlbum(albumId: String): PhotoAlbumEntity? {
         val table = getTableReference()
 
@@ -38,6 +48,10 @@ class PhotoAlbumStorage
         return table.execute(query).firstOrNull()
     }
 
+    /**
+     * Add a photo album to album storage
+     * @param albumName The name of the album being added
+     */
     fun addAlbum(albumName: String) {
         val albumId = UUID.randomUUID().toString()
 
