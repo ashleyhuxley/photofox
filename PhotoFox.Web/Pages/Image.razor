@@ -129,9 +129,9 @@
         this.FocalLength = metadata.FocalLength;
         this.FileSize = metadata.FileSize?.ToFileSize() ?? string.Empty;
         this.Orientation = metadata.Orientation?.ToString() ?? string.Empty;
-        this.ShowMap = metadata.GeolocationLattitude.HasValue && metadata.GeolocationLongitude.HasValue;
-        this.GpsLocation = $"{metadata.GeolocationLattitude:0.#####}, {metadata.GeolocationLongitude:0.#####}";
-        this.GpsLink = $"https://maps.google.com/?q={metadata.GeolocationLattitude},{metadata.GeolocationLongitude}";
-        this.MapLink = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={metadata.GeolocationLattitude},{metadata.GeolocationLongitude}";
+        this.ShowMap = metadata.GeolocationLatitude.HasValue && metadata.GeolocationLongitude.HasValue;
+        this.GpsLocation = $"{metadata.GeolocationLatitude:0.#####}, {metadata.GeolocationLongitude:0.#####}";
+        this.GpsLink = $"https://maps.google.com/?q={metadata.GeolocationLatitude},{metadata.GeolocationLongitude}";
+        this.MapLink = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={metadata.GeolocationLatitude},{metadata.GeolocationLongitude}";
     }
 }

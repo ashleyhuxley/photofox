@@ -14,10 +14,12 @@ using PhotoFox.Core.Extensions;
 using System.Drawing.Imaging;
 using LogLevel = PhotoFox.Storage.Models.LogLevel;
 using System.Runtime.Versioning;
+using System.Text.Json;
 
 namespace PhotoFox.Functions.UploadPhoto
 {
-    public class UploadPhoto
+    [SupportedOSPlatform("windows")]
+    public class UploadFunction
     {
         private readonly IPhotoFileStorage photoFileStorage;
         private readonly IStreamHash streamHash;
@@ -26,57 +28,72 @@ namespace PhotoFox.Functions.UploadPhoto
         private readonly IPhotoMetadataStorage photoMetadataStorage;
         private readonly IPhotoInAlbumStorage photoInAlbumStorage;
         private readonly ILogStorage logStorage;
+        private readonly IVideoInAlbumStorage videoInAlbumStorage;
+        private readonly IVideoStorage videoStorage;
 
         private const string source = "UploadFunction";
 
-        public UploadPhoto(
+        public UploadFunction(
             IPhotoFileStorage photoFileStorage,
             IStreamHash streamHash,
             IPhotoHashStorage photoHashStorage,
             IThumbnailProvider thumbnailProvider,
             IPhotoMetadataStorage photoMetadataStorage,
             IPhotoInAlbumStorage photoInAlbumStorage,
-            ILogStorage logStorage)
+            IVideoInAlbumStorage videoInAlbumStorage,
+            ILogStorage logStorage,
+            IVideoStorage videoStorage)
         {
-            this.photoFileStorage = photoFileStorage;
-            this.streamHash = streamHash;
-            this.photoHashStorage = photoHashStorage;
-            this.thumbnailProvider = thumbnailProvider;
-            this.photoMetadataStorage = photoMetadataStorage;
-            this.photoInAlbumStorage= photoInAlbumStorage;
-            this.logStorage = logStorage;
+            this.photoFileStorage = photoFileStorage ?? throw new ArgumentNullException(nameof(photoFileStorage));
+            this.streamHash = streamHash ?? throw new ArgumentNullException(nameof(streamHash));
+            this.photoHashStorage = photoHashStorage ?? throw new ArgumentNullException(nameof(photoHashStorage));
+            this.thumbnailProvider = thumbnailProvider ?? throw new ArgumentNullException(nameof(thumbnailProvider));
+            this.photoMetadataStorage = photoMetadataStorage ?? throw new ArgumentNullException(nameof(photoMetadataStorage));
+            this.photoInAlbumStorage = photoInAlbumStorage ?? throw new ArgumentNullException(nameof(photoInAlbumStorage));
+            this.videoInAlbumStorage = videoInAlbumStorage ?? throw new ArgumentNullException(nameof(videoInAlbumStorage));
+            this.logStorage = logStorage ?? throw new ArgumentNullException(nameof(logStorage));
+            this.videoStorage = videoStorage ?? throw new ArgumentNullException(nameof(videoStorage));
         }
 
         [FunctionName("Upload")]
-        [SupportedOSPlatform("windows")]
         public async Task Run([QueueTrigger("uploads", Connection = "PhotoFoxStorage")]string message, ILogger log)
         {
-            string albumId = Guid.Empty.ToString();
-            var items = message.Split(',');
-            string photoId = items[0];
-            string title = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
-
-            if (items.Length > 1)
+            var uploadMessage = JsonSerializer.Deserialize<UploadMessage>(message);
+            if (uploadMessage == null)
             {
-                albumId = items[1];
-            }
-            if (items.Length > 2)
-            {
-                title = items[2];
+                throw new ArgumentException("The input message could not be deserialized", nameof(message));
             }
 
-            log.LogInformation($"Processing image ID: {photoId} into album {albumId}");
+            var albumId = uploadMessage.Album ?? Guid.Empty.ToString();
+            var title = uploadMessage.Title ?? uploadMessage.DateTaken.ToString("yyyy-MM-dd HH:mm:ss");
 
+            log.LogInformation($"Processing entity ID: {uploadMessage.EntityId} into album {uploadMessage.Album} as {uploadMessage.Type}");
+
+            switch (uploadMessage.Type.ToUpperInvariant())
+            {
+                case "PHOTO":
+                    await ProcessPhoto(uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, log);
+                    break;
+                case "VIDEO":
+                    await ProcessVideo(uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, log);
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown Message Type: {uploadMessage.Type}");
+            }
+        }
+
+        private async Task ProcessPhoto(string photoId, string albumId, string title, DateTime dateTaken, ILogger log)
+        {
             // Get the photo from storage
             var blob = await photoFileStorage.GetPhotoAsync(photoId);
-            if (blob == null )
+            if (blob == null)
             {
-                log.LogError($"Image not found in blob storage: {photoId}");
-                return;
+                var errorMessage = $"Image not found in blob storage: {photoId}";
+                log.LogError(errorMessage);
+                throw new FileNotFoundException(errorMessage);
             }
 
             var stream = blob.ToStream();
-            var image = Image.FromStream(stream);
 
             // Check hash
             var md5 = await Task.Run(() => streamHash.ComputeHash(stream));
@@ -95,6 +112,7 @@ namespace PhotoFox.Functions.UploadPhoto
             var metadata = new PhotoMetadata();
             metadata.Orientation = exifReader.GetOrientation();
 
+            var image = Image.FromStream(stream);
             var thumbnail = await Task.Run(() => thumbnailProvider.GenerateThumbnail(image, 250, metadata.Orientation.ToRotationDegrees())).ConfigureAwait(false);
 
             metadata.FocalLength = exifReader.GetFocalLength();
@@ -110,10 +128,9 @@ namespace PhotoFox.Functions.UploadPhoto
             metadata.Manufacturer = exifReader.GetManufacturer();
             metadata.FileSize = blob.ToArray().Length;
 
-            var date = exifReader.GetDateTakenUtc() ?? DateTime.UtcNow;
+            var date = exifReader.GetDateTakenUtc() ?? dateTaken;
             metadata.PartitionKey = date.ToPartitionKey();
             metadata.UtcDate = date;
-
             metadata.RowKey = photoId;
             metadata.FileHash = md5;
 
@@ -138,7 +155,29 @@ namespace PhotoFox.Functions.UploadPhoto
 
             await photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, metadata.RowKey, metadata.UtcDate.Value);
             await logStorage.Log("Photo added to album", source, photoId, albumId, LogLevel.Info, md5);
+        }
 
+        private async Task ProcessVideo(string videoId, string albumId, string title, DateTime dateTaken, ILogger log)
+        {
+            // Get the photo from storage
+            var blob = await videoStorage.GetVideoAsync(videoId);
+            if (blob == null)
+            {
+                var errorMessage = $"Image not found in blob storage: {videoId}";
+                log.LogError(errorMessage);
+                throw new FileNotFoundException(errorMessage);
+            }
+
+            var videoInAlbum = new VideoInAlbum
+            {
+                FileSize = blob.ToArray().Length,
+                PartitionKey = albumId,
+                RowKey = videoId,
+                Title = title,
+                VideoDate = dateTaken
+            };
+
+            await videoInAlbumStorage.AddVideoInAlbumAsync(videoInAlbum);
         }
     }
 }
