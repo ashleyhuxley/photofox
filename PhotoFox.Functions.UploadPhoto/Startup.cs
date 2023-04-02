@@ -25,6 +25,8 @@ namespace MyNamespace
             builder.Services.AddSingleton<IPhotoInAlbumStorage, PhotoInAlbumStorage>();
             builder.Services.AddSingleton<ILogStorage, LogStorage>();
             builder.Services.AddSingleton<IStorageConfig, Config>();
+            builder.Services.AddSingleton<IVideoInAlbumStorage, VideoInAlbumStorage>();
+            builder.Services.AddSingleton<IVideoStorage, VideoStorage>();
         }
     }
 }

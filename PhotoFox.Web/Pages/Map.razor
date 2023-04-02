@@ -26,12 +26,12 @@
         var locations = new List<Location>();
         await foreach (var photo in this.PhotoService.GetPhotosInAlbumAsync(Id))
         {
-            if (photo.GeolocationLattitude.HasValue && photo.GeolocationLongitude.HasValue)
+            if (photo.GeolocationLatitude.HasValue && photo.GeolocationLongitude.HasValue)
             {
                 locations.Add(new Location
                     {
                         Name = photo.Title,
-                        Lat = photo.GeolocationLattitude.Value,
+                        Lat = photo.GeolocationLatitude.Value,
                         Lng = photo.GeolocationLongitude.Value,
                         Thumb = $"/thumbnail/{photo.PhotoId}",
                         Link = $"/photo/{photo.DateTaken.ToPartitionKey()}/{photo.PhotoId}"
