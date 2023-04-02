@@ -2,7 +2,7 @@
 
 namespace PhotoFox.Model
 {
-    public class Photo
+    public class Photo : IDisplayableItem
     {
         public string PhotoId { get; set; }
         public string Title { get; set; }
@@ -14,7 +14,7 @@ namespace PhotoFox.Model
         public string Device { get; set; }
         public int? Orientation { get; set; }
         public string Exposure { get; set; }
-        public double? GeolocationLattitude { get; set; }
+        public double? GeolocationLatitude { get; set; }
         public double? GeolocationLongitude { get; set; }
         public string FileHash { get; set; }
         public int DimensionWidth { get; set; }

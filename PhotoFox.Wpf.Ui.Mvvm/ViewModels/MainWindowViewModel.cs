@@ -9,6 +9,7 @@ using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using PhotoAlbum = PhotoFox.Model.PhotoAlbum;
@@ -35,6 +37,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly IPhotoService photoService;
 
+        private readonly IVideoService videoService;
+
         private readonly IPhotoAlbumService photoAlbumService;
 
         private readonly IPhotoFileStorage photoFileStorage;
@@ -47,12 +51,15 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private PhotoViewModel? selectedPhoto;
 
+        private VideoViewModel? selectedVideo;
+
         private AlbumViewModel? selectedAlbum;
 
         private CancellationTokenSource cancellationTokenSource;
 
         public MainWindowViewModel(
             IPhotoService photoService,
+            IVideoService videoService,
             IPhotoAlbumService photoAlbumService,
             IPhotoFileStorage photoFileStorage,
             IMessenger messenger,
@@ -66,6 +73,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             SetPermissionsCommand setPermissionsCommand)
         {
             this.photoService = photoService;
+            this.videoService = videoService;
             this.photoAlbumService = photoAlbumService;
             this.photoFileStorage = photoFileStorage;
             this.messenger = messenger;
@@ -73,6 +81,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
+            this.Videos= new ObservableCollection<VideoViewModel>();
 
             AddPhotosCommand = addPhotosCommand;
             OpenGpsLink = openGpsLocationCommand;
@@ -113,11 +122,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             cancellationTokenSource = new CancellationTokenSource();
 
             await LoadPhotos(cancellationTokenSource.Token);
+            await LoadVideos(cancellationTokenSource.Token);
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
 
         public ObservableCollection<PhotoViewModel> Photos { get; }
+
+        public ObservableCollection<VideoViewModel> Videos { get; set; }
 
         public ICommand AddPhotosCommand { get; }
         public ICommand OpenGpsLink { get; }
@@ -148,9 +160,29 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
         }
 
+        public VideoViewModel? SelectedVideo
+        {
+            get => selectedVideo;
+            set
+            {
+                if (ReferenceEquals(this.selectedVideo, value))
+                {
+                    return;
+                }
+
+                selectedVideo = value;
+                OnPropertyChanged(nameof(SelectedVideo));
+            }
+        }
+
         public IEnumerable<PhotoViewModel> SelectedPhotos
         {
             get => this.Photos.Where(p => p.IsSelected);
+        }
+
+        public IEnumerable<VideoViewModel> SelectedVieos
+        {
+            get => this.Videos.Where(p => p.IsSelected);
         }
 
         public AlbumViewModel? SelectedAlbum
@@ -182,13 +214,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             await LoadAlbums();
             await LoadPhotos(cancellationTokenSource.Token);
+            await LoadVideos(cancellationTokenSource.Token);
         }
 
         private void LoadPhoto(Photo photo, CancellationToken token)
         {
-            if (this.Photos.Any(p => p.Photo.PhotoId == photo.PhotoId))
+            if (this.Photos.Any(p => p.Item.PhotoId == photo.PhotoId))
             {
-                this.Photos.Remove(this.Photos.First(p => p.Photo.PhotoId == photo.PhotoId));
+                this.Photos.Remove(this.Photos.First(p => p.Item.PhotoId == photo.PhotoId));
             }
 
             if (token.IsCancellationRequested)
@@ -200,19 +233,42 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             Log.Trace($"Adding {photo.PhotoId}");
 
-            _ = Task.Run(() => LoadPhotoThumbnail(photo, viewModel), token);
+            _ = Task.Run(() => LoadThumbnail(photo.PhotoId, viewModel), token);
 
             this.Photos.Add(viewModel);
             this.OnPropertyChanged(nameof(this.Photos.Count));
         }
 
-        public async Task LoadPhotoThumbnail(Photo photo, PhotoViewModel viewModel)
+        private void LoadVideo(Video video, CancellationToken token)
         {
-            var blob = await this.photoFileStorage.GetThumbnailAsync(photo.PhotoId);
+            if (this.Videos.Any(p => p.Item.VideoId == video.VideoId))
+            {
+                this.Videos.Remove(this.Videos.First(p => p.Item.VideoId == video.VideoId));
+            }
+
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            var viewModel = new VideoViewModel(video);
+
+            Log.Trace($"Adding video {video.VideoId}");
+
+            _ = Task.Run(() => LoadThumbnail<Video>(video.VideoId, viewModel), token);
+
+            this.Videos.Add(viewModel);
+            this.OnPropertyChanged(nameof(this.Videos.Count));
+        }
+
+        public async Task LoadThumbnail<T>(string thumbnailId, ItemViewModelBase<T> viewModel)
+            where T : IDisplayableItem
+        {
+            var blob = await this.photoFileStorage.GetThumbnailAsync(thumbnailId);
             if (blob == null)
             {
                 // TODO: This will be swallowed as it's in Fire and Forget - better to replace with an "Error" image
-                throw new InvalidOperationException($"Unable to find {photo.PhotoId} in thumbnail storage");
+                throw new InvalidOperationException($"Unable to find {thumbnailId} in thumbnail storage");
             }
 
             var thumbnail = GetImageFromBytes(blob.ToArray());
@@ -231,6 +287,17 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
         }
 
+        public async Task LoadVideos(CancellationToken token)
+        {
+            this.Videos.Clear();
+            this.OnPropertyChanged(nameof(this.Videos.Count));
+
+            if (this.SelectedAlbum != null && !string.IsNullOrEmpty(this.SelectedAlbum.AlbumId))
+            {
+                await LoadVideosFromAlbum(this.SelectedAlbum.AlbumId, token);
+            }
+        }
+
         private async Task LoadPhotosFromAlbum(string albumId, CancellationToken token)
         {
             if (token.IsCancellationRequested)
@@ -246,6 +313,24 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 }
 
                 LoadPhoto(photo, token);
+            }
+        }
+
+        private async Task LoadVideosFromAlbum(string albumId, CancellationToken token)
+        {
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await foreach (var video in this.videoService.GetVideosInAlbumAsync(albumId))
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                LoadVideo(video, token);
             }
         }
 
@@ -316,7 +401,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
 
             var selected = this.Photos.Single(p => p.IsSelected);
-            this.messenger.Send(new OpenPhotoMessage(selected.Photo.PhotoId));
+            this.messenger.Send(new OpenPhotoMessage(selected.Item.PhotoId));
+        }
+
+        public void OpenSelectedVideo()
+        {
+            throw new NotImplementedException();
         }
 
         public bool OpenSelectedImageCanExecute()
@@ -333,7 +423,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            this.photoAlbumService.SetCoverImageAsync(this.SelectedAlbum.AlbumId, this.SelectedPhoto.Photo.PhotoId);
+            this.photoAlbumService.SetCoverImageAsync(this.SelectedAlbum.AlbumId, this.SelectedPhoto.Item.PhotoId);
             this.SelectedAlbum.SetImage(this.SelectedPhoto.Image);
         }
 
@@ -359,7 +449,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 AlbumId = Guid.NewGuid().ToString(),
                 Description = string.Empty,
                 Title = response.NewAlbumName,
-                CoverPhotoId = this.Photos.First(p => p.IsSelected).Photo.PhotoId
+                CoverPhotoId = this.Photos.First(p => p.IsSelected).Item.PhotoId
             };
 
             this.photoAlbumService.AddAlbumAsync(album);
@@ -375,7 +465,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            foreach (var photo in this.Photos.Where(p => p.IsSelected).Select(p => p.Photo))
+            foreach (var photo in this.Photos.Where(p => p.IsSelected).Select(p => p.Item))
             {
                 await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.PhotoId, photo.DateTaken);
             }
@@ -398,8 +488,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             foreach (var photo in this.Photos.Where(p => p.IsSelected))
             {
-                await this.photoAlbumService.RemoveFromAlbumAsync(this.SelectedAlbum.AlbumId, photo.Photo.PhotoId);
-                await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.Photo.PhotoId, photo.Photo.DateTaken);
+                await this.photoAlbumService.RemoveFromAlbumAsync(this.SelectedAlbum.AlbumId, photo.Item.PhotoId);
+                await this.photoAlbumService.AddPhotoToAlbumAsync(albumId, photo.Item.PhotoId, photo.Item.DateTaken);
                 toRemove.Add(photo);
             }
 
@@ -437,7 +527,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             var photosToProcess = new List<PhotoViewModel>();
             photosToProcess.AddRange(this.SelectedPhotos);
 
-            foreach (var photo in photosToProcess.Select(p => p.Photo))
+            foreach (var photo in photosToProcess.Select(p => p.Item))
             {
                 var newPhoto = await this.photoService.ReloadExifDataAsync(photo.DateTaken, photo.PhotoId);
 

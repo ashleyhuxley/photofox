@@ -54,12 +54,14 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IUploadService>().To<UploadService>();
             this.contianer.Bind<IPhotoAlbumService>().To<PhotoAlbumService>();
             this.contianer.Bind<IPhotoService>().To<PhotoService>();
+            this.contianer.Bind<IVideoService>().To<VideoService>();
 
             // Storage
             this.contianer.Bind<IPhotoAlbumDataStorage>().To<PhotoAlbumDataStorage>();
             this.contianer.Bind<IPhotoFileStorage>().To<PhotoFileStorage>();
             this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
             this.contianer.Bind<IPhotoInAlbumStorage>().To<PhotoInAlbumStorage>();
+            this.contianer.Bind<IVideoInAlbumStorage>().To<VideoInAlbumStorage>();
             this.contianer.Bind<IPhotoHashStorage>().To<PhotoHashStorage>();
             this.contianer.Bind<IAlbumPermissionStorage>().To<AlbumPermissionStorage>();
             this.contianer.Bind<IUserStorage>().To<UserStorage>();

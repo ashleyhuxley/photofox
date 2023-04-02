@@ -51,7 +51,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
             foreach (var selectedPhoto in selectedPhotos)
             {
-                await this.photoService.DeletePhotoAsync(selectedPhoto.Photo);
+                await this.photoService.DeletePhotoAsync(selectedPhoto.Item);
 
                 photosToRemove.Add(selectedPhoto);
             }
