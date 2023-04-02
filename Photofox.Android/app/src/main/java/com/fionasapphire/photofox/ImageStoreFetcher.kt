@@ -32,12 +32,11 @@ class ImageStoreFetcher(
     private val options: Options,
     private val context: Context): Fetcher {
 
-    private val connectionString = "DefaultEndpointsProtocol=https;AccountName=photofox;AccountKey=9HImTKLoDlh09Th4bo8xobaTXJe3mpPOASiVpnpLwsr5ox+QmnD7ZtMUaNnyqA0MKf99tkqYv3Zt+AStgHyEXw==;EndpointSuffix=core.windows.net"
-    private val imageStorage: ImageStorage = ImageStorage(connectionString)
+    private val imageStorage: ImageStorage = ImageStorage(Config.connectionString)
 
     override suspend fun fetch(): FetchResult? {
 
-        val filename = "${context.externalCacheDir}/thumbs/${image.imageId}.jpg"
+        val filename = "${context.externalCacheDir}/${image.imageId}.jpg"
 
         val source: BufferedSource
 

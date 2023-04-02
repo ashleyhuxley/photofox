@@ -4,7 +4,9 @@ import com.fionasapphire.photofox.storage.StorageBase
 import com.fionasapphire.photofox.storage.entity.PhotoAlbumEntity
 import com.fionasapphire.photofox.storage.enums.FieldName
 import com.fionasapphire.photofox.storage.enums.TableName
+import com.microsoft.azure.storage.table.TableOperation
 import com.microsoft.azure.storage.table.TableQuery
+import java.util.*
 import javax.inject.Inject
 
 class PhotoAlbumStorage
@@ -34,5 +36,19 @@ class PhotoAlbumStorage
         val query = TableQuery.from(PhotoAlbumEntity::class.java).where(filter)
 
         return table.execute(query).firstOrNull()
+    }
+
+    fun addAlbum(albumName: String) {
+        val albumId = UUID.randomUUID().toString()
+
+        val entity = PhotoAlbumEntity()
+        entity.partitionKey = albumId
+        entity.rowKey = ""
+        entity.AlbumName = albumName
+
+        val table = getTableReference()
+
+        val operation = TableOperation.insert(entity)
+        table.execute(operation)
     }
 }

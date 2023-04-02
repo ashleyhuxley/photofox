@@ -76,7 +76,7 @@ fun Navi() {
             ) {
             AlbumView(navController)
         }
-        composable("addAlbum") { AddAlbumView() }
+        composable("addAlbum") { AddAlbumView(onHome = { navController.popBackStack() }) }
         composable("addPhotos") { SelectPhotos() }
     }
 }

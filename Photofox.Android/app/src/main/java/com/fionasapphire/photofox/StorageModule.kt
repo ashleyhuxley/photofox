@@ -12,23 +12,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object  StorageModule {
-
-    private const val connectionString = "DefaultEndpointsProtocol=https;AccountName=photofox;AccountKey=9HImTKLoDlh09Th4bo8xobaTXJe3mpPOASiVpnpLwsr5ox+QmnD7ZtMUaNnyqA0MKf99tkqYv3Zt+AStgHyEXw==;EndpointSuffix=core.windows.net"
-
     @Provides
-    fun provideConnectionString(): String {
-        return connectionString
-    }
+    @Singleton
+    fun providePhotoAlbumStorage() = PhotoAlbumStorage(Config.connectionString)
 
     @Provides
     @Singleton
-    fun providePhotoAlbumStorage() = PhotoAlbumStorage(connectionString)
+    fun provideImageStorage() = ImageStorage(Config.connectionString)
 
     @Provides
     @Singleton
-    fun provideImageStorage() = ImageStorage(connectionString)
-
-    @Provides
-    @Singleton
-    fun provideMetadataStorage() = PhotoMetadataStorage(connectionString)
+    fun provideMetadataStorage() = PhotoMetadataStorage(Config.connectionString)
 }
