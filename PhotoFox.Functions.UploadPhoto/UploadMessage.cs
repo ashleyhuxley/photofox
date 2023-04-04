@@ -9,6 +9,7 @@ namespace PhotoFox.Functions.UploadPhoto
         public string? Album { get; set; }
         public string? Title { get; set; }
         public DateTime DateTaken { get; set; }
+        public string? FileExt { get; set; }
 
         public UploadMessage()
         {

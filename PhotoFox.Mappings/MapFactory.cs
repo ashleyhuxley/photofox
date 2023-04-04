@@ -36,7 +36,8 @@ namespace PhotoFox.Mappings
                     .ForMember(dest => dest.GeolocationLatitude, opt => opt.MapFrom(src => src.GeolocationLattitude))
                     .ForMember(dest => dest.GeolocationLongitude, opt => opt.MapFrom(src => src.GeolocationLongitude))
                     .ForMember(dest => dest.FileSize, opt => opt.MapFrom(src => src.FileSize))
-                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title));
+                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
+                    .ForMember(dest => dest.FileExt, opt => opt.MapFrom(src => src.FileExt));
             });
 
             var mapper = new Mapper(config);

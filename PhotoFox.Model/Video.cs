@@ -10,5 +10,6 @@ namespace PhotoFox.Model
         public double? GeolocationLongitude { get; set; }
         public DateTime DateTaken { get; set; }
         public long? FileSize { get; set; }
+        public string FileExt { get; set; }
     }
 }

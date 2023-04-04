@@ -75,7 +75,12 @@ namespace PhotoFox.Functions.UploadPhoto
                     await ProcessPhoto(uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, log);
                     break;
                 case "VIDEO":
-                    await ProcessVideo(uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, log);
+                    if (uploadMessage.FileExt == null)
+                    {
+                        throw new InvalidOperationException("Cannot upload video with unpecified file extension");
+                    }
+
+                    await ProcessVideo(uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, uploadMessage.FileExt, log);
                     break;
                 default:
                     throw new ArgumentException($"Unknown Message Type: {uploadMessage.Type}");
@@ -157,7 +162,7 @@ namespace PhotoFox.Functions.UploadPhoto
             await logStorage.Log("Photo added to album", source, photoId, albumId, LogLevel.Info, md5);
         }
 
-        private async Task ProcessVideo(string videoId, string albumId, string title, DateTime dateTaken, ILogger log)
+        private async Task ProcessVideo(string videoId, string albumId, string title, DateTime dateTaken, string fileExt, ILogger log)
         {
             // Get the photo from storage
             var blob = await videoStorage.GetVideoAsync(videoId);
@@ -174,7 +179,8 @@ namespace PhotoFox.Functions.UploadPhoto
                 PartitionKey = albumId,
                 RowKey = videoId,
                 Title = title,
-                VideoDate = dateTaken
+                VideoDate = dateTaken,
+                FileExt = fileExt
             };
 
             await videoInAlbumStorage.AddVideoInAlbumAsync(videoInAlbum);

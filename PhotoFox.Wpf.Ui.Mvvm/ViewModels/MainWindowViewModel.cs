@@ -9,7 +9,6 @@ using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -19,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using PhotoAlbum = PhotoFox.Model.PhotoAlbum;
@@ -121,8 +119,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             cancellationTokenSource.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
-            await LoadPhotos(cancellationTokenSource.Token);
-            await LoadVideos(cancellationTokenSource.Token);
+            await Task.WhenAll(
+                LoadPhotos(cancellationTokenSource.Token), 
+                LoadVideos(cancellationTokenSource.Token));
         }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
@@ -406,7 +405,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public void OpenSelectedVideo()
         {
-            throw new NotImplementedException();
+            if (this.Videos.Count(p => p.IsSelected) != 1)
+            {
+                return;
+            }
+
+            var selected = this.Videos.Single(p => p.IsSelected);
+            this.messenger.Send(new OpenVideoMessage(selected.Item.VideoId, selected.Item.FileExt));
         }
 
         public bool OpenSelectedImageCanExecute()

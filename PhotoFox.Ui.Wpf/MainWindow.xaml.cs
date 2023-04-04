@@ -2,6 +2,7 @@
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -35,19 +36,20 @@ namespace PhotoFox.Ui.Wpf
         {
             Log.Debug("Main window loaded");
 
-            SetupPhotoSort();
+            SetupSort(VideoList, "GroupName", "GroupSort");
+            SetupSort(PhotoList, "GroupName", "GroupSort");
             SetupAlbumSort();
 
             await this.viewModel.Load();
         }
 
-        private void SetupPhotoSort()
+        private void SetupSort(ListView listView, string groupName, string sortName)
         {
-            var view = (CollectionView)CollectionViewSource.GetDefaultView(PhotoList.ItemsSource);
-            PropertyGroupDescription groupDescription = new PropertyGroupDescription("GroupName");
+            var view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription(groupName);
             view.GroupDescriptions.Add(groupDescription);
 
-            view.SortDescriptions.Add(new SortDescription("GroupSort", ListSortDirection.Descending));
+            view.SortDescriptions.Add(new SortDescription(sortName, ListSortDirection.Descending));
         }
 
         private void SetupAlbumSort()

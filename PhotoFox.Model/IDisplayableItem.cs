@@ -11,5 +11,7 @@ namespace PhotoFox.Model
         DateTime DateTaken { get; }
 
         long? FileSize { get; }
+
+        string Title { get; }
     }
 }

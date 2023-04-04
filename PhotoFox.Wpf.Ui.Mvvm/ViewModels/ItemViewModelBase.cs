@@ -12,12 +12,22 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private BitmapSource? image;
 
+        private T item;
+
         public ItemViewModelBase(T item)
         {
-            this.Item = item;
+            this.item = item;
         }
 
-        public T Item { get; set; }
+        public T Item
+        {
+            get => this.item;
+            set
+            {
+                this.item = value;
+                this.OnPropertyChanged(nameof(this.Title));
+            }
+        }
 
         public BitmapSource? Image
         {
@@ -55,6 +65,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return string.Empty;
             }
         }
+
+        public string Title => this.Item.Title;
 
         public string FileSize => this.Item.FileSize.HasValue ? this.Item.FileSize.Value.ToFileSize() : "Unknown";
     }

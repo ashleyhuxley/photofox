@@ -43,29 +43,31 @@ namespace PhotoFox.Ui.Wpf
 
             this.contianer.Bind<MainWindowViewModel>().ToSelf();
 
-            this.contianer.Bind<IStorageConfig>().To<PhotoFoxConfig>();
+            this.contianer.Bind<IStorageConfig>().To<PhotoFoxConfig>().InSingletonScope();
+            this.contianer.Bind<IViewerConfig>().To<PhotoFoxConfig>().InSingletonScope();
             this.contianer.Bind<IMessenger>().To<WeakReferenceMessenger>().InSingletonScope();
-            this.contianer.Bind<IThumbnailProvider>().To<ThumbnailProvider>();
-            this.contianer.Bind<IStreamHash>().To<StreamHashMD5>();
-            this.contianer.Bind<IMessageHandler>().To<MessageHandler>();
+            this.contianer.Bind<IThumbnailProvider>().To<ThumbnailProvider>().InSingletonScope();
+            this.contianer.Bind<IStreamHash>().To<StreamHashMD5>().InSingletonScope();
+            this.contianer.Bind<IMessageHandler>().To<MessageHandler>().InSingletonScope();
             this.contianer.Bind<PhotoFox.Wpf.Ui.Mvvm.IContext>().To<WpfContext>();
 
             // Services
-            this.contianer.Bind<IUploadService>().To<UploadService>();
-            this.contianer.Bind<IPhotoAlbumService>().To<PhotoAlbumService>();
-            this.contianer.Bind<IPhotoService>().To<PhotoService>();
-            this.contianer.Bind<IVideoService>().To<VideoService>();
+            this.contianer.Bind<IUploadService>().To<UploadService>().InSingletonScope();
+            this.contianer.Bind<IPhotoAlbumService>().To<PhotoAlbumService>().InSingletonScope();
+            this.contianer.Bind<IPhotoService>().To<PhotoService>().InSingletonScope();
+            this.contianer.Bind<IVideoService>().To<VideoService>().InSingletonScope();
 
             // Storage
-            this.contianer.Bind<IPhotoAlbumDataStorage>().To<PhotoAlbumDataStorage>();
-            this.contianer.Bind<IPhotoFileStorage>().To<PhotoFileStorage>();
-            this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>();
-            this.contianer.Bind<IPhotoInAlbumStorage>().To<PhotoInAlbumStorage>();
-            this.contianer.Bind<IVideoInAlbumStorage>().To<VideoInAlbumStorage>();
-            this.contianer.Bind<IPhotoHashStorage>().To<PhotoHashStorage>();
-            this.contianer.Bind<IAlbumPermissionStorage>().To<AlbumPermissionStorage>();
-            this.contianer.Bind<IUserStorage>().To<UserStorage>();
-            this.contianer.Bind<IUploadQueue>().To<UploadQueue>();
+            this.contianer.Bind<IPhotoAlbumDataStorage>().To<PhotoAlbumDataStorage>().InSingletonScope();
+            this.contianer.Bind<IPhotoFileStorage>().To<PhotoFileStorage>().InSingletonScope();
+            this.contianer.Bind<IPhotoMetadataStorage>().To<PhotoMetadataStorage>().InSingletonScope();
+            this.contianer.Bind<IPhotoInAlbumStorage>().To<PhotoInAlbumStorage>().InSingletonScope();
+            this.contianer.Bind<IVideoInAlbumStorage>().To<VideoInAlbumStorage>().InSingletonScope();
+            this.contianer.Bind<IPhotoHashStorage>().To<PhotoHashStorage>().InSingletonScope();
+            this.contianer.Bind<IAlbumPermissionStorage>().To<AlbumPermissionStorage>().InSingletonScope();
+            this.contianer.Bind<IUserStorage>().To<UserStorage>().InSingletonScope();
+            this.contianer.Bind<IUploadQueue>().To<UploadQueue>().InSingletonScope();
+            this.contianer.Bind<IVideoStorage>().To<VideoStorage>().InSingletonScope();
 
             // Commands
             this.contianer.Bind<AddPhotosCommand>().ToSelf();
