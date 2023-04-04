@@ -16,7 +16,7 @@ namespace PhotoFox.Services
             IMapper mapper)
         {
             this.videoInAlbumStorage= videoInAlbumStorage;
-            this.mapper= mapper;
+            this.mapper = mapper;
         }
 
         public async IAsyncEnumerable<Video> GetVideosInAlbumAsync(string albumId)

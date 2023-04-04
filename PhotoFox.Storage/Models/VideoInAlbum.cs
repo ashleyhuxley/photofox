@@ -15,7 +15,7 @@ namespace PhotoFox.Storage.Models
         public int FileSize { get; set; }
         public double? GeolocationLattitude { get; set; }
         public double? GeolocationLongitude { get; set; }
-
+        public string FileExt { get; set; }
 
     }
 }

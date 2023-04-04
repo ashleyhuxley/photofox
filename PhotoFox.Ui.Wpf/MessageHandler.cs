@@ -19,6 +19,7 @@ namespace PhotoFox.Ui.Wpf
         IRecipient<AddAlbumMessage>,
         IRecipient<UserConfirmMessage>,
         IRecipient<OpenPhotoMessage>,
+        IRecipient<OpenVideoMessage>,
         IRecipient<SelectAlbumMessage>,
         IRecipient<ShowPermissionsWindowMessage>
     {
@@ -26,18 +27,26 @@ namespace PhotoFox.Ui.Wpf
 
         private readonly IPhotoFileStorage photoStorage;
 
+        private readonly IVideoStorage videoStorage;
+
         private readonly IKernel kernel;
+
+        private readonly IViewerConfig viewerConfig;
 
         private Window? ownerWindow;
 
         public MessageHandler(
             IMessenger messenger,
             IPhotoFileStorage photoStorage,
-            IKernel kernel)
+            IVideoStorage videoStorage,
+            IKernel kernel,
+            IViewerConfig viewerConfig)
         {
             this.messenger = messenger;
             this.photoStorage = photoStorage;
+            this.videoStorage = videoStorage;
             this.kernel = kernel;
+            this.viewerConfig = viewerConfig;
         }
 
         public void Register(Window ownerWindow)
@@ -48,6 +57,7 @@ namespace PhotoFox.Ui.Wpf
             messenger.Register<AddAlbumMessage>(this);
             messenger.Register<UserConfirmMessage>(this);
             messenger.Register<OpenPhotoMessage>(this);
+            messenger.Register<OpenVideoMessage>(this);
             messenger.Register<SelectAlbumMessage>(this);
             messenger.Register<ShowPermissionsWindowMessage>(this);
         }
@@ -126,12 +136,25 @@ namespace PhotoFox.Ui.Wpf
         public async void Receive(OpenPhotoMessage message)
         {
             var photo = await this.photoStorage.GetPhotoAsync(message.PhotoId);
-            var path = Path.GetTempFileName() + ".jpg";
+            var path = Path.GetRandomFileName() + ".jpg";
 
             File.WriteAllBytes(path, photo.ToArray());
 
             var proc = new Process();
-            proc.StartInfo.FileName = "C:\\Program Files\\IrfanView\\i_view64.exe";
+            proc.StartInfo.FileName = this.viewerConfig.PhotoViewerPath;
+            proc.StartInfo.Arguments = path;
+            proc.Start();
+        }
+
+        public async void Receive(OpenVideoMessage message)
+        {
+            var video = await this.videoStorage.GetVideoAsync(message.VideoId);
+            var path = $"{Path.GetRandomFileName()}.{message.FileExt}";
+
+            File.WriteAllBytes(path, video.ToArray());
+
+            var proc = new Process();
+            proc.StartInfo.FileName = this.viewerConfig.VideoViewerPath;
             proc.StartInfo.Arguments = path;
             proc.Start();
         }

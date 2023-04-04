@@ -126,7 +126,7 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
                                     <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
-                                    <TextBlock Text="{Binding Photo.Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -167,7 +167,7 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
                                     <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
-                                    <TextBlock Text="{Binding Video.Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
