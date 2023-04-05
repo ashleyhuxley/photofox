@@ -66,6 +66,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             AddPhotosCommand addPhotosCommand,
             OpenGpsLocationCommand openGpsLocationCommand,
             DeletePhotoCommand deletePhotoCommand,
+            DeleteVideoCommand deleteVideoCommand,
             AddAlbumCommand addAlbumCommand,
             DeleteAlbumCommand deleteAlbumCommand,
             SaveChangesCommand saveChangesCommand,
@@ -85,6 +86,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             AddPhotosCommand = addPhotosCommand;
             OpenGpsLink = openGpsLocationCommand;
             DeletePhotoCommand = deletePhotoCommand;
+            DeleteVideoCommand = deleteVideoCommand;
             AddAlbumCommand = addAlbumCommand;
             DeleteAlbumCommand = deleteAlbumCommand;
             StopLoadingCommand = new RelayCommand(StopLoadingExecute, () => true);
@@ -135,6 +137,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand AddPhotosCommand { get; }
         public ICommand OpenGpsLink { get; }
         public ICommand DeletePhotoCommand { get; }
+        public ICommand DeleteVideoCommand { get; }
         public ICommand AddAlbumCommand { get; }
         public ICommand DeleteAlbumCommand { get; }
         public ICommand StopLoadingCommand { get; }

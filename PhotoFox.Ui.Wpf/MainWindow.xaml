@@ -7,23 +7,9 @@
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         mc:Ignorable="d" Icon="Images/photofox.png"
         Loaded="Window_Loaded"
-        Title="PhotoFox" Height="800" Width="1200">
+        Title="PhotoFox" Height="800" Width="1200"
+        PreviewKeyDown="Window_PreviewKeyDown">
     <DockPanel>
-        <Ribbon DockPanel.Dock="Top">
-            <RibbonTab Header="Photos">
-                <RibbonGroup Header="Photos">
-                    <RibbonButton Label="Add Photos" LargeImageSource="/Images/add_photo.png" Command="{Binding AddPhotosCommand}" />
-                    <RibbonButton Label="Delete Photo" LargeImageSource="/Images/delete.png" Command="{Binding DeletePhotoCommand}" CommandParameter="{Binding SelectedPhotos}" />
-                </RibbonGroup>
-                <RibbonGroup Header="Albums">
-                    <RibbonButton Label="Add Album" LargeImageSource="/Images/add_album.png" Command="{Binding AddAlbumCommand}" CommandParameter="{Binding SelectedPhoto}" />
-                </RibbonGroup>
-                <RibbonGroup Header="Permissions">
-                    <RibbonButton Label="Set Permissions" LargeImageSource="/Images/add_photo.png" Command="{Binding SetPermissionsCommand}" />
-                </RibbonGroup>
-            </RibbonTab>
-        </Ribbon>
-
         <StatusBar DockPanel.Dock="Bottom" Height="25">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
