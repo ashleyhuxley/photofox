@@ -63,7 +63,7 @@ namespace PhotoFox.Storage.Table
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            var items = tableClient.QueryAsync<PhotoAlbum>(p => p.RowKey == photoId);
+            var items = tableClient.QueryAsync<PhotoInAlbum>(p => p.RowKey == photoId);
 
             await foreach (var item in items)
             {

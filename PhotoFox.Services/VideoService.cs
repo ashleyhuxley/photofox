@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using PhotoFox.Model;
+using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PhotoFox.Services
 {
@@ -9,13 +11,17 @@ namespace PhotoFox.Services
     {
         private readonly IVideoInAlbumStorage videoInAlbumStorage;
 
+        private readonly IVideoStorage videoStorage;
+
         private readonly IMapper mapper;
 
         public VideoService(
             IVideoInAlbumStorage videoInAlbumStorage,
+            IVideoStorage videoStorage,
             IMapper mapper)
         {
             this.videoInAlbumStorage= videoInAlbumStorage;
+            this.videoStorage= videoStorage;
             this.mapper = mapper;
         }
 
@@ -25,6 +31,13 @@ namespace PhotoFox.Services
             {
                 yield return mapper.Map<Video>(videoInAlbum);
             }
+        }
+
+        public async Task DeleteVideoAsync(Video video)
+        {
+            await Task.WhenAll(
+                this.videoStorage.DeleteVideoAsync(video.VideoId),
+                this.videoInAlbumStorage.RemoveFromAllAlbumsAsync(video.VideoId)).ConfigureAwait(false);
         }
     }
 }

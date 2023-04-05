@@ -9,5 +9,6 @@ namespace PhotoFox.Storage.Table
         AsyncPageable<VideoInAlbum> GetVideosInAlbumAsync(string albumId);
         Task AddVideoInAlbumAsync(VideoInAlbum videoInAlbum);
         Task ModifyVideoInAlbumAsync(VideoInAlbum videoInAlbum);
+        Task RemoveFromAllAlbumsAsync(string videoId);
     }
 }

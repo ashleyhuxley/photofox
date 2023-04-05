@@ -2,6 +2,7 @@
 using Azure;
 using PhotoFox.Storage.Models;
 using System.Threading.Tasks;
+using PhotoFox.Model;
 
 namespace PhotoFox.Storage.Table
 {
@@ -35,6 +36,18 @@ namespace PhotoFox.Storage.Table
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
             await tableClient.UpdateEntityAsync(videoInAlbum, ETag.All).ConfigureAwait(false);
+        }
+
+        public async Task RemoveFromAllAlbumsAsync(string videoId)
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            var items = tableClient.QueryAsync<PhotoInAlbum>(p => p.RowKey == videoId);
+
+            await foreach (var item in items)
+            {
+                await tableClient.DeleteEntityAsync(item.PartitionKey, item.RowKey).ConfigureAwait(false);
+            }
         }
     }
 }

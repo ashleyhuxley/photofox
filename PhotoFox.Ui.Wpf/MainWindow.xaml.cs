@@ -67,5 +67,21 @@ namespace PhotoFox.Ui.Wpf
         {
             viewModel.OpenSelectedVideo();
         }
+
+        private void PhotoItem_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                viewModel.DeletePhotoCommand.Execute(viewModel.SelectedPhotos);
+            }
+        }
+
+        private void VideoItem_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                viewModel.DeleteVideoCommand.Execute(viewModel.SelectedVideos);
+            }
+        }
     }
 }
