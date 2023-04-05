@@ -8,7 +8,7 @@
         mc:Ignorable="d" Icon="Images/photofox.png"
         Loaded="Window_Loaded"
         Title="PhotoFox" Height="800" Width="1200"
-        PreviewKeyDown="Window_PreviewKeyDown">
+        KeyDown="Window_KeyDown">
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" Height="25">
             <StatusBar.ItemsPanel>
