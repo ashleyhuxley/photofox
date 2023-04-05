@@ -83,5 +83,14 @@ namespace PhotoFox.Ui.Wpf
                 viewModel.DeleteVideoCommand.Execute(viewModel.SelectedVideos);
             }
         }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if ((Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                && e.Key == Key.P)
+            {
+                viewModel.SetPermissionsCommand.Execute(null);
+            }
+        }
     }
 }
