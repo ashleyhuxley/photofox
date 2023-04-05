@@ -249,7 +249,7 @@ namespace PhotoFox.Functions.UploadTests
                 .WithVideoStorage(videoStorage.Object)
                 .Build();
 
-            string message = "{\"Type\": \"VIDEO\", \"EntityId\": \"" + videoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
+            string message = "{\"Type\": \"VIDEO\", \"EntityId\": \"" + videoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\", \"FileExt\": \"mp4\"}";
 
             await function.Run(message, Mock.Of<ILogger>());
 
@@ -271,7 +271,7 @@ namespace PhotoFox.Functions.UploadTests
                 .WithVideoInAlbumStorage(videoInAlbumStorage.Object)
                 .Build();
 
-            string message = "{\"Type\": \"VIDEO\", \"EntityId\": \"" + videoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
+            string message = "{\"Type\": \"VIDEO\", \"EntityId\": \"" + videoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\", \"FileExt\": \"mp4\"}";
 
             await function.Run(message, Mock.Of<ILogger>());
 
