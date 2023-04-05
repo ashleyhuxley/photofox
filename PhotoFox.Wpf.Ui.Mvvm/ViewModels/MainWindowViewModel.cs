@@ -28,6 +28,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         IRecipient<RefreshAlbumsMessage>,
         IRecipient<LoadPhotoMessage>,
         IRecipient<UnloadPhotoMessage>,
+        IRecipient<UnloadVideoMessage>,
         IRecipient<UpdateStatusMessage>,
         IRecipient<SetStatusMessage>
     {
@@ -100,6 +101,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             messenger.Register<UnloadPhotoMessage>(this);
             messenger.Register<UpdateStatusMessage>(this);
             messenger.Register<SetStatusMessage>(this);
+            messenger.Register<UnloadVideoMessage>(this);
 
             this.PropertyChanged += MainWindowViewModel_PropertyChanged;
 
@@ -179,7 +181,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             get => this.Photos.Where(p => p.IsSelected);
         }
 
-        public IEnumerable<VideoViewModel> SelectedVieos
+        public IEnumerable<VideoViewModel> SelectedVideos
         {
             get => this.Videos.Where(p => p.IsSelected);
         }
@@ -515,6 +517,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             this.Photos.Remove(message.ViewModel);
             this.OnPropertyChanged(nameof(this.Photos.Count));
+        }
+
+        public void Receive(UnloadVideoMessage message)
+        {
+            this.Videos.Remove(message.ViewModel);
+            this.OnPropertyChanged(nameof(this.Videos.Count));
         }
 
         public async void Receive(RefreshAlbumsMessage message)

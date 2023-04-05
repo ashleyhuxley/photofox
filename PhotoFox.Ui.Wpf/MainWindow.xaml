@@ -115,6 +115,7 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                 <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                                 <EventSetter Event="MouseDoubleClick" Handler="PhotoDoubleClicked" />
+                                <EventSetter Event="PreviewKeyDown" Handler="PhotoItem_PreviewKeyDown" />
                             </Style>
                         </ListView.ItemContainerStyle>
                         <ItemsControl.ItemsPanel>
@@ -156,6 +157,7 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                 <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                                 <EventSetter Event="MouseDoubleClick" Handler="VideoItemDoubleClick" />
+                                <EventSetter Event="PreviewKeyDown" Handler="VideoItem_PreviewKeyDown" />
                             </Style>
                         </ListView.ItemContainerStyle>
                         <ItemsControl.ItemsPanel>
