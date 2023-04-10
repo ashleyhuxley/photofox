@@ -58,6 +58,7 @@ namespace PhotoFox.Functions.UploadPhoto
         [FunctionName("Upload")]
         public async Task Run([QueueTrigger("uploads", Connection = "PhotoFoxStorage")]string message, ILogger log)
         {
+            
             var uploadMessage = JsonSerializer.Deserialize<UploadMessage>(message);
             if (uploadMessage == null)
             {
@@ -179,7 +180,7 @@ namespace PhotoFox.Functions.UploadPhoto
                 PartitionKey = albumId,
                 RowKey = videoId,
                 Title = title,
-                VideoDate = dateTaken,
+                VideoDate = DateTime.SpecifyKind(dateTaken, DateTimeKind.Utc),
                 FileExt = fileExt
             };
 
