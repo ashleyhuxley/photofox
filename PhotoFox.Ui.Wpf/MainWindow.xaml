@@ -83,7 +83,9 @@
                         VerticalAlignment="Stretch" 
                         ScrollViewer.VerticalScrollBarVisibility="Visible" 
                         ItemsSource="{Binding Photos}"
-                        SelectedItem="{Binding SelectedPhoto}">
+                        SelectedItem="{Binding SelectedPhoto}"
+                        AllowDrop="True"
+                        Drop="PhotoList_Drop">
                         <ListView.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Open Image" Command="{Binding OpenPhotoCommand}" />
@@ -137,7 +139,9 @@
                         VerticalAlignment="Stretch" 
                         ScrollViewer.VerticalScrollBarVisibility="Visible" 
                         ItemsSource="{Binding Videos}"
-                        SelectedItem="{Binding SelectedVideo}">
+                        SelectedItem="{Binding SelectedVideo}"
+                        AllowDrop="True"
+                        Drop="PhotoList_Drop">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

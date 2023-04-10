@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Queues;
-using System;
+using PhotoFox.Storage.Models;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Queue
@@ -15,28 +16,14 @@ namespace PhotoFox.Storage.Queue
             this.config = config;
         }
 
-        public async Task QueueUploadMessage(string photoId, string albumId, string title)
+        public async Task QueueUploadMessage(UploadMessage message)
         {
-            if (string.IsNullOrEmpty(photoId))
+            var client = new QueueClient(this.config.StorageConnectionString, QueueName, new QueueClientOptions
             {
-                throw new ArgumentNullException(nameof(photoId));
-            }
+                MessageEncoding = QueueMessageEncoding.Base64
+            });
 
-            if (string.IsNullOrEmpty(albumId))
-            {
-                throw new ArgumentNullException(nameof(albumId));
-            }
-
-            if (string.IsNullOrEmpty(title))
-            {
-                throw new ArgumentNullException(nameof(title));
-            }
-
-            string message = $"{photoId},{albumId},{title}";
-
-            var client = new QueueClient(this.config.StorageConnectionString, QueueName);
-
-            await client.SendMessageAsync(message);
+            await client.SendMessageAsync(JsonSerializer.Serialize(message));
         }
     }
 }

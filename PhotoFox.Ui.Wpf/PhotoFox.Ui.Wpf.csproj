@@ -18,6 +18,7 @@
     <None Remove="Images\arrow_right.png" />
     <None Remove="Images\cancel.png" />
     <None Remove="Images\delete.png" />
+    <None Remove="Images\hourglass.png" />
     <None Remove="Images\images.png" />
     <None Remove="Images\no.png" />
     <None Remove="Images\photofox.png" />
@@ -44,6 +45,7 @@
     <Resource Include="Images\arrow_right.png" />
     <Resource Include="Images\cancel.png" />
     <Resource Include="Images\delete.png" />
+    <Resource Include="Images\hourglass.png" />
     <Resource Include="Images\images.png" />
     <Resource Include="Images\add_album.png" />
     <Resource Include="Images\add_photo.png" />

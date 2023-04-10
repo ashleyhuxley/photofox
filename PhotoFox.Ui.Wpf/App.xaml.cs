@@ -42,6 +42,7 @@ namespace PhotoFox.Ui.Wpf
             this.contianer.Bind<IMapper>().ToMethod(i => MapFactory.GetMap()).InSingletonScope();
 
             this.contianer.Bind<MainWindowViewModel>().ToSelf();
+            this.contianer.Bind<UploadFilesViewModel>().ToSelf();
 
             this.contianer.Bind<IStorageConfig>().To<PhotoFoxConfig>().InSingletonScope();
             this.contianer.Bind<IViewerConfig>().To<PhotoFoxConfig>().InSingletonScope();
