@@ -27,10 +27,10 @@ namespace PhotoFox.Services
             IPhotoInAlbumStorage photoInAlbumStorage,
             IMapper mapper)
         {
-            this.photoMetadataStorage = photoMetadataStorage;
-            this.photoFileStorage = photoFileStorage;
-            this.photoInAlbumStorage = photoInAlbumStorage;
-            this.mapper = mapper;
+            this.photoMetadataStorage = photoMetadataStorage ?? throw new ArgumentNullException(nameof(photoMetadataStorage));
+            this.photoFileStorage = photoFileStorage ?? throw new ArgumentNullException(nameof(photoFileStorage));
+            this.photoInAlbumStorage = photoInAlbumStorage ?? throw new ArgumentNullException(nameof(photoInAlbumStorage));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId)
@@ -57,17 +57,6 @@ namespace PhotoFox.Services
                 this.photoFileStorage.DeletePhotoAsync(photo.PhotoId),
                 this.photoMetadataStorage.DeletePhotoAsync(photo.DateTaken.ToPartitionKey(), photo.PhotoId),
                 this.photoInAlbumStorage.RemoveFromAllAlbumsAsync(photo.PhotoId)).ConfigureAwait(false);
-        }
-
-        public async IAsyncEnumerable<Photo> GetPhotosByDateNotInAlbumAsync(DateTime dateTaken)
-        {
-            await foreach (var photo in this.photoMetadataStorage.GetPhotosByDateAsync(dateTaken))
-            {
-                if (! await this.photoInAlbumStorage.IsPhotoInAnAlbumAsync(photo.RowKey).ConfigureAwait(false))
-                {
-                    yield return mapper.Map<Photo>(photo);
-                }
-            }
         }
 
         public async IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId)
