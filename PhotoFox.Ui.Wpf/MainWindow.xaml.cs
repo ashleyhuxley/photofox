@@ -1,6 +1,9 @@
-﻿using NLog;
+﻿using Ninject;
+using NLog;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
+using System;
 using System.ComponentModel;
+using System.Runtime.Versioning;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,6 +14,8 @@ namespace PhotoFox.Ui.Wpf
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    
+    [SupportedOSPlatform("windows")]
     public partial class MainWindow : Window
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
@@ -19,14 +24,18 @@ namespace PhotoFox.Ui.Wpf
 
         private IMessageHandler messageHandler;
 
+        private IKernel kernel;
+
         public MainWindow(
             MainWindowViewModel viewModel,
-            IMessageHandler messageHandler)
+            IMessageHandler messageHandler,
+            IKernel kernel)
         {
             InitializeComponent();
 
             this.viewModel = viewModel;
             this.DataContext = viewModel;
+            this.kernel = kernel;
 
             this.messageHandler = messageHandler;
             this.messageHandler.Register(this);
@@ -91,6 +100,27 @@ namespace PhotoFox.Ui.Wpf
             {
                 viewModel.SetPermissionsCommand.Execute(null);
             }
+        }
+
+        private void PhotoList_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                var uploadViewModel = kernel.Get<UploadFilesViewModel>();
+
+                var window = new UploadFilesWindow
+                {
+                    Owner = this,
+                    DataContext = uploadViewModel
+                };
+
+                uploadViewModel.AddFiles(files, viewModel.SelectedAlbum?.AlbumId ?? Guid.Empty.ToString());
+                window.Show();
+            }
+
+            e.Handled = true;
         }
     }
 }

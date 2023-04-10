@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using NLog;
 using PhotoFox.Services;
+using PhotoFox.Wpf.Ui.Mvvm.Commands.Parameters;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System;
 using System.IO;
@@ -39,18 +40,21 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
         public async void Execute(object? parameter)
         {
-            var message = new AddPhotosMessage();
-            this.messenger.Send(message);
+            var parameters = parameter as AddPhotoCommandParameters;
+            if (parameters == null)
+            {
+                throw new InvalidOperationException("AddPhotosCommand must be called with AddPhotosCommandParameters");
+            }
 
             var i = 0;
 
-            if (message.FileNames.Any())
+            if (parameters.Files.Any())
             {
-                foreach (var file in message.FileNames)
+                foreach (var file in parameters.Files)
                 {
                     i++;
-                    await UploadImage(file, message.AlbumId);
-                    this.messenger.Send(new SetStatusMessage($"Uploaded file {i} of {message.FileNames.Count}"));
+                    await UploadImage(file, parameters.AlbumId);
+                    this.messenger.Send(new SetStatusMessage($"Uploaded {file}"));
                 }
             }
         }
@@ -64,11 +68,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
             Log.Debug($"Uploading {fileName}");
 
+            var info = new FileInfo(fileName);
+
             using (var stream = File.Open(fileName, FileMode.Open))
             {
                 try
                 {
-                    await this.uploadService.UploadFromStreamAsync(stream, albumId, Path.GetFileName(fileName));
+                    await this.uploadService.UploadFromStreamAsync(stream, albumId, Path.GetFileName(fileName), Path.GetExtension(fileName).Substring(1), info.CreationTimeUtc);
                 }
                 catch (Exception ex)
                 {
