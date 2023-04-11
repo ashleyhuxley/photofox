@@ -25,21 +25,26 @@ namespace PhotoFox.Services
             IVideoStorage videoStorage,
             IUploadQueue uploadQueue)
         {
-            this.uploadQueue= uploadQueue;
-            this.photoFileStorage = photoFileStorage;
-            this.videoStorage = videoStorage;
+            this.uploadQueue= uploadQueue ?? throw new ArgumentNullException(nameof(uploadQueue));
+            this.photoFileStorage = photoFileStorage ?? throw new ArgumentNullException(nameof(photoFileStorage));
+            this.videoStorage = videoStorage ?? throw new ArgumentNullException(nameof(videoStorage));
         }
 
         [SupportedOSPlatform("windows")]
-        public async Task UploadFromStreamAsync(Stream stream, string albumId, string fallbackTitle, string fileExt, DateTime modifiedDate)
+        public async Task UploadFromStreamAsync(Stream stream, string albumId, string fallbackTitle, string fileExt, DateTime createdDate)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
+
             var photoId = Guid.NewGuid().ToString();
             Log.Info($"Uploading photo {photoId}");
 
             var message = new UploadMessage
             {
                 Album = albumId,
-                DateTaken = modifiedDate,
+                DateTaken = createdDate,
                 EntityId = photoId,
                 FileExt = fileExt,
                 Title = fallbackTitle,
@@ -53,7 +58,7 @@ namespace PhotoFox.Services
             await this.uploadQueue.QueueUploadMessage(message);
         }
 
-        public async Task UploadVideoFromStreamAsync(Stream stream, string albumId, string fallbackTitle, string fileExt, DateTime modifiedDate)
+        public async Task UploadVideoFromStreamAsync(Stream stream, string albumId, string fallbackTitle, string fileExt, DateTime createdDate)
         {
             var videoId = Guid.NewGuid().ToString();
             Log.Info($"Uploading video {videoId}");
@@ -61,7 +66,7 @@ namespace PhotoFox.Services
             var message = new UploadMessage
             {
                 Album = albumId,
-                DateTaken = modifiedDate,
+                DateTaken = createdDate,
                 EntityId = videoId,
                 FileExt = fileExt,
                 Title = fallbackTitle,
