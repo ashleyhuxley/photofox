@@ -185,7 +185,7 @@ namespace PhotoFox.Services.UnitTests
                 RowKey = "photoId"
             };
 
-            photoInAlbumStorage.Setup(p => p.GetPhotosInAlbumAsync(albumId)).Returns(GetSingleItemAsAsyncPageable(photoInAlbum));
+            photoInAlbumStorage.Setup(p => p.GetPhotosInAlbumAsync(albumId)).Returns(photoInAlbum.AsAsyncPageable());
 
             var service = new PhotoService(
                 photoMetadataStorage.Object,
@@ -199,13 +199,6 @@ namespace PhotoFox.Services.UnitTests
             }
 
             photoInAlbumStorage.Verify(s => s.GetPhotosInAlbumAsync(albumId), Times.Once);
-        }
-
-        private AsyncPageable<T> GetSingleItemAsAsyncPageable<T>(T item)
-            where T : notnull
-        {
-            var page = Page<T>.FromValues(new[] { item }, null, Mock.Of<Response>());
-            return AsyncPageable<T>.FromPages(new[] { page });
         }
 
         private Photo GetSamplePhoto()

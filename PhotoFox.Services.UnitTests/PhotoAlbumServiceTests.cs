@@ -78,7 +78,7 @@ namespace PhotoFox.Services.UnitTests
             };
 
             photoAlbumDataStorage.Setup(s => s.GetPhotoAlbumsAsync()).Returns(GetTestData());
-            albumPermissionStorage.Setup(s => s.GetPermissionsByUsernameAsync(username)).Returns(GetSingleItemAsAsyncPageable(permission));
+            albumPermissionStorage.Setup(s => s.GetPermissionsByUsernameAsync(username)).Returns(permission.AsAsyncPageable());
 
             var service = GetDefaultService();
 
@@ -101,7 +101,7 @@ namespace PhotoFox.Services.UnitTests
             };
 
             photoAlbumDataStorage.Setup(s => s.GetPhotoAlbumsAsync()).Returns(GetTestData());
-            albumPermissionStorage.Setup(s => s.GetPermissionsByUsernameAsync(username)).Returns(GetSingleItemAsAsyncPageable(permission));
+            albumPermissionStorage.Setup(s => s.GetPermissionsByUsernameAsync(username)).Returns(permission.AsAsyncPageable());
 
             var service = GetDefaultService();
 
@@ -140,7 +140,7 @@ namespace PhotoFox.Services.UnitTests
                 Title = "Title"
             };
 
-            this.photoInAlbumStorage.Setup(s => s.GetPhotosInAlbumAsync(albumId)).Returns(GetSingleItemAsAsyncPageable(photoInAlbum));
+            this.photoInAlbumStorage.Setup(s => s.GetPhotosInAlbumAsync(albumId)).Returns(photoInAlbum.AsAsyncPageable());
             this.photoMetadataStorage.Setup(s => s.GetPhotoMetadataAsync(date, photoId)).Returns(Task.FromResult(photoMetadata));
             var service = GetDefaultService();
 
@@ -228,13 +228,6 @@ namespace PhotoFox.Services.UnitTests
             }
 
             return result.ToArray();
-        }
-
-        private AsyncPageable<T> GetSingleItemAsAsyncPageable<T>(T item)
-            where T: notnull
-        {
-            var page = Page<T>.FromValues(new[] { item }, null, Mock.Of<Response>());
-            return AsyncPageable<T>.FromPages(new[] { page });
         }
 
         private AsyncPageable<PhotoAlbum> GetTestData()
