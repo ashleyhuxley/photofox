@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Core", "PhotoFox.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Services", "PhotoFox.Services\PhotoFox.Services.csproj", "{01875AF0-6172-4215-9F16-0EA96510EFAD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.CmdLine", "PhotoFox.CmdLine\PhotoFox.CmdLine.csproj", "{8A99E31D-B6E7-47AD-BAA7-679E6480E858}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Web", "PhotoFox.Web\PhotoFox.Web.csproj", "{D1896016-DF91-49E7-835E-0993E01BC196}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoFox.Mappings", "PhotoFox.Mappings\PhotoFox.Mappings.csproj", "{45BC9FCC-3DB9-4B52-82D8-FD8356A8B9E1}"
@@ -61,10 +59,6 @@ Global
 		{01875AF0-6172-4215-9F16-0EA96510EFAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01875AF0-6172-4215-9F16-0EA96510EFAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01875AF0-6172-4215-9F16-0EA96510EFAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A99E31D-B6E7-47AD-BAA7-679E6480E858}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D1896016-DF91-49E7-835E-0993E01BC196}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1896016-DF91-49E7-835E-0993E01BC196}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1896016-DF91-49E7-835E-0993E01BC196}.Release|Any CPU.ActiveCfg = Release|Any CPU
