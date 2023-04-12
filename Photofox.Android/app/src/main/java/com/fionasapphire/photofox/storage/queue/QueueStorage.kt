@@ -4,6 +4,8 @@ import com.fionasapphire.photofox.storage.entity.UploadMessage
 import com.google.gson.Gson
 import com.microsoft.azure.storage.CloudStorageAccount
 import com.microsoft.azure.storage.queue.CloudQueueMessage
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -22,13 +24,19 @@ class QueueStorage
      * @param dateTaken A fallback date to be used if date taken cannot be extracted from EXIF
      */
     fun enqueue(photoId: String, albumId: String, title: String, dateTaken: Date) {
+
+            val df: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.ENGLISH)
+            df.timeZone = TimeZone.getTimeZone("UTC")
+
             val gson = Gson()
-            val msg = UploadMessage(photoId, "PHOTO", albumId, title, dateTaken)
+            val msg = UploadMessage(photoId, "PHOTO", albumId, title, df.format(dateTaken), "JPG")
 
             val account = CloudStorageAccount.parse(connectionString)
             val queueClient = account.createCloudQueueClient()
             val queue = queueClient.getQueueReference("uploads")
-            val message = CloudQueueMessage(gson.toJson(msg))
+
+            val message = CloudQueueMessage(gson.toJson(msg).toByteArray())
+
             queue.addMessage(message)
         }
 }

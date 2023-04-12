@@ -3,9 +3,10 @@ package com.fionasapphire.photofox.storage.entity
 import java.util.*
 
 data class UploadMessage (
-    val entityId: String,
-    val type: String,
-    val album: String,
-    val title: String,
-    val dateTaken: Date
+    val EntityId: String,
+    val Type: String,
+    val Album: String,
+    val Title: String,
+    val DateTaken: String,
+    val FileExt: String
 )

@@ -36,8 +36,6 @@ fun SelectPhotos() {
     val viewModel = hiltViewModel<AddPhotosViewModel>()
     val context = LocalContext.current
 
-
-
     val state by viewModel.state.collectAsState()
     when (state) {
         AddPhotosViewModelState.START -> {
