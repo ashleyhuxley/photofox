@@ -23,4 +23,8 @@ object  StorageModule {
     @Provides
     @Singleton
     fun provideMetadataStorage() = PhotoMetadataStorage(Config.connectionString)
+
+    @Provides
+    @Singleton
+    fun provideConnectionString() = Config.connectionString
 }
