@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Blob
