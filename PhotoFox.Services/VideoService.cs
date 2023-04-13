@@ -20,8 +20,8 @@ namespace PhotoFox.Services
             IVideoStorage videoStorage,
             IMapper mapper)
         {
-            this.videoInAlbumStorage= videoInAlbumStorage;
-            this.videoStorage= videoStorage;
+            this.videoInAlbumStorage = videoInAlbumStorage;
+            this.videoStorage = videoStorage;
             this.mapper = mapper;
         }
 

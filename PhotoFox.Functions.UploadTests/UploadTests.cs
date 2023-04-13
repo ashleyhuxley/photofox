@@ -39,14 +39,14 @@ namespace PhotoFox.Functions.UploadTests
         {
             string photoId = "photoId";
 
-            var photoFileStorage = new Mock<IPhotoFileStorage>();
-            photoFileStorage.Setup(p => p.GetPhotoAsync(photoId)).Returns(Task.FromResult(BinaryData.FromBytes(jpegData)));
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(p => p.GetFileAsync(photoId)).Returns(Task.FromResult(BinaryData.FromBytes(jpegData)));
 
             var thumbnailProvider = new Mock<IThumbnailProvider>();
             thumbnailProvider.Setup(t => t.GenerateThumbnail(It.IsAny<Image>(), It.IsAny<int>(), It.IsAny<int>())).Returns(Image.FromStream(new MemoryStream(jpegData)));
 
             var function = new UploadFunctionBuilder()
-                .WithPhotoFileStorage(photoFileStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .WithThumbnailProvider(thumbnailProvider.Object)
                 .Build();
 
@@ -54,7 +54,7 @@ namespace PhotoFox.Functions.UploadTests
 
             await function.Run(message, Mock.Of<ILogger>());
 
-            photoFileStorage.Verify(p => p.GetPhotoAsync(photoId), Times.Once);
+            uploadStorage.Verify(p => p.GetFileAsync(photoId), Times.Once);
         }
 
         [Test]
@@ -62,7 +62,11 @@ namespace PhotoFox.Functions.UploadTests
         {
             string photoId = "photoId";
 
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(photoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
+
             var function = new UploadFunctionBuilder()
+                .WithUpladStorage(uploadStorage.Object)
                 .Build();
 
             string message = "{\"Type\": \"TEST_INVALID_TYPE\", \"EntityId\": \"" + photoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
@@ -93,8 +97,8 @@ namespace PhotoFox.Functions.UploadTests
             string photoId = "photoId";
             string hash = "hash";
 
-            var photoFileStorage = new Mock<IPhotoFileStorage>();
-            photoFileStorage.Setup(p => p.GetPhotoAsync(photoId)).Returns(Task.FromResult(BinaryData.FromBytes(jpegData)));
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(photoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
 
             var streamHash = new Mock<IStreamHash>();
             streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
@@ -103,7 +107,7 @@ namespace PhotoFox.Functions.UploadTests
             photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new Tuple<string, string>("foo", "bar")));
 
             var function = new UploadFunctionBuilder()
-                .WithPhotoFileStorage(photoFileStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .WithStreamHash(streamHash.Object)
                 .WithPhotoHashStorage(photoHashStorage.Object)
                 .Build();
@@ -119,8 +123,8 @@ namespace PhotoFox.Functions.UploadTests
             string photoId = "photoId";
             string hash = "hash";
 
-            var photoFileStorage = new Mock<IPhotoFileStorage>();
-            photoFileStorage.Setup(p => p.GetPhotoAsync(photoId)).Returns(Task.FromResult(BinaryData.FromBytes(jpegData)));
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(photoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
 
             var streamHash = new Mock<IStreamHash>();
             streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
@@ -131,7 +135,7 @@ namespace PhotoFox.Functions.UploadTests
             var logStorage = new Mock<ILogStorage>();
 
             var function = new UploadFunctionBuilder()
-                .WithPhotoFileStorage(photoFileStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .WithStreamHash(streamHash.Object)
                 .WithPhotoHashStorage(photoHashStorage.Object)
                 .WithLogStorage(logStorage.Object)
@@ -150,8 +154,8 @@ namespace PhotoFox.Functions.UploadTests
             string photoId = "photoId";
             string hash = "hash";
 
-            var photoFileStorage = new Mock<IPhotoFileStorage>();
-            photoFileStorage.Setup(p => p.GetPhotoAsync(photoId)).Returns(Task.FromResult(BinaryData.FromBytes(jpegData)));
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(photoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
 
             var streamHash = new Mock<IStreamHash>();
             streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
@@ -160,7 +164,7 @@ namespace PhotoFox.Functions.UploadTests
             photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new Tuple<string, string>("foo", "bar")));
 
             var function = new UploadFunctionBuilder()
-                .WithPhotoFileStorage(photoFileStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .WithStreamHash(streamHash.Object)
                 .WithPhotoHashStorage(photoHashStorage.Object)
                 .Build();
@@ -169,7 +173,7 @@ namespace PhotoFox.Functions.UploadTests
 
             await function.Run(message, Mock.Of<ILogger>());
 
-            photoFileStorage.Verify(s => s.DeletePhotoAsync(photoId), Times.Once);
+            uploadStorage.Verify(s => s.DeleteFileAsync(photoId), Times.Once);
         }
 
         [Test]
@@ -179,7 +183,9 @@ namespace PhotoFox.Functions.UploadTests
             string hash = "hash";
 
             var photoFileStorage = new Mock<IPhotoFileStorage>();
-            photoFileStorage.Setup(p => p.GetPhotoAsync(photoId)).Returns(Task.FromResult(BinaryData.FromBytes(jpegData)));
+
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(photoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
 
             var streamHash = new Mock<IStreamHash>();
             streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
@@ -194,6 +200,7 @@ namespace PhotoFox.Functions.UploadTests
                 .WithStreamHash(streamHash.Object)
                 .WithPhotoHashStorage(photoHashStorage.Object)
                 .WithPhotoMetadataStorage(photoMetadataStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .Build();
 
             string message = "{\"Type\": \"PHOTO\", \"EntityId\": \"" + photoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
@@ -208,8 +215,8 @@ namespace PhotoFox.Functions.UploadTests
         {
             string photoId = "photoId";
 
-            var photoFileStorage = new Mock<IPhotoFileStorage>();
-            photoFileStorage.Setup(p => p.GetPhotoAsync(photoId)).Returns(Task.FromResult(BinaryData.FromBytes(jpegData)));
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(photoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
 
             var thumbnailProvider = new Mock<IThumbnailProvider>();
             thumbnailProvider.Setup(t => t.GenerateThumbnail(It.IsAny<Image>(), It.IsAny<int>(), It.IsAny<int>())).Returns(Image.FromStream(new MemoryStream(jpegData)));
@@ -221,7 +228,7 @@ namespace PhotoFox.Functions.UploadTests
             var photoInAlbumStorage = new Mock<IPhotoInAlbumStorage>();
 
             var function = new UploadFunctionBuilder()
-                .WithPhotoFileStorage(photoFileStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .WithPhotoMetadataStorage(photoMetadataStorage.Object)
                 .WithPhotoHashStorage(photoHashStorage.Object)
                 .WithPhotoInAlbumStorage(photoInAlbumStorage.Object)
@@ -242,18 +249,18 @@ namespace PhotoFox.Functions.UploadTests
         {
             string videoId = "videoId";
 
-            var videoStorage = new Mock<IVideoStorage>();
-            videoStorage.Setup(v => v.GetVideoAsync(videoId)).Returns(Task.FromResult(BinaryData.FromBytes(new byte[] { })));
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(videoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
 
             var function = new UploadFunctionBuilder()
-                .WithVideoStorage(videoStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .Build();
 
             string message = "{\"Type\": \"VIDEO\", \"EntityId\": \"" + videoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\", \"FileExt\": \"mp4\"}";
 
             await function.Run(message, Mock.Of<ILogger>());
 
-            videoStorage.Verify(v => v.GetVideoAsync(videoId), Times.Once);
+            uploadStorage.Verify(v => v.GetFileAsync(videoId), Times.Once);
         }
 
         [Test]
@@ -261,13 +268,13 @@ namespace PhotoFox.Functions.UploadTests
         {
             string videoId = "videoId";
 
-            var videoStorage = new Mock<IVideoStorage>();
-            videoStorage.Setup(v => v.GetVideoAsync(videoId)).Returns(Task.FromResult(BinaryData.FromBytes(new byte[] { })));
+            var uploadStorage = new Mock<IUploadStorage>();
+            uploadStorage.Setup(s => s.GetFileAsync(videoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
 
             var videoInAlbumStorage = new Mock<IVideoInAlbumStorage>();
 
             var function = new UploadFunctionBuilder()
-                .WithVideoStorage(videoStorage.Object)
+                .WithUpladStorage(uploadStorage.Object)
                 .WithVideoInAlbumStorage(videoInAlbumStorage.Object)
                 .Build();
 
@@ -291,6 +298,7 @@ namespace PhotoFox.Functions.UploadTests
         private ILogStorage logStorage;
         private IVideoInAlbumStorage videoInAlbumStorage;
         private IVideoStorage videoStorage;
+        private IUploadStorage uploadStorage;
 
         public UploadFunctionBuilder()
         {
@@ -303,6 +311,7 @@ namespace PhotoFox.Functions.UploadTests
             this.logStorage = Mock.Of<ILogStorage>();
             this.videoInAlbumStorage = Mock.Of<IVideoInAlbumStorage>();
             this.videoStorage = Mock.Of<IVideoStorage>();
+            this.uploadStorage = Mock.Of<IUploadStorage>();
         }
 
         public UploadFunction Build()
@@ -316,7 +325,8 @@ namespace PhotoFox.Functions.UploadTests
                 this.photoInAlbumStorage,
                 this.videoInAlbumStorage,
                 this.logStorage,
-                this.videoStorage);
+                this.videoStorage,
+                this.uploadStorage);
         }
 
         public UploadFunctionBuilder WithPhotoFileStorage(IPhotoFileStorage photoFileStorage)
@@ -370,6 +380,12 @@ namespace PhotoFox.Functions.UploadTests
         public UploadFunctionBuilder WithVideoStorage(IVideoStorage videoStorage)
         {
             this.videoStorage = videoStorage;
+            return this;
+        }
+
+        public UploadFunctionBuilder WithUpladStorage(IUploadStorage uploadStorage)
+        {
+            this.uploadStorage = uploadStorage;
             return this;
         }
     }

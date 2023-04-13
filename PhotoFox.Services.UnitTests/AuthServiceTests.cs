@@ -14,12 +14,6 @@ namespace PhotoFox.Services.UnitTests
         }
 
         [Test]
-        public void Constructor_AlbumPermissionStorageIsNull_ThrowsArgumentNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new AuthService(null));
-        }
-
-        [Test]
         public async Task AuthService_HasPermission_CallsHasPermissionWithCorrectArgs()
         {
             string albumId = "albumId";

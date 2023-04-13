@@ -16,7 +16,7 @@ namespace PhotoFox.Storage.Queue
             this.config = config;
         }
 
-        public async Task QueueUploadMessage(UploadMessage message)
+        public async Task QueueUploadMessageAsync(UploadMessage message)
         {
             var client = new QueueClient(this.config.StorageConnectionString, QueueName, new QueueClientOptions
             {

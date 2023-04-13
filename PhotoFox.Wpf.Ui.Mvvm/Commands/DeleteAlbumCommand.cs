@@ -37,7 +37,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
         public void Execute(object? parameter)
         {
             var viewModel = parameter as AlbumViewModel;
-            if (viewModel == null)
+            if (viewModel?.AlbumId == null)
             {
                 return;
             }

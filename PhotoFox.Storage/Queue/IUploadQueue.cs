@@ -5,6 +5,6 @@ namespace PhotoFox.Storage.Queue
 {
     public interface IUploadQueue
     {
-        Task QueueUploadMessage(UploadMessage message);
+        Task QueueUploadMessageAsync(UploadMessage message);
     }
 }

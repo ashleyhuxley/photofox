@@ -7,22 +7,22 @@ import java.io.ByteArrayOutputStream
 /**
  * Stores and retrieves images and thumbnails from Azure storage
  */
-class ImageStorage
+class FileStorage
     constructor(private val connectionString: String)
 {
     /**
      * Uploads an image to Azure storage in the specified container
-     * @param imageId A unique ID that represents the image
-     * @param containerName The name of the container in which the image will be stored
-     * @param data A byte array representing the image data
+     * @param id A unique ID that represents the file
+     * @param containerName The name of the container in which the file will be stored
+     * @param data A byte array representing the file data
      */
-    fun uploadImage(imageId: String, containerName: String, data: ByteArray) {
+    fun uploadFile(id: String, containerName: String, data: ByteArray) {
         val account = CloudStorageAccount.parse(connectionString)
 
         val client = account.createCloudBlobClient()
         val container = client.getContainerReference(containerName)
 
-        val blob = container.getBlockBlobReference(imageId)
+        val blob = container.getBlockBlobReference(id)
 
         blob.uploadFromByteArray(data, 0, data.size)
     }
