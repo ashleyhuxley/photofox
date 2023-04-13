@@ -15,7 +15,7 @@ import androidx.lifecycle.viewModelScope
 import com.fionasapphire.photofox.model.ImageReference
 import com.fionasapphire.photofox.atMidnight
 import com.fionasapphire.photofox.model.PhotoAlbumEntry
-import com.fionasapphire.photofox.storage.blob.ImageStorage
+import com.fionasapphire.photofox.storage.blob.FileStorage
 import com.fionasapphire.photofox.storage.table.PhotoAlbumStorage
 import com.fionasapphire.photofox.storage.table.PhotoInAlbumStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +33,7 @@ class PhotosViewModel
 @Inject constructor(
     private val photoInAlbumStorage: PhotoInAlbumStorage,
     private val photoAlbumStorage: PhotoAlbumStorage,
-    private val imageStorage: ImageStorage,
+    private val fileStorage: FileStorage,
     private val savedStateHandle: SavedStateHandle
     ): ViewModel() {
     val state = MutableStateFlow<PhotosViewModelState>(PhotosViewModelState.START)
@@ -60,7 +60,7 @@ class PhotosViewModel
 
             // Download the main image file from storage
             withContext(Dispatchers.IO) {
-                val bytes = imageStorage.getImage(photo.image.imageId)
+                val bytes = fileStorage.getImage(photo.image.imageId)
 
                 try {
                     file.createNewFile()

@@ -15,6 +15,8 @@ using System.Drawing.Imaging;
 using LogLevel = PhotoFox.Storage.Models.LogLevel;
 using System.Runtime.Versioning;
 using System.Text.Json;
+using PhotoFox.Model;
+using NLog.LayoutRenderers;
 
 namespace PhotoFox.Functions.UploadPhoto
 {
@@ -30,6 +32,7 @@ namespace PhotoFox.Functions.UploadPhoto
         private readonly ILogStorage logStorage;
         private readonly IVideoInAlbumStorage videoInAlbumStorage;
         private readonly IVideoStorage videoStorage;
+        private readonly IUploadStorage uploadStorage;
 
         private const string source = "UploadFunction";
 
@@ -42,7 +45,8 @@ namespace PhotoFox.Functions.UploadPhoto
             IPhotoInAlbumStorage photoInAlbumStorage,
             IVideoInAlbumStorage videoInAlbumStorage,
             ILogStorage logStorage,
-            IVideoStorage videoStorage)
+            IVideoStorage videoStorage,
+            IUploadStorage uploadStorage)
         {
             this.photoFileStorage = photoFileStorage ?? throw new ArgumentNullException(nameof(photoFileStorage));
             this.streamHash = streamHash ?? throw new ArgumentNullException(nameof(streamHash));
@@ -53,6 +57,7 @@ namespace PhotoFox.Functions.UploadPhoto
             this.videoInAlbumStorage = videoInAlbumStorage ?? throw new ArgumentNullException(nameof(videoInAlbumStorage));
             this.logStorage = logStorage ?? throw new ArgumentNullException(nameof(logStorage));
             this.videoStorage = videoStorage ?? throw new ArgumentNullException(nameof(videoStorage));
+            this.uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
         }
 
         [FunctionName("Upload")]
@@ -64,6 +69,15 @@ namespace PhotoFox.Functions.UploadPhoto
                 throw new ArgumentException("The input message could not be deserialized", nameof(message));
             }
 
+            // Get the photo from storage
+            var blob = await uploadStorage.GetFileAsync(uploadMessage.EntityId);
+            if (blob == null)
+            {
+                var errorMessage = $"File not found in blob storage: {uploadMessage.EntityId}";
+                log.LogError(errorMessage);
+                throw new FileNotFoundException(errorMessage);
+            }
+
             var albumId = uploadMessage.Album ?? Guid.Empty.ToString();
             var title = uploadMessage.Title ?? uploadMessage.DateTaken.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -72,7 +86,7 @@ namespace PhotoFox.Functions.UploadPhoto
             switch (uploadMessage.Type.ToUpperInvariant())
             {
                 case "PHOTO":
-                    await ProcessPhoto(uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, log);
+                    await ProcessPhoto(blob, uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, log);
                     break;
                 case "VIDEO":
                     if (uploadMessage.FileExt == null)
@@ -80,24 +94,15 @@ namespace PhotoFox.Functions.UploadPhoto
                         throw new InvalidOperationException("Cannot upload video with unpecified file extension");
                     }
 
-                    await ProcessVideo(uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, uploadMessage.FileExt, log);
+                    await ProcessVideo(blob, uploadMessage.EntityId, albumId, title, uploadMessage.DateTaken, uploadMessage.FileExt, log);
                     break;
                 default:
                     throw new ArgumentException($"Unknown Message Type: {uploadMessage.Type}");
             }
         }
 
-        private async Task ProcessPhoto(string photoId, string albumId, string title, DateTime dateTaken, ILogger log)
+        private async Task ProcessPhoto(BinaryData blob, string photoId, string albumId, string title, DateTime dateTaken, ILogger log)
         {
-            // Get the photo from storage
-            var blob = await photoFileStorage.GetPhotoAsync(photoId);
-            if (blob == null)
-            {
-                var errorMessage = $"Image not found in blob storage: {photoId}";
-                log.LogError(errorMessage);
-                throw new FileNotFoundException(errorMessage);
-            }
-
             var stream = blob.ToStream();
 
             // Check hash
@@ -108,7 +113,7 @@ namespace PhotoFox.Functions.UploadPhoto
 
                 await logStorage.Log("An image with this hash already exists", source, photoId, albumId, LogLevel.Warn, md5);
 
-                await photoFileStorage.DeletePhotoAsync(photoId);
+                await uploadStorage.DeleteFileAsync(photoId);
                 return;
             }
 
@@ -151,6 +156,9 @@ namespace PhotoFox.Functions.UploadPhoto
                 await photoFileStorage.PutThumbnailAsync(metadata.RowKey, data);
             }
 
+            // Store blob
+            await photoFileStorage.PutPhotoAsync(photoId, blob);
+
             // Store table items
             await photoMetadataStorage.AddPhotoAsync(metadata);
             await logStorage.Log("Metadata entry added", source, photoId, "", LogLevel.Info, md5);
@@ -160,19 +168,20 @@ namespace PhotoFox.Functions.UploadPhoto
 
             await photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, metadata.RowKey, metadata.UtcDate.Value);
             await logStorage.Log("Photo added to album", source, photoId, albumId, LogLevel.Info, md5);
+
+            // Delete temp file
+            await uploadStorage.DeleteFileAsync(photoId);
         }
 
-        private async Task ProcessVideo(string videoId, string albumId, string title, DateTime dateTaken, string fileExt, ILogger log)
+        private async Task ProcessVideo(
+            BinaryData blob, 
+            string videoId, 
+            string albumId, 
+            string title, 
+            DateTime dateTaken, 
+            string fileExt,
+            ILogger log)
         {
-            // Get the photo from storage
-            var blob = await videoStorage.GetVideoAsync(videoId);
-            if (blob == null)
-            {
-                var errorMessage = $"Video not found in blob storage: {videoId}";
-                log.LogError(errorMessage);
-                throw new FileNotFoundException(errorMessage);
-            }
-
             var videoInAlbum = new VideoInAlbum
             {
                 FileSize = blob.ToArray().Length,
@@ -183,7 +192,12 @@ namespace PhotoFox.Functions.UploadPhoto
                 FileExt = fileExt
             };
 
+            log.LogInformation($"Moving video {videoId} to video storage and creating record...");
+            await videoStorage.PutVideoAsync(videoId, blob);
             await videoInAlbumStorage.AddVideoInAlbumAsync(videoInAlbum);
+
+            log.LogInformation($"Deleting video {videoId} from temp storage...");
+            await uploadStorage.DeleteFileAsync(videoId);
         }
     }
 }

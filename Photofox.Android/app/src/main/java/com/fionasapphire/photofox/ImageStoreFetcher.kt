@@ -11,7 +11,7 @@ import coil.fetch.Fetcher
 import coil.fetch.SourceResult
 import coil.request.Options
 import com.fionasapphire.photofox.model.ImageReference
-import com.fionasapphire.photofox.storage.blob.ImageStorage
+import com.fionasapphire.photofox.storage.blob.FileStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.*
@@ -35,7 +35,7 @@ class ImageStoreFetcher(
     private val options: Options,
     private val context: Context): Fetcher {
 
-    private val imageStorage: ImageStorage = ImageStorage(Config.connectionString)
+    private val fileStorage: FileStorage = FileStorage(Config.connectionString)
 
     override suspend fun fetch(): FetchResult? {
 
@@ -47,7 +47,7 @@ class ImageStoreFetcher(
         val file = File(filename)
         if (!file.exists()) {
             val bytes = withContext(Dispatchers.IO) {
-                val bytes = imageStorage.getThumbnail(image.imageId)
+                val bytes = fileStorage.getThumbnail(image.imageId)
 
                 try {
                     file.createNewFile()

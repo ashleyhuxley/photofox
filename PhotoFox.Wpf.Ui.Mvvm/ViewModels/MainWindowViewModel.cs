@@ -427,7 +427,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         private void SetAlbumCoverCommandExecute()
         {
             if (this.SelectedPhoto == null 
-                || this.SelectedAlbum == null 
+                || this.SelectedAlbum?.AlbumId == null 
                 || this.SelectedPhoto.Image == null)
             {
                 return;

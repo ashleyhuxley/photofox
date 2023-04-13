@@ -1,6 +1,6 @@
 package com.fionasapphire.photofox
 
-import com.fionasapphire.photofox.storage.blob.ImageStorage
+import com.fionasapphire.photofox.storage.blob.FileStorage
 import com.fionasapphire.photofox.storage.table.PhotoAlbumStorage
 import com.fionasapphire.photofox.storage.table.PhotoMetadataStorage
 import dagger.Module
@@ -18,7 +18,7 @@ object  StorageModule {
 
     @Provides
     @Singleton
-    fun provideImageStorage() = ImageStorage(Config.connectionString)
+    fun provideImageStorage() = FileStorage(Config.connectionString)
 
     @Provides
     @Singleton

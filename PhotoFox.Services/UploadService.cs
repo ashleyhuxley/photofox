@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using NLog;
-using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Queue;
@@ -14,30 +13,21 @@ namespace PhotoFox.Services
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
-        private readonly IPhotoFileStorage photoFileStorage;
-
-        private readonly IVideoStorage videoStorage;
-
         private readonly IUploadQueue uploadQueue;
 
+        private readonly IUploadStorage uploadStorage;
+
         public UploadService(
-            IPhotoFileStorage photoFileStorage,
-            IVideoStorage videoStorage,
-            IUploadQueue uploadQueue)
+            IUploadQueue uploadQueue,
+            IUploadStorage uploadStorage)
         {
-            this.uploadQueue= uploadQueue ?? throw new ArgumentNullException(nameof(uploadQueue));
-            this.photoFileStorage = photoFileStorage ?? throw new ArgumentNullException(nameof(photoFileStorage));
-            this.videoStorage = videoStorage ?? throw new ArgumentNullException(nameof(videoStorage));
+            this.uploadQueue = uploadQueue;
+            this.uploadStorage = uploadStorage;
         }
 
         [SupportedOSPlatform("windows")]
         public async Task UploadFromStreamAsync(Stream stream, string albumId, string fallbackTitle, string fileExt, DateTime createdDate)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
             var photoId = Guid.NewGuid().ToString();
             Log.Info($"Uploading photo {photoId}");
 
@@ -53,9 +43,9 @@ namespace PhotoFox.Services
 
             var binaryData = await BinaryData.FromStreamAsync(stream).ConfigureAwait(false);
 
-            await this.photoFileStorage.PutPhotoAsync(photoId, binaryData).ConfigureAwait(false);
+            await this.uploadStorage.PutFileAsync(photoId, binaryData).ConfigureAwait(false);
 
-            await this.uploadQueue.QueueUploadMessage(message);
+            await this.uploadQueue.QueueUploadMessageAsync(message).ConfigureAwait(false);
         }
 
         public async Task UploadVideoFromStreamAsync(Stream stream, string albumId, string fallbackTitle, string fileExt, DateTime createdDate)
@@ -75,9 +65,9 @@ namespace PhotoFox.Services
 
             var binaryData = await BinaryData.FromStreamAsync(stream).ConfigureAwait(false);
 
-            await this.videoStorage.PutVideoAsync(videoId, binaryData).ConfigureAwait(false);
+            await this.uploadStorage.PutFileAsync(videoId, binaryData).ConfigureAwait(false);
 
-            await this.uploadQueue.QueueUploadMessage(message);
+            await this.uploadQueue.QueueUploadMessageAsync(message).ConfigureAwait(false);
         }
     }
 }

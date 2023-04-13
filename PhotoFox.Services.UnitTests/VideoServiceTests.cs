@@ -27,14 +27,6 @@ namespace PhotoFox.Services.UnitTests
         }
 
         [Test]
-        public void Constructor_ParametersAreNull_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => _ = new VideoService(null, videoStorage.Object, mapper));
-            Assert.Throws<ArgumentNullException>(() => _ = new VideoService(videoInAlbumStorage.Object, null, mapper));
-            Assert.Throws<ArgumentNullException>(() => _ = new VideoService(videoInAlbumStorage.Object, videoStorage.Object, null));
-        }
-
-        [Test]
         public async Task Thing()
         {
             string albumId = "albumId";

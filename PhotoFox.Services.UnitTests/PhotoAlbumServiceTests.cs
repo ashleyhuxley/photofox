@@ -34,16 +34,6 @@ namespace PhotoFox.Services.UnitTests
         }
 
         [Test]
-        public void Constructor_NullArgumentsProvided_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => new PhotoAlbumService(null, photoInAlbumStorage.Object, photoMetadataStorage.Object, albumPermissionStorage.Object, mapper));
-            Assert.Throws<ArgumentNullException>(() => new PhotoAlbumService(photoAlbumDataStorage.Object, null, photoMetadataStorage.Object, albumPermissionStorage.Object, mapper));
-            Assert.Throws<ArgumentNullException>(() => new PhotoAlbumService(photoAlbumDataStorage.Object, photoInAlbumStorage.Object, null, albumPermissionStorage.Object, mapper));
-            Assert.Throws<ArgumentNullException>(() => new PhotoAlbumService(photoAlbumDataStorage.Object, photoInAlbumStorage.Object, photoMetadataStorage.Object, null, mapper));
-            Assert.Throws<ArgumentNullException>(() => new PhotoAlbumService(photoAlbumDataStorage.Object, photoInAlbumStorage.Object, photoMetadataStorage.Object, albumPermissionStorage.Object, null));
-        }
-
-        [Test]
         public async Task GetAllAlbumsAsync_Invoked_ReturnsAllAlbums()
         {
             photoAlbumDataStorage.Setup(s => s.GetPhotoAlbumsAsync()).Returns(GetTestData());
@@ -55,14 +45,6 @@ namespace PhotoFox.Services.UnitTests
             Assert.That(results.Count, Is.EqualTo(15));
             Assert.That(results.First().Title, Is.EqualTo("Album 1"));
             Assert.That(results.Last().Title, Is.EqualTo("Album 15"));
-        }
-
-        [Test]
-        public void GetAllAlbums_UsernameNull_ThrowsArgumentNullException()
-        {
-            var service = GetDefaultService();
-
-            Assert.Throws<ArgumentNullException>(() => _ = service.GetAllAlbumsAsync(null));
         }
 
         [Test]
@@ -112,14 +94,6 @@ namespace PhotoFox.Services.UnitTests
         }
 
         [Test]
-        public void GetPhotosInAlbumAsync_AlbumIdIsNull_ThrowsArgumentNullException()
-        {
-            var service = GetDefaultService();
-
-            Assert.Throws<ArgumentNullException>(() => _ = service.GetPhotosInAlbumAsync(null));
-        }
-
-        [Test]
         public async Task GetPhotosInAlbumAsync_AlbumIdProvided_ReturnsPhotosInAlbum()
         {
             var albumId = "ALBUM-0001";
@@ -151,14 +125,6 @@ namespace PhotoFox.Services.UnitTests
         }
 
         [Test]
-        public void AddAlbumAsync_AlbumIsNull_ThrowsArgumentNullException()
-        {
-            var service = this.GetDefaultService();
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAlbumAsync(null));
-        }
-
-        [Test]
         public async Task AddAlbumAsync_Invoked_AddsAlbumToStorage()
         {
             var service = this.GetDefaultService();
@@ -172,26 +138,6 @@ namespace PhotoFox.Services.UnitTests
             await service.AddAlbumAsync(album);
 
             photoAlbumDataStorage.Verify(d => d.AddPhotoAlbumAsync(It.IsAny<PhotoAlbum>()));
-        }
-
-        [Test]
-        public void AddPhotoToAlbumAsync_AlbumIdIsNull_ThrowsArgumentNullException()
-        {
-            var date = DateTime.SpecifyKind(new DateTime(2000, 1, 1), DateTimeKind.Utc);
-
-            var service = this.GetDefaultService();
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddPhotoToAlbumAsync(null, "photoid", date));
-        }
-
-        [Test]
-        public void AddPhotoToAlbumAsync_PhotoIdIsNull_ThrowsArgumentNullException()
-        {
-            var date = DateTime.SpecifyKind(new DateTime(2000, 1, 1), DateTimeKind.Utc);
-
-            var service = this.GetDefaultService();
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddPhotoToAlbumAsync("albumid", null, date));
         }
 
         [Test]

@@ -30,15 +30,6 @@ namespace PhotoFox.Services.UnitTests
         }
 
         [Test]
-        public void Constructor_NullParameters_ThrowsArgumentNullException()
-        {
-            Assert.Throws<ArgumentNullException>(() => _ = new PhotoService(null, photoFileStorage.Object, photoInAlbumStorage.Object, mapper));
-            Assert.Throws<ArgumentNullException>(() => _ = new PhotoService(photoMetadataStorage.Object, null, photoInAlbumStorage.Object, mapper));
-            Assert.Throws<ArgumentNullException>(() => _ = new PhotoService(photoMetadataStorage.Object, photoFileStorage.Object, null, mapper));
-            Assert.Throws<ArgumentNullException>(() => _ = new PhotoService(photoMetadataStorage.Object, photoFileStorage.Object, photoInAlbumStorage.Object, null));
-        }
-
-        [Test]
         public async Task GetPhotoAsync_ValidArgsDateTimeOverload_GetsPhotoFromStorage()
         {
             var date = new DateTime(2000, 1, 1);

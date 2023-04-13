@@ -2,11 +2,9 @@ package com.fionasapphire.photofox.viewmodels
 
 import android.content.Context
 import android.net.Uri
-import androidx.core.net.toFile
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fionasapphire.photofox.storage.blob.ImageStorage
+import com.fionasapphire.photofox.storage.blob.FileStorage
 import com.fionasapphire.photofox.storage.enums.BlobType
 import com.fionasapphire.photofox.storage.queue.QueueStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddPhotosViewModel
 @Inject constructor(
-    private val imageStorage: ImageStorage,
+    private val fileStorage: FileStorage,
     private val queueStorage: QueueStorage
 ) : ViewModel() {
 
@@ -64,7 +62,7 @@ class AddPhotosViewModel
 
                 // Upload the content to storage and queue a message for it to be processed
                 withContext(Dispatchers.IO) {
-                    imageStorage.uploadImage(photoId, BlobType.images.name, bytes)
+                    fileStorage.uploadFile(photoId, BlobType.uploads.name, bytes)
                     queueStorage.enqueue(photoId, albumId, name, date)
 
                     uploadStates[i].value = PhotoUploadState.SUCCESS
