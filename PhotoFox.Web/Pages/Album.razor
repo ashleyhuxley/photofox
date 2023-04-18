@@ -65,7 +65,7 @@
         var authState = await authenticationStateTask;
         var user = authState.User;
 
-        if (user?.Identity is null || string.IsNullOrEmpty(user.Identity.Name))
+        if (user?.Identity is null || string.IsNullOrEmpty(user.Identity.Name) || this.AlbumId == null)
         {
             return;
         }
@@ -92,6 +92,11 @@
     protected async override Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+
+        if (string.IsNullOrEmpty(this.AlbumId))
+        {
+            return;
+        }
 
         this.LoadedAlbum = await this.AlbumService.GetPhotoAlbumAsync(AlbumId);
 

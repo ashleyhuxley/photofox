@@ -19,8 +19,6 @@ namespace PhotoFox.Services.UnitTests
 
         private Mock<IAlbumPermissionStorage> albumPermissionStorage;
 
-        private IMapper mapper;
-
         [SetUp]
         public void Setup()
         {
@@ -28,9 +26,6 @@ namespace PhotoFox.Services.UnitTests
             photoInAlbumStorage = new Mock<IPhotoInAlbumStorage>();
             photoMetadataStorage = new Mock<IPhotoMetadataStorage>();
             albumPermissionStorage = new Mock<IAlbumPermissionStorage>();
-
-            // Use the real mapper otherwise we'll just be recreating the mapper functionality in a mock
-            mapper = MapFactory.GetMap();
         }
 
         [Test]
@@ -40,7 +35,7 @@ namespace PhotoFox.Services.UnitTests
 
             var service = GetDefaultService();
 
-            var results = await AsyncEnumerableToArray<Model.PhotoAlbum>(service.GetAllAlbumsAsync());
+            var results = await AsyncEnumerableToArray(service.GetAllAlbumsAsync());
 
             Assert.That(results.Count, Is.EqualTo(15));
             Assert.That(results.First().Title, Is.EqualTo("Album 1"));
@@ -129,11 +124,7 @@ namespace PhotoFox.Services.UnitTests
         {
             var service = this.GetDefaultService();
 
-            var album = new Model.PhotoAlbum
-            {
-                AlbumId = "ALBUMID",
-                Title = "Title"
-            };
+            var album = new Model.PhotoAlbum("ALBUMID", "Title", string.Empty, string.Empty);
 
             await service.AddAlbumAsync(album);
 
@@ -161,8 +152,7 @@ namespace PhotoFox.Services.UnitTests
                 photoAlbumDataStorage.Object,
                 photoInAlbumStorage.Object,
                 photoMetadataStorage.Object,
-                albumPermissionStorage.Object,
-                mapper);
+                albumPermissionStorage.Object);
         }
 
         private async Task<T[]> AsyncEnumerableToArray<T>(IAsyncEnumerable<T> values)

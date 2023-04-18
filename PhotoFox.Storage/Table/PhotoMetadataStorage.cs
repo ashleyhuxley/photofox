@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System;
 using PhotoFox.Core.Extensions;
 using PhotoFox.Storage.Models;
+using PhotoFox.Core.Exceptions;
+using System.Linq;
 
 namespace PhotoFox.Storage.Table
 {
@@ -35,6 +37,11 @@ namespace PhotoFox.Storage.Table
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
             var result = await tableClient.GetEntityAsync<PhotoMetadata>(utcDate, photoId).ConfigureAwait(false);
+            if (result.Value == null)
+            {
+                throw new EntityNotFoundException(TableName, photoId);
+            }
+
             return result.Value;
         }
 
@@ -49,12 +56,14 @@ namespace PhotoFox.Storage.Table
             var tableClient = client.GetTableClient(TableName);
             var results = tableClient.QueryAsync<PhotoMetadata>(p => p.RowKey == photoId);
 
-            await foreach (var photo in results)
+            var result = await results.FirstOrDefaultAsync();
+
+            if (result == null)
             {
-                return photo;
+                throw new EntityNotFoundException(nameof(PhotoMetadata), photoId);
             }
 
-            return null;
+            return result;
         }
 
         public AsyncPageable<PhotoMetadata> GetAllPhotosAsync()

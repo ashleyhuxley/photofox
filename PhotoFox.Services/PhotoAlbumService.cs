@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using PhotoFox.Model;
+﻿using PhotoFox.Model;
 using PhotoFox.Storage.Table;
 using System;
 using System.Collections.Generic;
@@ -17,33 +16,27 @@ namespace PhotoFox.Services
 
         private readonly IAlbumPermissionStorage albumPermissionStorage;
 
-        private readonly IMapper mapper;
-
         public PhotoAlbumService(
             IPhotoAlbumDataStorage photoAlbumDataStorage,
             IPhotoInAlbumStorage photoInAlbumStorage,
             IPhotoMetadataStorage photoMetadataStorage,
-            IAlbumPermissionStorage albumPermissionStorage,
-            IMapper mapper)
+            IAlbumPermissionStorage albumPermissionStorage)
         {
             this.photoAlbumDataStorage = photoAlbumDataStorage ?? throw new ArgumentNullException(nameof(photoAlbumDataStorage));
             this.photoInAlbumStorage = photoInAlbumStorage ?? throw new ArgumentNullException(nameof(photoInAlbumStorage));
             this.photoMetadataStorage = photoMetadataStorage ?? throw new ArgumentNullException(nameof(photoMetadataStorage));
             this.albumPermissionStorage = albumPermissionStorage ?? throw new ArgumentNullException(nameof(albumPermissionStorage));
-            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async IAsyncEnumerable<PhotoAlbum> GetAllAlbumsAsync()
         {
             await foreach (var album in this.photoAlbumDataStorage.GetPhotoAlbumsAsync())
             {
-                yield return new PhotoAlbum
-                {
-                    AlbumId = album.PartitionKey,
-                    CoverPhotoId = album.CoverPhotoId,
-                    Description = album.AlbumDescription,
-                    Title = album.AlbumName
-                };
+                yield return new PhotoAlbum(
+                    album.PartitionKey,
+                    album.AlbumName,
+                    album.AlbumDescription,
+                    album.CoverPhotoId);
             }
         }
 
@@ -65,21 +58,13 @@ namespace PhotoFox.Services
                 validAlbums.Add(albumPermission.RowKey);
             }
 
-#pragma warning disable S3267 // Loops should be simplified with "LINQ" expressions
             await foreach (var album in photoAlbumDataStorage.GetPhotoAlbumsAsync())
             {
                 if (validAlbums.Contains(album.PartitionKey))
                 {
-                    yield return new PhotoAlbum
-                    {
-                        AlbumId = album.PartitionKey,
-                        CoverPhotoId = album.CoverPhotoId,
-                        Description = album.AlbumDescription,
-                        Title = album.AlbumName
-                    };
+                    yield return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId);
                 }
             }
-#pragma warning restore S3267 // Loops should be simplified with "LINQ" expressions
         }
 
         public IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId)
@@ -98,18 +83,21 @@ namespace PhotoFox.Services
             {
                 var photo = await this.photoMetadataStorage.GetPhotoMetadataAsync(photoInAlbum.UtcDate, photoInAlbum.RowKey).ConfigureAwait(false);
 
-                yield return mapper.Map<Photo>(photo);
+                yield return Converter.ToPhoto(photo);
             }
         }
 
         public async Task AddAlbumAsync(PhotoAlbum album)
         {
-            if (album == null)
+            var storageAlbum = new Storage.Models.PhotoAlbum
             {
-                throw new ArgumentNullException(nameof(album));
-            }
+                AlbumDescription = album.Description,
+                AlbumName = album.Title,
+                CoverPhotoId = album.CoverPhotoId,
+                PartitionKey = album.AlbumId,
+                RowKey = string.Empty
+            };
 
-            var storageAlbum = mapper.Map<Storage.Models.PhotoAlbum>(album);
             await this.photoAlbumDataStorage.AddPhotoAlbumAsync(storageAlbum).ConfigureAwait(false);
         }
 
@@ -143,7 +131,7 @@ namespace PhotoFox.Services
         public async Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId)
         {
             var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId).ConfigureAwait(false);
-            return mapper.Map<PhotoAlbum>(album);
+            return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId);
         }
 
         public async Task RemoveFromAlbumAsync(string albumId, string photoId)

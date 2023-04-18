@@ -113,22 +113,27 @@
     {
         await base.OnParametersSetAsync();
 
+        if (string.IsNullOrEmpty(this.Id) || string.IsNullOrEmpty(this.Date))
+        {
+            return;
+        }
+
         var metadata = await this.PhotoService.GetPhotoAsync(this.Date, this.Id);
 
         string apiKey = "AIzaSyC_Mmr0ETT1iX3SQkQTl6pvlo7Ef3-K1E4";
 
         this.Name = metadata.Title;
-        this.Description = metadata.Description;
-        this.Dimension = $"{metadata.DimensionWidth} x {metadata.DimensionHeight}";
+        this.Description = metadata.ImageProperties.Description;
+        this.Dimension = $"{metadata.ImageProperties.Dimensions.Width} x {metadata.ImageProperties.Dimensions.Height}";
         this.DateTaken = metadata.DateTaken.ToString("dd MMMM yyyy HH:mm:ss");
-        this.Manufacturer = metadata.Manufacturer;
-        this.Device = metadata.Device;
-        this.Aperture = metadata.Aperture;
-        this.Exposure = metadata.Exposure;
-        this.ISO = metadata.ISO;
-        this.FocalLength = metadata.FocalLength;
+        this.Manufacturer = metadata.CameraSettings.Manufacturer;
+        this.Device = metadata.CameraSettings.Device;
+        this.Aperture = metadata.CameraSettings.Aperture;
+        this.Exposure = metadata.CameraSettings.Exposure;
+        this.ISO = metadata.CameraSettings.ISO;
+        this.FocalLength = metadata.CameraSettings.FocalLength;
         this.FileSize = metadata.FileSize?.ToFileSize() ?? string.Empty;
-        this.Orientation = metadata.Orientation?.ToString() ?? string.Empty;
+        this.Orientation = metadata.ImageProperties.Orientation?.ToString() ?? string.Empty;
         this.ShowMap = metadata.GeolocationLatitude.HasValue && metadata.GeolocationLongitude.HasValue;
         this.GpsLocation = $"{metadata.GeolocationLatitude:0.#####}, {metadata.GeolocationLongitude:0.#####}";
         this.GpsLink = $"https://maps.google.com/?q={metadata.GeolocationLatitude},{metadata.GeolocationLongitude}";

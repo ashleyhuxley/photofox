@@ -29,7 +29,7 @@ namespace PhotoFox.Storage.Table
             }).ConfigureAwait(false);
         }
 
-        public async Task<Tuple<string, string>> HashExistsAsync(string hash)
+        public async Task<HashSearchResult> HashExistsAsync(string hash)
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
@@ -37,11 +37,11 @@ namespace PhotoFox.Storage.Table
             if (await tableClient.EntityExistsAsync<PhotoHash>(hash, string.Empty).ConfigureAwait(false))
             {
                 var hashResult = await tableClient.GetEntityAsync<PhotoHash>(hash, string.Empty);
-                return Tuple.Create(hashResult.Value.PhotoPartitionKey, hashResult.Value.PhotoRowKey);
+                return new HashSearchResult(hashResult.Value.PhotoPartitionKey, hashResult.Value.PhotoRowKey);
             }
             else
             {
-                return null;
+                return HashSearchResult.NotFoundResult;
             }
         }
 

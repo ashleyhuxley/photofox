@@ -16,7 +16,6 @@ namespace PhotoFox.Services.UnitTests
         private Mock<IPhotoMetadataStorage> photoMetadataStorage;
         private Mock<IPhotoFileStorage> photoFileStorage;
         private Mock<IPhotoInAlbumStorage> photoInAlbumStorage;
-        private IMapper mapper;
 
         [SetUp]
         public void Setup()
@@ -24,22 +23,22 @@ namespace PhotoFox.Services.UnitTests
             photoMetadataStorage = new Mock<IPhotoMetadataStorage>();
             photoFileStorage = new Mock<IPhotoFileStorage>();
             photoInAlbumStorage = new Mock<IPhotoInAlbumStorage>();
-
-            // Use the real mapper otherwise we'll just be recreating the mapper functionality in a mock
-            mapper = MapFactory.GetMap();
         }
 
         [Test]
         public async Task GetPhotoAsync_ValidArgsDateTimeOverload_GetsPhotoFromStorage()
         {
-            var date = new DateTime(2000, 1, 1);
+            var date = DateTime.SpecifyKind(new DateTime(2000, 1, 1), DateTimeKind.Utc);
             var photoId = "photoId";
+
+            var metadata = new PhotoMetadata { PartitionKey = date.ToPartitionKey(), RowKey = photoId };
+
+            photoMetadataStorage.Setup(s => s.GetPhotoMetadataAsync(date, photoId)).Returns(Task.FromResult(metadata));
 
             var service = new PhotoService(
                 photoMetadataStorage.Object, 
                 photoFileStorage.Object, 
-                photoInAlbumStorage.Object, 
-                mapper);
+                photoInAlbumStorage.Object);
 
             await service.GetPhotoAsync(date, photoId);
 
@@ -52,11 +51,14 @@ namespace PhotoFox.Services.UnitTests
             var date = DateTime.SpecifyKind(new DateTime(2000, 1, 1), DateTimeKind.Utc).ToPartitionKey();
             var photoId = "photoId";
 
+            var metadata = new PhotoMetadata { PartitionKey = date, RowKey = photoId };
+
+            photoMetadataStorage.Setup(s => s.GetPhotoMetadataAsync(date, photoId)).Returns(Task.FromResult(metadata));
+
             var service = new PhotoService(
                 photoMetadataStorage.Object,
                 photoFileStorage.Object,
-                photoInAlbumStorage.Object,
-                mapper);
+                photoInAlbumStorage.Object);
 
             await service.GetPhotoAsync(date, photoId);
 
@@ -72,27 +74,26 @@ namespace PhotoFox.Services.UnitTests
             {
                 return m.RowKey == photo.PhotoId
                     && m.Title == photo.Title
-                    && m.Aperture == photo.Aperture
-                    && m.Description == photo.Description
-                    && m.Device == photo.Device
-                    && m.Exposure == photo.Exposure
-                    && m.DimensionWidth == photo.DimensionWidth
-                    && m.DimensionHeight == photo.DimensionHeight
-                    && m.FileHash == photo.FileHash
+                    && m.Aperture == photo.CameraSettings.Aperture
+                    && m.Description == photo.ImageProperties.Description
+                    && m.Device == photo.CameraSettings.Device
+                    && m.Exposure == photo.CameraSettings.Exposure
+                    && m.DimensionWidth == photo.ImageProperties.Dimensions.Width
+                    && m.DimensionHeight == photo.ImageProperties.Dimensions.Height
+                    && m.FileHash == photo.ImageProperties.FileHash
                     && m.FileSize == photo.FileSize
-                    && m.FocalLength == photo.FocalLength
+                    && m.FocalLength == photo.CameraSettings.FocalLength
                     && m.GeolocationLattitude == photo.GeolocationLatitude
                     && m.GeolocationLongitude == photo.GeolocationLongitude
-                    && m.ISO == photo.ISO
-                    && m.Manufacturer == photo.Manufacturer
-                    && m.Orientation == photo.Orientation;
+                    && m.ISO == photo.CameraSettings.ISO
+                    && m.Manufacturer == photo.CameraSettings.Manufacturer
+                    && m.Orientation == photo.ImageProperties.Orientation;
             };
 
             var service = new PhotoService(
                 photoMetadataStorage.Object,
                 photoFileStorage.Object,
-                photoInAlbumStorage.Object,
-                mapper);
+                photoInAlbumStorage.Object);
 
             await service.SavePhotoAsync(photo);
 
@@ -107,8 +108,7 @@ namespace PhotoFox.Services.UnitTests
             var service = new PhotoService(
                 photoMetadataStorage.Object,
                 photoFileStorage.Object,
-                photoInAlbumStorage.Object,
-                mapper);
+                photoInAlbumStorage.Object);
 
             await service.DeletePhotoAsync(photo);
 
@@ -123,8 +123,7 @@ namespace PhotoFox.Services.UnitTests
             var service = new PhotoService(
                 photoMetadataStorage.Object,
                 photoFileStorage.Object,
-                photoInAlbumStorage.Object,
-                mapper);
+                photoInAlbumStorage.Object);
 
             await service.DeletePhotoAsync(photo);
 
@@ -141,8 +140,7 @@ namespace PhotoFox.Services.UnitTests
             var service = new PhotoService(
                 photoMetadataStorage.Object,
                 photoFileStorage.Object,
-                photoInAlbumStorage.Object,
-                mapper);
+                photoInAlbumStorage.Object);
 
             await service.DeletePhotoAsync(photo);
 
@@ -157,8 +155,7 @@ namespace PhotoFox.Services.UnitTests
             var service = new PhotoService(
                 photoMetadataStorage.Object,
                 photoFileStorage.Object,
-                photoInAlbumStorage.Object,
-                mapper);
+                photoInAlbumStorage.Object);
 
             await service.DeletePhotoAsync(photo);
 
@@ -178,11 +175,14 @@ namespace PhotoFox.Services.UnitTests
 
             photoInAlbumStorage.Setup(p => p.GetPhotosInAlbumAsync(albumId)).Returns(photoInAlbum.AsAsyncPageable());
 
+            var metadata = new PhotoMetadata { PartitionKey = "pk", RowKey = "rk" };
+
+            photoMetadataStorage.Setup(s => s.GetPhotoMetadataAsync(It.IsAny<DateTime>(), It.IsAny<string>())).Returns(Task.FromResult(metadata));
+
             var service = new PhotoService(
                 photoMetadataStorage.Object,
                 photoFileStorage.Object,
-                photoInAlbumStorage.Object,
-                mapper);
+                photoInAlbumStorage.Object);
 
             await foreach (var photo in service.GetPhotosInAlbumAsync(albumId))
             {
@@ -194,26 +194,11 @@ namespace PhotoFox.Services.UnitTests
 
         private Photo GetSamplePhoto()
         {
-            return new Photo
-            {
-                PhotoId = "photoId",
-                DateTaken = DateTime.SpecifyKind(new DateTime(2000, 1, 1), DateTimeKind.Utc),
-                Title = "Title",
-                Aperture = "Aperture",
-                Description = "Description",
-                Device = "Device",
-                Exposure = "Exposure",
-                DimensionHeight = 10,
-                DimensionWidth = 20,
-                FileHash = "FileHash",
-                FileSize = 123,
-                FocalLength = "FocalLength",
-                GeolocationLatitude = 1.23,
-                GeolocationLongitude = 2.34,
-                ISO = "iso",
-                Manufacturer = "Manufacturer",
-                Orientation = 4
-            };
+            var date = DateTime.SpecifyKind(new DateTime(2000, 1, 1), DateTimeKind.Utc);
+            var imageProperties = new ImageProperties(123, new System.Drawing.Size(800, 600), "Title", "Description", date, 4, "hash");
+            var cameraSettings = new CameraSettings("iso", "aperture", "fl", "device", "manufacture", "exposure");
+            var geoloaction = new Geolocation(1.23, -0.50);
+            return new Photo("photoId", imageProperties, geoloaction, cameraSettings);
         }
     }
 }

@@ -449,18 +449,16 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             var albumId = response.SelectedAlbumId;
 
-            if (albumId != string.Empty)
+            if (albumId != string.Empty || string.IsNullOrEmpty(response.NewAlbumName))
             {
                 return albumId;
             }
 
-            var album = new PhotoAlbum
-            {
-                AlbumId = Guid.NewGuid().ToString(),
-                Description = string.Empty,
-                Title = response.NewAlbumName,
-                CoverPhotoId = this.Photos.First(p => p.IsSelected).Item.PhotoId
-            };
+            var album = new PhotoAlbum(
+                Guid.NewGuid().ToString(), 
+                response.NewAlbumName, 
+                string.Empty,
+                this.Photos.First(p => p.IsSelected).Item.PhotoId);
 
             this.photoAlbumService.AddAlbumAsync(album);
 

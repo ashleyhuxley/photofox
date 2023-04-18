@@ -190,10 +190,10 @@
                     </Style>
                 </StackPanel.Resources>
                 <Label Style="{StaticResource LabelStyle}">Title</Label>
-                <TextBox Text="{Binding SelectedPhoto.Item.Title}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.Title}" Style="{StaticResource PropertyStyle}" />
                 
                 <Label Style="{StaticResource LabelStyle}">Description</Label>
-                <TextBox Text="{Binding SelectedPhoto.Item.Description}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.ImageProperties.Description}" Style="{StaticResource PropertyStyle}" />
                 
                 <Label Style="{StaticResource LabelStyle}">Dimensions</Label>
                 <TextBlock Text="{Binding SelectedPhoto.Dimensions}" Style="{StaticResource PropertyStyle}" />
@@ -202,22 +202,22 @@
                 <TextBlock Text="{Binding SelectedPhoto.Item.DateTaken}" Style="{StaticResource PropertyStyle}" />
 
                 <Label Style="{StaticResource LabelStyle}">Manufacturer</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Item.Manufacturer}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.CameraSettings.Manufacturer}" Style="{StaticResource PropertyStyle}" />
                 
                 <Label Style="{StaticResource LabelStyle}">Device</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Item.Device}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.CameraSettings.Device}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">Aperture</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Item.Aperture}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.CameraSettings.Aperture}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">Exposure</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Item.Exposure}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.CameraSettings.Exposure}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">ISO</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Item.ISO}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.CameraSettings.ISO}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">Focal Length</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Item.FocalLength}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.CameraSettings.FocalLength}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">File Size</Label>
                 <TextBlock Text="{Binding SelectedPhoto.FileSize}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">Orientation</Label>
-                <TextBlock Text="{Binding SelectedPhoto.Item.Orientation}" Style="{StaticResource PropertyStyle}" />
+                <TextBlock Text="{Binding SelectedPhoto.Item.ImageProperties.Orientation}" Style="{StaticResource PropertyStyle}" />
 
                 <Label Style="{StaticResource LabelStyle}">GPS Location</Label>
                 <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}" CommandParameter="{Binding SelectedPhoto}">

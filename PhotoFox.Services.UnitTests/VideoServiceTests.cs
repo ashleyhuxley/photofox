@@ -16,14 +16,11 @@ namespace PhotoFox.Services.UnitTests
 
         private Mock<IVideoStorage> videoStorage;
 
-        private IMapper mapper;
-
         [SetUp]
         public void Setup()
         {
             videoInAlbumStorage= new Mock<IVideoInAlbumStorage>();
             videoStorage= new Mock<IVideoStorage>();
-            mapper = MapFactory.GetMap();
         }
 
         [Test]
@@ -41,8 +38,7 @@ namespace PhotoFox.Services.UnitTests
 
             var service = new VideoService(
                 videoInAlbumStorage.Object,
-                videoStorage.Object,
-                mapper);
+                videoStorage.Object);
 
             await foreach (var video in service.GetVideosInAlbumAsync(albumId))
             {

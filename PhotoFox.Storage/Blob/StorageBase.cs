@@ -1,6 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using System.Threading.Tasks;
 using System;
+using PhotoFox.Core.Exceptions;
 
 namespace PhotoFox.Storage.Blob
 {
@@ -22,7 +23,7 @@ namespace PhotoFox.Storage.Blob
 
             if (!blob.Exists())
             {
-                return null;
+                throw new EntityNotFoundException(containerName, id);
             }
 
             var res = await blob.DownloadContentAsync().ConfigureAwait(false);
