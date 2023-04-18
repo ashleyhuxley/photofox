@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using PhotoFox.Core.Exif;
+﻿using PhotoFox.Core.Exif;
 using PhotoFox.Core.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
-using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using System;
 using System.Collections.Generic;
@@ -19,35 +17,31 @@ namespace PhotoFox.Services
 
         private readonly IPhotoInAlbumStorage photoInAlbumStorage;
 
-        private readonly IMapper mapper;
-
         public PhotoService(
             IPhotoMetadataStorage photoMetadataStorage,
             IPhotoFileStorage photoFileStorage,
-            IPhotoInAlbumStorage photoInAlbumStorage,
-            IMapper mapper)
+            IPhotoInAlbumStorage photoInAlbumStorage)
         {
             this.photoMetadataStorage = photoMetadataStorage ?? throw new ArgumentNullException(nameof(photoMetadataStorage));
             this.photoFileStorage = photoFileStorage ?? throw new ArgumentNullException(nameof(photoFileStorage));
             this.photoInAlbumStorage = photoInAlbumStorage ?? throw new ArgumentNullException(nameof(photoInAlbumStorage));
-            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<Photo> GetPhotoAsync(DateTime dateTaken, string photoId)
         {
             var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(dateTaken, photoId).ConfigureAwait(false);
-            return mapper.Map<Photo>(metadata);
+            return Converter.ToPhoto(metadata);
         }
 
         public async Task<Photo> GetPhotoAsync(string dateTaken, string photoId)
         {
             var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(dateTaken, photoId).ConfigureAwait(false);
-            return mapper.Map<Photo>(metadata);
+            return Converter.ToPhoto(metadata);
         }
 
         public async Task SavePhotoAsync(Photo photo)
         {
-            await this.photoMetadataStorage.SavePhotoAsync(mapper.Map<PhotoMetadata>(photo)).ConfigureAwait(false);
+            await this.photoMetadataStorage.SavePhotoAsync(Converter.ToPhotoMetadata(photo)).ConfigureAwait(false);
         }
 
         public async Task DeletePhotoAsync(Photo photo)
@@ -64,7 +58,7 @@ namespace PhotoFox.Services
             await foreach (var photoInAlbum in this.photoInAlbumStorage.GetPhotosInAlbumAsync(albumId))
             {
                 var photo = await this.photoMetadataStorage.GetPhotoMetadataAsync(photoInAlbum.UtcDate, photoInAlbum.RowKey).ConfigureAwait(false);
-                yield return mapper.Map<Photo>(photo);
+                yield return Converter.ToPhoto(photo);
             }
         }
 
@@ -77,7 +71,7 @@ namespace PhotoFox.Services
             metadata.Orientation = exifReader.GetOrientation();
             await this.photoMetadataStorage.SavePhotoAsync(metadata).ConfigureAwait(false);
 
-            return mapper.Map<Photo>(metadata);
+            return Converter.ToPhoto(metadata);
         }
     }
 }

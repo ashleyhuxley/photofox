@@ -42,7 +42,6 @@ namespace PhotoFox.Web
             builder.Services.AddSingleton<IPhotoInAlbumStorage, PhotoInAlbumStorage>();
             builder.Services.AddSingleton<IPhotoMetadataStorage, PhotoMetadataStorage>();
             builder.Services.AddSingleton<IPhotoFileStorage, PhotoFileStorage>();
-            builder.Services.AddSingleton(i => MapFactory.GetMap());
             builder.Services.AddSingleton<IPhotoService, PhotoService>();
             builder.Services.AddSingleton<IPhotoHashStorage, PhotoHashStorage>();
             builder.Services.AddSingleton<IAlbumPermissionStorage, AlbumPermissionStorage>();

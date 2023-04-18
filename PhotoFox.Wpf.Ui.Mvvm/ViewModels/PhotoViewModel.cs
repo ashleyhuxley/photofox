@@ -9,6 +9,6 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
         }
 
-        public string Dimensions => $"{this.Item.DimensionWidth} x {this.Item.DimensionHeight}";
+        public string Dimensions => $"{this.Item.ImageProperties.Dimensions.Width} x {this.Item.ImageProperties.Dimensions.Height}";
     }
 }

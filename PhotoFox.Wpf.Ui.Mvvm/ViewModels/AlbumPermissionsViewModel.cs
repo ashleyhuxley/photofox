@@ -33,8 +33,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             this.PropertyChanged += AlbumPermissionsViewModel_PropertyChanged;
 
-            this.AllowSelected = new RelayCommand(this.AllowSelectedExecute);
-            this.RemoveSelected = new RelayCommand(this.RemoveSelectedExecute);
+            this.AllowSelected = new RelayCommand(this.OnAllowSelectedExecute);
+            this.RemoveSelected = new RelayCommand(this.OnRemoveSelectedExecute);
         }
 
         private async void AlbumPermissionsViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -101,7 +101,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
         }
 
-        private async void AllowSelectedExecute()
+        private async void OnAllowSelectedExecute()
         {
             var albums = this.DisallowedAlbums.Where(d => d.IsSelected).ToArray();
 
@@ -114,7 +114,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
         }
 
-        private async void RemoveSelectedExecute()
+        private async void OnRemoveSelectedExecute()
         {
             var albums = this.AllowedAlbums.Where(d => d.IsSelected).ToArray();
 

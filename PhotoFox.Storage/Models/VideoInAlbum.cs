@@ -6,6 +6,14 @@ namespace PhotoFox.Storage.Models
 {
     public class VideoInAlbum : ITableEntity
     {
+        public VideoInAlbum()
+        {
+            this.PartitionKey = string.Empty;
+            this.RowKey= string.Empty;
+            this.Title= string.Empty;
+            this.FileExt= string.Empty;
+        }
+
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }

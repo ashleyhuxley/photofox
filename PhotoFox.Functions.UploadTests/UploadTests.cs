@@ -3,13 +3,11 @@ using Moq;
 using PhotoFox.Core.Hashing;
 using PhotoFox.Core.Imaging;
 using PhotoFox.Functions.UploadPhoto;
-using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using System.Drawing;
 using System.Runtime.Versioning;
-using LogLevel = PhotoFox.Storage.Models.LogLevel;
 
 namespace PhotoFox.Functions.UploadTests
 {
@@ -75,23 +73,6 @@ namespace PhotoFox.Functions.UploadTests
         }
 
         [Test]
-        public void UploadPhoto_FileNotInStorage_ThrowsFileNotFoundException()
-        {
-            string photoId = "photoId";
-
-            var photoFileStorage = new Mock<IPhotoFileStorage>();
-            photoFileStorage.Setup(f => f.GetPhotoAsync(photoId)).Returns(Task.FromResult<BinaryData?>(null));
-
-            var function = new UploadFunctionBuilder()
-                .WithPhotoFileStorage(photoFileStorage.Object)
-                .Build();
-
-            string message = "{\"Type\": \"PHOTO\", \"EntityId\": \"" + photoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
-
-            Assert.ThrowsAsync<FileNotFoundException>(async () => await function.Run(message, Mock.Of<ILogger>()));
-        }
-
-        [Test]
         public void UploadPhoto_HashExists_DoesNotThrow()
         {
             string photoId = "photoId";
@@ -104,7 +85,7 @@ namespace PhotoFox.Functions.UploadTests
             streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
 
             var photoHashStorage = new Mock<IPhotoHashStorage>();
-            photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new Tuple<string, string>("foo", "bar")));
+            photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new HashSearchResult("foo", "bar")));
 
             var function = new UploadFunctionBuilder()
                 .WithUpladStorage(uploadStorage.Object)
@@ -115,37 +96,6 @@ namespace PhotoFox.Functions.UploadTests
             string message = "{\"Type\": \"PHOTO\", \"EntityId\": \"" + photoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
 
             Assert.DoesNotThrowAsync(async () => await function.Run(message, Mock.Of<ILogger>()));
-        }
-
-        [Test]
-        public async Task UploadPhoto_HashExists_MessageIsLogged()
-        {
-            string photoId = "photoId";
-            string hash = "hash";
-
-            var uploadStorage = new Mock<IUploadStorage>();
-            uploadStorage.Setup(s => s.GetFileAsync(photoId)).Returns(Task.FromResult(new BinaryData(jpegData)));
-
-            var streamHash = new Mock<IStreamHash>();
-            streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
-
-            var photoHashStorage = new Mock<IPhotoHashStorage>();
-            photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new Tuple<string, string>("foo", "bar")));
-
-            var logStorage = new Mock<ILogStorage>();
-
-            var function = new UploadFunctionBuilder()
-                .WithUpladStorage(uploadStorage.Object)
-                .WithStreamHash(streamHash.Object)
-                .WithPhotoHashStorage(photoHashStorage.Object)
-                .WithLogStorage(logStorage.Object)
-                .Build();
-
-            string message = "{\"Type\": \"PHOTO\", \"EntityId\": \"" + photoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
-
-            await function.Run(message, Mock.Of<ILogger>());
-
-            logStorage.Verify(l => l.Log(It.IsAny<string>(), "UploadFunction", photoId, It.IsAny<string>(), LogLevel.Warn, hash), Times.Once);
         }
 
         [Test]
@@ -161,7 +111,7 @@ namespace PhotoFox.Functions.UploadTests
             streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
 
             var photoHashStorage = new Mock<IPhotoHashStorage>();
-            photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new Tuple<string, string>("foo", "bar")));
+            photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new HashSearchResult("foo", "bar")));
 
             var function = new UploadFunctionBuilder()
                 .WithUpladStorage(uploadStorage.Object)
@@ -191,7 +141,7 @@ namespace PhotoFox.Functions.UploadTests
             streamHash.Setup(p => p.ComputeHash(It.IsAny<Stream>())).Returns(hash);
 
             var photoHashStorage = new Mock<IPhotoHashStorage>();
-            photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new Tuple<string, string>("foo", "bar")));
+            photoHashStorage.Setup(p => p.HashExistsAsync(hash)).Returns(Task.FromResult(new HashSearchResult("foo", "bar")));
 
             var photoMetadataStorage = new Mock<IPhotoMetadataStorage>();
 
@@ -295,7 +245,6 @@ namespace PhotoFox.Functions.UploadTests
         private IThumbnailProvider thumbnailProvider;
         private IPhotoMetadataStorage photoMetadataStorage;
         private IPhotoInAlbumStorage photoInAlbumStorage;
-        private ILogStorage logStorage;
         private IVideoInAlbumStorage videoInAlbumStorage;
         private IVideoStorage videoStorage;
         private IUploadStorage uploadStorage;
@@ -308,7 +257,6 @@ namespace PhotoFox.Functions.UploadTests
             this.photoMetadataStorage = Mock.Of<IPhotoMetadataStorage>();
             this.thumbnailProvider = Mock.Of<IThumbnailProvider>();
             this.photoInAlbumStorage = Mock.Of<IPhotoInAlbumStorage>();
-            this.logStorage = Mock.Of<ILogStorage>();
             this.videoInAlbumStorage = Mock.Of<IVideoInAlbumStorage>();
             this.videoStorage = Mock.Of<IVideoStorage>();
             this.uploadStorage = Mock.Of<IUploadStorage>();
@@ -324,7 +272,6 @@ namespace PhotoFox.Functions.UploadTests
                 this.photoMetadataStorage,
                 this.photoInAlbumStorage,
                 this.videoInAlbumStorage,
-                this.logStorage,
                 this.videoStorage,
                 this.uploadStorage);
         }
@@ -362,12 +309,6 @@ namespace PhotoFox.Functions.UploadTests
         public UploadFunctionBuilder WithPhotoInAlbumStorage(IPhotoInAlbumStorage photoInAlbumStorage)
         {
             this.photoInAlbumStorage = photoInAlbumStorage;
-            return this;
-        }
-
-        public UploadFunctionBuilder WithLogStorage(ILogStorage logStorage)
-        {
-            this.logStorage = logStorage;
             return this;
         }
 

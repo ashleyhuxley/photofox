@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using PhotoFox.Model;
+﻿using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;
 using System.Collections.Generic;
@@ -13,23 +12,19 @@ namespace PhotoFox.Services
 
         private readonly IVideoStorage videoStorage;
 
-        private readonly IMapper mapper;
-
         public VideoService(
             IVideoInAlbumStorage videoInAlbumStorage,
-            IVideoStorage videoStorage,
-            IMapper mapper)
+            IVideoStorage videoStorage)
         {
             this.videoInAlbumStorage = videoInAlbumStorage;
             this.videoStorage = videoStorage;
-            this.mapper = mapper;
         }
 
         public async IAsyncEnumerable<Video> GetVideosInAlbumAsync(string albumId)
         {
             await foreach (var videoInAlbum in this.videoInAlbumStorage.GetVideosInAlbumAsync(albumId))
             {
-                yield return mapper.Map<Video>(videoInAlbum);
+                yield return Converter.ToVideo(videoInAlbum);
             }
         }
 

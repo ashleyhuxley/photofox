@@ -4,22 +4,27 @@ namespace PhotoFox.Model
 {
     public class Photo : IDisplayableItem
     {
+        public Photo(
+            string photoId, 
+            ImageProperties imageProperties, 
+            Geolocation? geolocation, 
+            CameraSettings cameraSettings)
+        {
+            PhotoId = photoId;
+            ImageProperties = imageProperties;
+            Geolocation = geolocation;
+            CameraSettings = cameraSettings;
+        }
+
         public string PhotoId { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public DateTime DateTaken { get; set; }
-        public string ISO { get; set; }
-        public string Aperture { get; set; }
-        public string FocalLength { get; set; }
-        public string Device { get; set; }
-        public int? Orientation { get; set; }
-        public string Exposure { get; set; }
-        public double? GeolocationLatitude { get; set; }
-        public double? GeolocationLongitude { get; set; }
-        public string FileHash { get; set; }
-        public int DimensionWidth { get; set; }
-        public int DimensionHeight { get; set; }
-        public long? FileSize { get; set; }
-        public string Manufacturer { get; set; }
+        public ImageProperties ImageProperties { get; }
+        public Geolocation? Geolocation { get; }
+        public CameraSettings CameraSettings { get; }
+
+        public double? GeolocationLatitude => this.Geolocation?.Latitude;
+        public double? GeolocationLongitude => this.Geolocation?.Longitude;
+        public string Title => this.ImageProperties.Title;
+        public long? FileSize => this.ImageProperties.FileSize;
+        public DateTime DateTaken => this.ImageProperties.DateTaken;
     }
 }
