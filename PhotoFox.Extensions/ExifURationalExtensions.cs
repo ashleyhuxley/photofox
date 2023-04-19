@@ -1,6 +1,6 @@
 ﻿using ExifLibrary;
 
-namespace PhotoFox.Core.Extensions
+namespace PhotoFox.Extensions
 {
     public static class ExifURationalExtensions
     {

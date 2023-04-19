@@ -3,6 +3,7 @@ using NLog;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.Versioning;
 using System.Windows;
 using System.Windows.Controls;
@@ -108,16 +109,32 @@ namespace PhotoFox.Ui.Wpf
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                var uploadViewModel = kernel.Get<UploadFilesViewModel>();
-
-                var window = new UploadFilesWindow
+                if (files.Length == 1 && Path.GetExtension(files[0]).ToLowerInvariant() ==".json")
                 {
-                    Owner = this,
-                    DataContext = uploadViewModel
-                };
+                    var importViewModel = kernel.Get<ImportAlbumViewModel>();
 
-                uploadViewModel.AddFiles(files, viewModel.SelectedAlbum?.AlbumId ?? Guid.Empty.ToString());
-                window.Show();
+                    var window = new ImportAlbumWindow
+                    {
+                        Owner = this,
+                        DataContext = importViewModel
+                    };
+
+                    importViewModel.ImportFile = files[0];
+                    window.Show();
+                }
+                else
+                {
+                    var uploadViewModel = kernel.Get<UploadFilesViewModel>();
+
+                    var window = new UploadFilesWindow
+                    {
+                        Owner = this,
+                        DataContext = uploadViewModel
+                    };
+
+                    uploadViewModel.AddFiles(files, viewModel.SelectedAlbum?.AlbumId ?? Guid.Empty.ToString());
+                    window.Show();
+                }
             }
 
             e.Handled = true;

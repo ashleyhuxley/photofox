@@ -2,7 +2,7 @@
 using Azure;
 using System.Threading.Tasks;
 using System;
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 using PhotoFox.Storage.Models;
 using PhotoFox.Core.Exceptions;
 using System.Linq;

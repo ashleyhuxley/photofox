@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PhotoFox.Core.Extensions
+namespace PhotoFox.Extensions
 {
     public static class IEnumerableExtensions
     {

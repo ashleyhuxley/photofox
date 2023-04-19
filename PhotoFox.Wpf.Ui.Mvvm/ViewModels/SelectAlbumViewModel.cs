@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 using PhotoFox.Services;
 using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
 using System.Collections.Generic;

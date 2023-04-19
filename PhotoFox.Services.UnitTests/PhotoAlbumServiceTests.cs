@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Azure;
+﻿using Azure;
 using Moq;
-using PhotoFox.Core.Extensions;
-using PhotoFox.Mappings;
+using PhotoFox.Extensions;
 using PhotoFox.Storage.Models;
 using PhotoFox.Storage.Table;
 using PhotoAlbum = PhotoFox.Storage.Models.PhotoAlbum;

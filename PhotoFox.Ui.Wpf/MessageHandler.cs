@@ -135,10 +135,15 @@ namespace PhotoFox.Ui.Wpf
 
         public async void Receive(OpenPhotoMessage message)
         {
-            var photo = await this.photoStorage.GetPhotoAsync(message.PhotoId);
-            var path = Path.GetRandomFileName() + ".jpg";
+            var path = message.PhotoId;
 
-            File.WriteAllBytes(path, photo.ToArray());
+            if (message.IsId)
+            {
+                var photo = await this.photoStorage.GetPhotoAsync(message.PhotoId);
+                path = Path.GetRandomFileName() + ".jpg";
+
+                File.WriteAllBytes(path, photo.ToArray());
+            }
 
             var proc = new Process();
             proc.StartInfo.FileName = this.viewerConfig.PhotoViewerPath;

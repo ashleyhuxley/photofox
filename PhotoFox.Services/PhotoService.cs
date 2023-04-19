@@ -1,5 +1,5 @@
 ﻿using PhotoFox.Core.Exif;
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
 using PhotoFox.Storage.Table;

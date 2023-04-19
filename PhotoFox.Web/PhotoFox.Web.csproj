@@ -10,7 +10,6 @@
     <PackageReference Include="ElCamino.AspNetCore.Identity.AzureTable" Version="6.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
     <ProjectReference Include="..\PhotoFox.Core\PhotoFox.Core.csproj" />
-    <ProjectReference Include="..\PhotoFox.Mappings\PhotoFox.Mappings.csproj" />
     <ProjectReference Include="..\PhotoFox.Services\PhotoFox.Services.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.12" />
     <ProjectReference Include="..\PhotoFox.Storage\PhotoFox.Storage.csproj" />

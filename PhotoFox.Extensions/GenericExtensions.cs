@@ -1,7 +1,7 @@
 ﻿using Azure;
 using Moq;
 
-namespace PhotoFox.Core.Extensions
+namespace PhotoFox.Extensions
 {
     public static class GenericExtensions
     {

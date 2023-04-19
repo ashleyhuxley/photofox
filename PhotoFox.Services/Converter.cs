@@ -2,7 +2,7 @@
 using PhotoFox.Storage.Models;
 using System.Drawing;
 using System;
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 
 namespace PhotoFox.Services
 {

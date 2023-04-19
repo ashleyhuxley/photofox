@@ -1,7 +1,6 @@
 ﻿using Azure.Data.Tables;
-using System.Threading.Tasks;
 
-namespace PhotoFox.Core.Extensions
+namespace PhotoFox.Extensions
 {
     public static class TableClientExtensions
     {

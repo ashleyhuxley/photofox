@@ -1,4 +1,4 @@
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 
 namespace PhotoFox.Core.UnitTests
 {
