@@ -34,11 +34,14 @@
             <Separator Grid.Column="3" />
             <StatusBarItem Grid.Column="4">
                 <TextBlock>
+                    <Run>Albums: </Run>
+                    <Run Text="{Binding Albums.Count, Mode=OneWay}" />
+                    <Run> - </Run>
                     <Run>Photos: </Run>
                     <Run Text="{Binding Photos.Count, Mode=OneWay}" />
                     <Run> - </Run>
-                    <Run>Albums: </Run>
-                    <Run Text="{Binding Albums.Count, Mode=OneWay}" />
+                    <Run>Videos: </Run>
+                    <Run Text="{Binding Videos.Count, Mode=OneWay}" />
                 </TextBlock>
             </StatusBarItem>
         </StatusBar>
@@ -58,6 +61,11 @@
                 VerticalAlignment="Top" 
                 ItemsSource="{Binding Albums}" 
                 SelectedItem="{Binding SelectedAlbum}">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete Album" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}" />
+                    </ContextMenu>
+                </ListView.ContextMenu>
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

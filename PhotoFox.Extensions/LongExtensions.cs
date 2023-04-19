@@ -1,4 +1,4 @@
-﻿namespace PhotoFox.Core.Extensions
+﻿namespace PhotoFox.Extensions
 {
     public static class LongExtensions
     {

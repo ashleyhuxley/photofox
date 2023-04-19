@@ -1,4 +1,4 @@
-﻿using PhotoFox.Core.Extensions;
+﻿using PhotoFox.Extensions;
 using System.IO;
 using System.Security.Cryptography;
 

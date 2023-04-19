@@ -1,4 +1,3 @@
-using PhotoFox.Mappings;
 using PhotoFox.Services;
 using PhotoFox.Storage;
 using PhotoFox.Storage.Blob;

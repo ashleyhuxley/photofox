@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using PhotoFox.Core.Imaging;
 using System.Drawing;
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 using System.Drawing.Imaging;
 using System.Runtime.Versioning;
 using System.Text.Json;

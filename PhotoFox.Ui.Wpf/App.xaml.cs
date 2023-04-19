@@ -37,6 +37,7 @@ namespace PhotoFox.Ui.Wpf
 
             this.container.Bind<MainWindowViewModel>().ToSelf();
             this.container.Bind<UploadFilesViewModel>().ToSelf();
+            this.container.Bind<ImportAlbumViewModel>().ToSelf();
 
             this.container.Bind<IStorageConfig>().To<PhotoFoxConfig>().InSingletonScope();
             this.container.Bind<IViewerConfig>().To<PhotoFoxConfig>().InSingletonScope();

@@ -1,5 +1,5 @@
 ﻿using ExifLibrary;
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 using System;
 using System.IO;
 using System.Threading.Tasks;

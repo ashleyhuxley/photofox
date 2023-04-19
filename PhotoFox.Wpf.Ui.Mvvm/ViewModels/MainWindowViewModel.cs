@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PhotoAlbum = PhotoFox.Model.PhotoAlbum;
 
@@ -29,6 +30,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         IRecipient<LoadPhotoMessage>,
         IRecipient<UnloadPhotoMessage>,
         IRecipient<UnloadVideoMessage>,
+        IRecipient<UnloadAlbumMessage>,
         IRecipient<UpdateStatusMessage>,
         IRecipient<SetStatusMessage>
     {
@@ -104,6 +106,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             messenger.Register<UpdateStatusMessage>(this);
             messenger.Register<SetStatusMessage>(this);
             messenger.Register<UnloadVideoMessage>(this);
+            messenger.Register<UnloadAlbumMessage>(this);
 
             this.PropertyChanged += MainWindowViewModel_PropertyChanged;
 
@@ -351,15 +354,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 };
 
                 string coverId = album.CoverPhotoId;
-
-                var blob = await this.photoFileStorage.GetThumbnailAsync(coverId);
-                if (blob != null)
+                if (string.IsNullOrEmpty(coverId))
                 {
-                    viewModel.Image = GetImageFromBytes(blob.ToArray());
+                    viewModel.Image = new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.jpg"));
                 }
                 else
                 {
-                    // TODO: Default Cover Image
+                    var blob = await this.photoFileStorage.GetThumbnailAsync(coverId);
+                    viewModel.Image = GetImageFromBytes(blob.ToArray());
                 }
 
                 this.Albums.Add(viewModel);
@@ -524,6 +526,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         {
             this.Videos.Remove(message.ViewModel);
             this.OnPropertyChanged(nameof(this.Videos.Count));
+        }
+
+        public void Receive(UnloadAlbumMessage message)
+        {
+            this.Albums.Remove(message.ViewModel);
+            this.OnPropertyChanged(nameof(this.Albums.Count));
         }
 
         public async void Receive(RefreshAlbumsMessage message)

@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using PhotoFox.Core.Extensions;
+using PhotoFox.Extensions;
 using PhotoFox.Model;
 using System.Windows.Media.Imaging;
 
