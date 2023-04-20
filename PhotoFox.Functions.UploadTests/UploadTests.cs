@@ -43,9 +43,13 @@ namespace PhotoFox.Functions.UploadTests
             var thumbnailProvider = new Mock<IThumbnailProvider>();
             thumbnailProvider.Setup(t => t.GenerateThumbnail(It.IsAny<Image>(), It.IsAny<int>(), It.IsAny<int>())).Returns(Image.FromStream(new MemoryStream(jpegData)));
 
+            var hashProvider = new Mock<IPhotoHashStorage>();
+            hashProvider.Setup(h => h.HashExistsAsync(It.IsAny<string>())).Returns(Task.FromResult(HashSearchResult.NotFoundResult));
+
             var function = new UploadFunctionBuilder()
                 .WithUpladStorage(uploadStorage.Object)
                 .WithThumbnailProvider(thumbnailProvider.Object)
+                .WithPhotoHashStorage(hashProvider.Object)
                 .Build();
 
             string message = "{\"Type\": \"PHOTO\", \"EntityId\": \"" + photoId + "\", \"DateTaken\": \"2000-01-01T00:00:00.0000000Z\"}";
@@ -172,6 +176,7 @@ namespace PhotoFox.Functions.UploadTests
             thumbnailProvider.Setup(t => t.GenerateThumbnail(It.IsAny<Image>(), It.IsAny<int>(), It.IsAny<int>())).Returns(Image.FromStream(new MemoryStream(jpegData)));
 
             var photoHashStorage = new Mock<IPhotoHashStorage>();
+            photoHashStorage.Setup(h => h.HashExistsAsync(It.IsAny<string>())).Returns(Task.FromResult(HashSearchResult.NotFoundResult));
 
             var photoMetadataStorage = new Mock<IPhotoMetadataStorage>();
 
