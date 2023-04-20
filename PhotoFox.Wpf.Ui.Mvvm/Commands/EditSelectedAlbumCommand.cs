@@ -46,7 +46,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 
             if (message.DialogResult.GetValueOrDefault(false))
             {
-                await this.photoAlbumService.EditAlbumAsync(viewModel.AlbumId, viewModel.Title, viewModel.Description, viewModel.Folder);
+                await this.photoAlbumService.EditAlbumAsync(
+                    viewModel.AlbumId, 
+                    viewModel.Title, 
+                    viewModel.Description, 
+                    viewModel.Folder,
+                    viewModel.SortOrder);
             }
         }
     }

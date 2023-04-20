@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf" xmlns:viewmodels="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance viewmodels:AlbumViewModel}"
-        Title="Edit Album" Height="190" Width="650" ResizeMode="NoResize" ShowInTaskbar="False">
+        Title="Edit Album" Height="220" Width="650" ResizeMode="NoResize" ShowInTaskbar="False">
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
             <RowDefinition Height="30" />
@@ -20,12 +21,14 @@
         <Label Grid.Row="0" Grid.Column="0" FontWeight="Bold">Album Name</Label>
         <Label Grid.Row="1" Grid.Column="0" FontWeight="Bold">Descriptione</Label>
         <Label Grid.Row="2" Grid.Column="0" FontWeight="Bold">Folder</Label>
+        <Label Grid.Row="3" Grid.Column="0" FontWeight="Bold">Sort Order</Label>
 
-        <TextBox Grid.Row="0" Grid.Column="1" Height="23" Text="{Binding Title}" />
+        <TextBox Grid.Row="0" Grid.Column="1" Height="23" Text="{Binding Title}" Width="300" HorizontalAlignment="Left" />
         <TextBox Grid.Row="1" Grid.Column="1" Height="23" Text="{Binding Description}" />
-        <TextBox Grid.Row="2" Grid.Column="1" Height="23" Text="{Binding Folder}" />
+        <TextBox Grid.Row="2" Grid.Column="1" Height="23" Text="{Binding Folder}" Width="200" HorizontalAlignment="Left" />
+        <TextBox Grid.Row="3" Grid.Column="1" Height="23" Text="{Binding SortOrder}" Width="200" HorizontalAlignment="Left" />
 
-        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
             <wpf:ImageButton Width="100" Height="30" ImageSource="Images/accept.png" ImageHeight="16" ImageWidth="16" Click="Ok_Click">
                 <Label Margin="10,0,0,0">OK</Label>
             </wpf:ImageButton>

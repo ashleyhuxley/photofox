@@ -31,6 +31,6 @@ namespace PhotoFox.Services
 
         Task RemovePermissionAsync(string albumId, string username);
 
-        Task EditAlbumAsync(string albumId, string title, string description, string folder);
+        Task EditAlbumAsync(string albumId, string title, string description, string folder, string sortOrder);
     }
 }
