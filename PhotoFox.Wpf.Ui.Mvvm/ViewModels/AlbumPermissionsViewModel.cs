@@ -93,7 +93,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                     AlbumId = album.AlbumId, 
                     Title = album.Title, 
                     Description = album.Description, 
-                    Folder = album.Folder 
+                    Folder = album.Folder,
+                    SortOrder = album.SortOrder,
                 };
 
                 if (await this.albumService.UserHasPermissionAsync(album.AlbumId, this.SelectedUser))

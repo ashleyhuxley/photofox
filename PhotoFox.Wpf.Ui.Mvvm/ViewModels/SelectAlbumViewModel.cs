@@ -78,6 +78,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                     Title = album.Title,
                     Folder = album.Folder,
                     Description = album.Description,
+                    SortOrder = album.SortOrder,
                 };
 
                 unsortedList.Add(viewModel);

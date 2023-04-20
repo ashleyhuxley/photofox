@@ -65,7 +65,7 @@ namespace PhotoFox.Ui.Wpf
         private void SetupAlbumSort()
         {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(AlbumList.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("Title", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new SortDescription("SortOrder", ListSortDirection.Descending));
         }
 
         private void PhotoDoubleClicked(object sender, MouseButtonEventArgs e)

@@ -37,7 +37,8 @@ namespace PhotoFox.Services
                     album.AlbumName,
                     album.AlbumDescription,
                     album.CoverPhotoId,
-                    album.Folder);
+                    album.Folder,
+                    album.SortOrder);
             }
         }
 
@@ -63,7 +64,7 @@ namespace PhotoFox.Services
             {
                 if (validAlbums.Contains(album.PartitionKey))
                 {
-                    yield return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder);
+                    yield return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder, album.SortOrder);
                 }
             }
         }
@@ -132,7 +133,7 @@ namespace PhotoFox.Services
         public async Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId)
         {
             var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId).ConfigureAwait(false);
-            return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder);
+            return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder, album.SortOrder);
         }
 
         public async Task RemoveFromAlbumAsync(string albumId, string photoId)
@@ -155,12 +156,13 @@ namespace PhotoFox.Services
             await this.albumPermissionStorage.RemovePermissionAsync(albumId, username).ConfigureAwait(false);
         }
 
-        public async Task EditAlbumAsync(string albumId, string title, string description, string folder)
+        public async Task EditAlbumAsync(string albumId, string title, string description, string folder, string sortOrder)
         {
             var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId);
             album.AlbumName = title;
             album.AlbumDescription = description;
             album.Folder = folder;
+            album.SortOrder = sortOrder;
 
             await this.photoAlbumDataStorage.ModifyAlbumAsync(album);
         }

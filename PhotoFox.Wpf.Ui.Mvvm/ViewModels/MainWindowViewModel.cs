@@ -143,7 +143,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            foreach (var album in this.allAlbums.Where(a => a.Folder == this.SelectedFolder.Title))
+            foreach (var album in this.allAlbums.Where(a => a.Folder == this.SelectedFolder.Title).OrderBy(o => o.SortOrder))
             {
                 this.Albums.Add(album);
             }
@@ -405,6 +405,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                     AlbumId = album.AlbumId,
                     Folder = album.Folder,
                     Description = album.Description,
+                    SortOrder = album.SortOrder,
                 };
 
                 string coverId = album.CoverPhotoId;
@@ -515,6 +516,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 response.NewAlbumName, 
                 string.Empty,
                 this.Photos.First(p => p.IsSelected).Item.PhotoId,
+                string.Empty,
                 string.Empty);
 
             this.photoAlbumService.AddAlbumAsync(album);

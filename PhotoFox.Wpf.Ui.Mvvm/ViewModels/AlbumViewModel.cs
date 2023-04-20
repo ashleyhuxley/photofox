@@ -13,6 +13,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.AlbumId = string.Empty;
             this.Folder = string.Empty;
             this.Description = string.Empty;
+            this.SortOrder= string.Empty;
         }
 
         public string Title { get; set; }
@@ -24,6 +25,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public string Folder { get; set; }
 
         public string Description { get; set; }
+
+        public string SortOrder { get; set; }
 
         public bool IsSelected
         {
