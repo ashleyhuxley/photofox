@@ -4,3 +4,4 @@ obj
 /PhotoFox.Web/Properties/PublishProfiles/PhotoFoxWeb - FTP.pubxml.user
 *.pubxml
 profile.arm.json
+/PhotoFox.Ui.Wpf/PhotoFox.Ui.Wpf.csproj.user

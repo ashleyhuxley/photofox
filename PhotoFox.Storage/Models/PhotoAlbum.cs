@@ -13,6 +13,7 @@ namespace PhotoFox.Storage.Models
             this.CoverPhotoId = string.Empty;
             this.RowKey = string.Empty;
             this.PartitionKey = string.Empty;
+            this.Folder = string.Empty;
         }
 
         public string AlbumName { get; set; }
@@ -20,6 +21,7 @@ namespace PhotoFox.Storage.Models
         public string CoverPhotoId { get; set; }
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
+        public string Folder { get; set; }
         public ETag ETag { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
     }

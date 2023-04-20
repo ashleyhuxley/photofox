@@ -55,31 +55,70 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ListView 
-                x:Name="AlbumList" 
-                HorizontalAlignment="Stretch" 
-                VerticalAlignment="Top" 
-                ItemsSource="{Binding Albums}" 
-                SelectedItem="{Binding SelectedAlbum}">
-                <ListView.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Delete Album" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}" />
-                    </ContextMenu>
-                </ListView.ContextMenu>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,0,0,20">
-                            <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="150" />
-                            <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="350" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <ListView
+                    x:Name="FolderList"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    ItemsSource="{Binding Folders}"
+                    SelectedItem="{Binding SelectedFolder}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White">
+                                <Label.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF80CEF3" Offset="0.01" />
+                                        <GradientStop Color="#FF5588A0" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Label.Background>
+                            </Label>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+
+                <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+                <ListView
+                    Grid.Row="2"
+                    x:Name="AlbumList" 
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Top" 
+                    ItemsSource="{Binding Albums}" 
+                    SelectedItem="{Binding SelectedAlbum}">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Edit Album..." Command="{Binding EditSelectedAlbumCommand}" CommandParameter="{Binding SelectedAlbum}" />
+                            <MenuItem Header="Delete Album" Command="{Binding DeleteAlbumCommand}" CommandParameter="{Binding SelectedAlbum}" />
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0,0,0,20">
+                                <Image Source="{Binding Image}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="150" />
+                                <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
 
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
 
@@ -121,7 +160,7 @@
                         </ItemsControl.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
+                                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto" Margin="0,0,0,20">
                                     <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
                                     <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                                 </StackPanel>
@@ -131,9 +170,14 @@
                             <GroupStyle>
                                 <GroupStyle.HeaderTemplate>
                                     <DataTemplate>
-                                        <Grid Background="CornflowerBlue" Margin="0,10,0,5">
-                                            <TextBlock FontWeight="Bold" FontSize="14" Margin="4" Text="{Binding Name}"/>
-                                        </Grid>
+                                        <Label Content="{Binding Name}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Margin="0,0,0,10">
+                                            <Label.Background>
+                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                    <GradientStop Color="#FF80CEF3" Offset="0.01" />
+                                                    <GradientStop Color="#FF5588A0" Offset="1" />
+                                                </LinearGradientBrush>
+                                            </Label.Background>
+                                        </Label>
                                     </DataTemplate>
                                 </GroupStyle.HeaderTemplate>
                             </GroupStyle>
@@ -165,7 +209,7 @@
                         </ItemsControl.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto">
+                                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto" Margin="0,0,0,20">
                                     <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
                                     <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                                 </StackPanel>
@@ -175,9 +219,10 @@
                             <GroupStyle>
                                 <GroupStyle.HeaderTemplate>
                                     <DataTemplate>
-                                        <Grid Background="CornflowerBlue" Margin="0,10,0,5">
-                                            <TextBlock FontWeight="Bold" FontSize="14" Margin="4" Text="{Binding Name}"/>
-                                        </Grid>
+                                        <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="Auto" Margin="0,0,0,20">
+                                            <Image Source="{Binding Image}" HorizontalAlignment="Center" VerticalAlignment="Top" Width="150" />
+                                            <TextBlock Text="{Binding Title}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                                        </StackPanel>
                                     </DataTemplate>
                                 </GroupStyle.HeaderTemplate>
                             </GroupStyle>
