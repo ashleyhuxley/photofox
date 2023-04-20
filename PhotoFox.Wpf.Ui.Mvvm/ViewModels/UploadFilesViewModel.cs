@@ -1,6 +1,5 @@
 ﻿using PhotoFox.Model;
 using PhotoFox.Services;
-using PhotoFox.Storage.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;

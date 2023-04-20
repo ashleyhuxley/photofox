@@ -292,9 +292,6 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <wpf:ImageButton Width="130" Height="40" HorizontalAlignment="Left" Margin="10,20,0,0" Command="{Binding SaveChangesCommand}" CommandParameter="{Binding SelectedPhoto}" ImageSource="/Images/accept.png" ImageWidth="16" >
-                    <Label>Save Changes</Label>
-                </wpf:ImageButton>
             </StackPanel>
         </Grid>
     </DockPanel>
