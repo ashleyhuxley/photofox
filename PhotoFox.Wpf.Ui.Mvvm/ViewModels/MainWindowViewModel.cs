@@ -5,7 +5,7 @@ using NLog;
 using PhotoFox.Model;
 using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
-using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
+using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System;
@@ -19,7 +19,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PhotoAlbum = PhotoFox.Model.PhotoAlbum;
 
@@ -50,6 +49,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private string loadingStatusText = string.Empty;
 
+        private FolderViewModel? selectedFolder;
+
         private PhotoViewModel? selectedPhoto;
 
         private VideoViewModel? selectedVideo;
@@ -57,6 +58,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         private AlbumViewModel? selectedAlbum;
 
         private CancellationTokenSource cancellationTokenSource;
+
+        private readonly List<AlbumViewModel> allAlbums;
 
         public MainWindowViewModel(
             IPhotoService photoService,
@@ -72,7 +75,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             AddAlbumCommand addAlbumCommand,
             DeleteAlbumCommand deleteAlbumCommand,
             SaveChangesCommand saveChangesCommand,
-            SetPermissionsCommand setPermissionsCommand)
+            SetPermissionsCommand setPermissionsCommand,
+            EditSelectedAlbumCommand editSelectedAlbumCommand)
         {
             this.photoService = photoService;
             this.videoService = videoService;
@@ -81,9 +85,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.messenger = messenger;
             this.context = context;
 
+            this.Folders = new ObservableCollection<FolderViewModel>();
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
             this.Videos= new ObservableCollection<VideoViewModel>();
+
+            this.allAlbums = new List<AlbumViewModel>();
 
             AddPhotosCommand = addPhotosCommand;
             OpenGpsLink = openGpsLocationCommand;
@@ -99,6 +106,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             SetAlbumCoverCommand = new RelayCommand(SetAlbumCoverCommandExecute, () => this.SelectedPhoto != null);
             ReloadExifCommand = new RelayCommand(ReloadExifExecute, () => this.SelectedPhoto != null);
             SetPermissionsCommand = setPermissionsCommand;
+            EditSelectedAlbumCommand = editSelectedAlbumCommand;
 
             messenger.Register<RefreshAlbumsMessage>(this);
             messenger.Register<LoadPhotoMessage>(this);
@@ -115,9 +123,29 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private async void MainWindowViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == nameof(this.SelectedFolder))
+            {
+                OnSelectedFolderChanged();
+            }
+
             if (e.PropertyName == nameof(this.SelectedAlbum))
             {
                 await OnSelectedAlbumChanged();
+            }
+        }
+
+        private void OnSelectedFolderChanged()
+        {
+            this.Albums.Clear();
+
+            if (this.SelectedFolder == null)
+            {
+                return;
+            }
+
+            foreach (var album in this.allAlbums.Where(a => a.Folder == this.SelectedFolder.Title))
+            {
+                this.Albums.Add(album);
             }
         }
 
@@ -130,6 +158,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 LoadPhotos(cancellationTokenSource.Token), 
                 LoadVideos(cancellationTokenSource.Token));
         }
+
+        public ObservableCollection<FolderViewModel> Folders { get; }
 
         public ObservableCollection<AlbumViewModel> Albums { get; }
 
@@ -151,6 +181,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand SetAlbumCoverCommand { get; }
         public ICommand ReloadExifCommand { get; }
         public ICommand SetPermissionsCommand { get; }
+        public ICommand EditSelectedAlbumCommand { get; }
 
         public PhotoViewModel? SelectedPhoto
         {
@@ -190,6 +221,21 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public IEnumerable<VideoViewModel> SelectedVideos
         {
             get => this.Videos.Where(p => p.IsSelected);
+        }
+
+        public FolderViewModel? SelectedFolder
+        {
+            get => this.selectedFolder;
+            set
+            {
+                if (ReferenceEquals(this.selectedFolder, value))
+                {
+                    return;
+                }
+
+                selectedFolder = value;
+                OnPropertyChanged(nameof(SelectedFolder));
+            }
         }
 
         public AlbumViewModel? SelectedAlbum
@@ -343,14 +389,22 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private async Task LoadAlbums()
         {
-            this.Albums.Clear();
+            this.allAlbums.Clear();
+            this.Folders.Clear();
 
             await foreach (var album in this.photoAlbumService.GetAllAlbumsAsync())
             {
+                if (!this.Folders.Any(f => f.Title == album.Folder))
+                {
+                    this.Folders.Add(new FolderViewModel(album.Folder));
+                }
+
                 var viewModel = new AlbumViewModel
                 {
                     Title = album.Title,
-                    AlbumId = album.AlbumId
+                    AlbumId = album.AlbumId,
+                    Folder = album.Folder,
+                    Description = album.Description,
                 };
 
                 string coverId = album.CoverPhotoId;
@@ -364,8 +418,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                     viewModel.Image = GetImageFromBytes(blob.ToArray());
                 }
 
-                this.Albums.Add(viewModel);
-                this.OnPropertyChanged(nameof(this.Albums.Count));
+                this.allAlbums.Add(viewModel);
+                this.OnPropertyChanged(nameof(this.allAlbums.Count));
             }
         }
 
@@ -460,7 +514,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 Guid.NewGuid().ToString(), 
                 response.NewAlbumName, 
                 string.Empty,
-                this.Photos.First(p => p.IsSelected).Item.PhotoId);
+                this.Photos.First(p => p.IsSelected).Item.PhotoId,
+                string.Empty);
 
             this.photoAlbumService.AddAlbumAsync(album);
 

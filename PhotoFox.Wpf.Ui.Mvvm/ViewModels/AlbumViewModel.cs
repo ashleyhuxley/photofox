@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Media.Imaging;
 
-namespace PhotoFox.Ui.Wpf.Mvvm.ViewModels
+namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
     public class AlbumViewModel : ObservableObject
     {
@@ -10,7 +10,9 @@ namespace PhotoFox.Ui.Wpf.Mvvm.ViewModels
         public AlbumViewModel()
         {
             this.Title = string.Empty;
-            this.AlbumId= string.Empty;
+            this.AlbumId = string.Empty;
+            this.Folder = string.Empty;
+            this.Description = string.Empty;
         }
 
         public string Title { get; set; }
@@ -18,6 +20,10 @@ namespace PhotoFox.Ui.Wpf.Mvvm.ViewModels
         public BitmapSource? Image { get; set; }
 
         public string AlbumId { get; set; }
+
+        public string Folder { get; set; }
+
+        public string Description { get; set; }
 
         public bool IsSelected
         {

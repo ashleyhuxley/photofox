@@ -111,7 +111,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            var album = new PhotoAlbum(Guid.NewGuid().ToString(), this.AlbumName, this.Description, string.Empty);
+            var album = new PhotoAlbum(Guid.NewGuid().ToString(), this.AlbumName, this.Description, string.Empty, "Imported");
 
             await this.photoAlbumService.AddAlbumAsync(album);
 

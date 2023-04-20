@@ -2,13 +2,15 @@
 
 namespace PhotoFox.Wpf.Ui.Mvvm.Messages
 {
-    public class UnloadAlbumMessage
+    public class EditAlbumMessage
     {
-        public UnloadAlbumMessage(AlbumViewModel viewModel)
-        {
+        public EditAlbumMessage(AlbumViewModel viewModel)
+        { 
             this.ViewModel = viewModel;
         }
 
         public AlbumViewModel ViewModel { get; }
+
+        public bool? DialogResult { get; set; }
     }
 }

@@ -1,24 +1,24 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using PhotoFox.Services;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System;
 using System.Windows.Input;
+using PhotoFox.Services;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.Commands
 {
-    public class DeleteAlbumCommand : ICommand
+    public class EditSelectedAlbumCommand : ICommand
     {
         private readonly IMessenger messenger;
 
         private readonly IPhotoAlbumService photoAlbumService;
 
-        public DeleteAlbumCommand(
-            IPhotoAlbumService IPhotoAlbumService,
-            IMessenger messenger)
-        {
-            this.photoAlbumService = IPhotoAlbumService;
+        public EditSelectedAlbumCommand(
+            IMessenger messenger,
+            IPhotoAlbumService photoAlbumService)
+        { 
             this.messenger = messenger;
+            this.photoAlbumService = photoAlbumService;
         }
 
         public event EventHandler? CanExecuteChanged
@@ -33,7 +33,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             return viewModel != null;
         }
 
-        public void Execute(object? parameter)
+        public async void Execute(object? parameter)
         {
             var viewModel = parameter as AlbumViewModel;
             if (viewModel?.AlbumId == null)
@@ -41,8 +41,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
                 return;
             }
 
-            this.photoAlbumService.DeleteAlbumAsync(viewModel.AlbumId);
-            this.messenger.Send(new UnloadAlbumMessage(viewModel));
+            var message = new EditAlbumMessage(viewModel);
+            this.messenger.Send(message);
+
+            if (message.DialogResult.GetValueOrDefault(false))
+            {
+                await this.photoAlbumService.EditAlbumAsync(viewModel.AlbumId, viewModel.Title, viewModel.Description, viewModel.Folder);
+            }
         }
     }
 }

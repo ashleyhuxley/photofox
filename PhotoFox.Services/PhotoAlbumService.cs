@@ -36,7 +36,8 @@ namespace PhotoFox.Services
                     album.PartitionKey,
                     album.AlbumName,
                     album.AlbumDescription,
-                    album.CoverPhotoId);
+                    album.CoverPhotoId,
+                    album.Folder);
             }
         }
 
@@ -62,7 +63,7 @@ namespace PhotoFox.Services
             {
                 if (validAlbums.Contains(album.PartitionKey))
                 {
-                    yield return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId);
+                    yield return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder);
                 }
             }
         }
@@ -131,7 +132,7 @@ namespace PhotoFox.Services
         public async Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId)
         {
             var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId).ConfigureAwait(false);
-            return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId);
+            return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder);
         }
 
         public async Task RemoveFromAlbumAsync(string albumId, string photoId)
@@ -152,6 +153,16 @@ namespace PhotoFox.Services
         public async Task RemovePermissionAsync(string albumId, string username)
         {
             await this.albumPermissionStorage.RemovePermissionAsync(albumId, username).ConfigureAwait(false);
+        }
+
+        public async Task EditAlbumAsync(string albumId, string title, string description, string folder)
+        {
+            var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId);
+            album.AlbumName = title;
+            album.AlbumDescription = description;
+            album.Folder = folder;
+
+            await this.photoAlbumDataStorage.ModifyAlbumAsync(album);
         }
     }
 }

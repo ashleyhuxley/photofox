@@ -21,7 +21,8 @@ namespace PhotoFox.Ui.Wpf
         IRecipient<OpenPhotoMessage>,
         IRecipient<OpenVideoMessage>,
         IRecipient<SelectAlbumMessage>,
-        IRecipient<ShowPermissionsWindowMessage>
+        IRecipient<ShowPermissionsWindowMessage>,
+        IRecipient<EditAlbumMessage>
     {
         private readonly IMessenger messenger;
 
@@ -60,6 +61,7 @@ namespace PhotoFox.Ui.Wpf
             messenger.Register<OpenVideoMessage>(this);
             messenger.Register<SelectAlbumMessage>(this);
             messenger.Register<ShowPermissionsWindowMessage>(this);
+            messenger.Register<EditAlbumMessage>(this);
         }
 
         public void Receive(AddPhotosMessage message)
@@ -110,6 +112,21 @@ namespace PhotoFox.Ui.Wpf
                     throw;
                 }
             }
+        }
+
+        public void Receive(EditAlbumMessage message)
+        {
+            EnsureOwnerWindowIsSet();
+
+            var window = new EditAlbumWindow
+            {
+                Owner = this.ownerWindow,
+                DataContext = message.ViewModel
+            };
+
+            var result = window.ShowDialog();
+
+            message.DialogResult = result;
         }
 
         public void Receive(AddAlbumMessage message)

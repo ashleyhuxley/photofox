@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using PhotoFox.Services;
 using PhotoFox.Storage.Table;
-using PhotoFox.Ui.Wpf.Mvvm.ViewModels;
+using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -88,7 +88,13 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             await foreach (var album in this.albumService.GetAllAlbumsAsync())
             {
-                var viewModel = new AlbumViewModel { AlbumId = album.AlbumId, Title = album.Title };
+                var viewModel = new AlbumViewModel 
+                { 
+                    AlbumId = album.AlbumId, 
+                    Title = album.Title, 
+                    Description = album.Description, 
+                    Folder = album.Folder 
+                };
 
                 if (await this.albumService.UserHasPermissionAsync(album.AlbumId, this.SelectedUser))
                 {
