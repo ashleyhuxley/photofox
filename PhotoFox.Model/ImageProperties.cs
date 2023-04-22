@@ -12,7 +12,8 @@ namespace PhotoFox.Model
             string description,
             DateTime dateTaken,
             int? orientation,
-            string fileHash)
+            string fileHash,
+            int starRating)
         {
             this.FileSize = fileSize;
             this.Dimensions = dimensions;
@@ -21,6 +22,7 @@ namespace PhotoFox.Model
             this.DateTaken = dateTaken;
             this.Orientation = orientation;
             this.FileHash = fileHash;
+            this.StarRating = starRating;
         }
 
         public long? FileSize { get; }
@@ -30,5 +32,6 @@ namespace PhotoFox.Model
         public DateTime DateTaken { get; }
         public int? Orientation { get; }
         public string FileHash { get; }
+        public int StarRating { get; }
     }
 }

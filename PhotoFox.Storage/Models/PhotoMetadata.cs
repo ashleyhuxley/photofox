@@ -41,5 +41,6 @@ namespace PhotoFox.Storage.Models
         public int? DimensionWidth { get; set; }
         public int? DimensionHeight { get; set; }
         public long? FileSize { get; set; }
+        public int? StarRating { get; set; }
     }
 }

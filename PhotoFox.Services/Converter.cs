@@ -11,9 +11,28 @@ namespace PhotoFox.Services
         internal static Photo ToPhoto(PhotoMetadata photo)
         {
             var size = new Size(photo.DimensionWidth.GetValueOrDefault(0), photo.DimensionHeight.GetValueOrDefault(0));
-            var imageProperties = new ImageProperties(photo.FileSize, size, photo.Title, photo.Description, photo.UtcDate.GetValueOrDefault(DateTime.MinValue), photo.Orientation, photo.FileHash);
-            var geolocation = photo.GeolocationLattitude.HasValue && photo.GeolocationLongitude.HasValue ? new Geolocation(photo.GeolocationLattitude.Value, photo.GeolocationLongitude.Value) : null;
-            var cameraSettings = new CameraSettings(photo.ISO, photo.Aperture, photo.FocalLength, photo.Device, photo.Manufacturer, photo.Exposure);
+            var imageProperties = new ImageProperties(
+                photo.FileSize, 
+                size, 
+                photo.Title, 
+                photo.Description, 
+                photo.UtcDate.GetValueOrDefault(DateTime.MinValue), 
+                photo.Orientation, 
+                photo.FileHash,
+                photo.StarRating ?? 5);
+
+            var geolocation = photo.GeolocationLattitude.HasValue && photo.GeolocationLongitude.HasValue 
+                ? new Geolocation(photo.GeolocationLattitude.Value, photo.GeolocationLongitude.Value) 
+                : null;
+
+            var cameraSettings = new CameraSettings(
+                photo.ISO, 
+                photo.Aperture, 
+                photo.FocalLength, 
+                photo.Device, 
+                photo.Manufacturer, 
+                photo.Exposure);
+
             return new Photo(photo.RowKey, imageProperties, geolocation, cameraSettings);
         }
 
