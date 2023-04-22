@@ -192,7 +192,7 @@ namespace PhotoFox.Services.UnitTests
         private Photo GetSamplePhoto()
         {
             var date = DateTime.SpecifyKind(new DateTime(2000, 1, 1), DateTimeKind.Utc);
-            var imageProperties = new ImageProperties(123, new System.Drawing.Size(800, 600), "Title", "Description", date, 4, "hash");
+            var imageProperties = new ImageProperties(123, new System.Drawing.Size(800, 600), "Title", "Description", date, 4, "hash", 3);
             var cameraSettings = new CameraSettings("iso", "aperture", "fl", "device", "manufacture", "exposure");
             var geoloaction = new Geolocation(1.23, -0.50);
             return new Photo("photoId", imageProperties, geoloaction, cameraSettings);
