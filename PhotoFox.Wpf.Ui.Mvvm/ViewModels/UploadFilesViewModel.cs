@@ -1,14 +1,19 @@
-﻿using PhotoFox.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using PhotoFox.Model;
 using PhotoFox.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+using System.Windows.Input;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
-    public class UploadFilesViewModel
+    public class UploadFilesViewModel : ObservableObject
     {
         private readonly IUploadService _uploadService;
 
@@ -22,6 +27,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         }
 
         public ObservableCollection<UploadStatusViewModel> Uploads { get; }
+
+        public ICommand CleanUpCommand => new RelayCommand(CleanUpExecute);
 
         public void AddFiles(string[] files, string albumId)
         {
@@ -63,12 +70,17 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             viewModel.Status = UploadStatus.InProgress;
 
             var fileInfo = new FileInfo(viewModel.Filename);
+            var title = Path.GetFileName(viewModel.Filename);
+            if (title.Length > 25)
+            {
+                title = title.Substring(0, 25);
+            }
 
             if (type == UploadType.Photo)
             {
                 using (var stream = File.OpenRead(viewModel.Filename))
                 {
-                    await _uploadService.UploadFromStreamAsync(stream, albumId, Path.GetFileName(viewModel.Filename), Path.GetExtension(viewModel.Filename).Substring(1), fileInfo.CreationTimeUtc);
+                    await _uploadService.UploadFromStreamAsync(stream, albumId, title, Path.GetExtension(viewModel.Filename).Substring(1), fileInfo.CreationTimeUtc);
                     viewModel.Status = UploadStatus.Success;
                 }
             }
@@ -76,7 +88,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             {
                 using (var stream = File.OpenRead(viewModel.Filename))
                 {
-                    await _uploadService.UploadVideoFromStreamAsync(stream, albumId, Path.GetFileName(viewModel.Filename), Path.GetExtension(viewModel.Filename).Substring(1), fileInfo.CreationTimeUtc);
+                    await _uploadService.UploadVideoFromStreamAsync(stream, albumId, title, Path.GetExtension(viewModel.Filename).Substring(1), fileInfo.CreationTimeUtc);
                     viewModel.Status = UploadStatus.Success;
                 }
             }
@@ -99,6 +111,19 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 default:
                     return UploadType.Other;
             }
+        }
+
+        private void CleanUpExecute()
+        {
+            var toRemove = new List<UploadStatusViewModel>();
+
+            foreach (var upload in Uploads)
+            {
+                File.Delete(upload.Filename);
+                toRemove.Add(upload);
+            }
+
+            toRemove.ForEach(t => Uploads.Remove(t));
         }
     }
 }

@@ -83,6 +83,14 @@ namespace PhotoFox.Ui.Wpf
             if (e.Key == Key.Delete)
             {
                 viewModel.DeletePhotoCommand.Execute(viewModel.SelectedPhotos);
+            } 
+            else if (e.Key == Key.Oem4)
+            {
+                viewModel.DecrementRatingCommand.Execute(viewModel.SelectedPhotos);
+            }
+            else if (e.Key == Key.Oem6)
+            {
+                viewModel.IncrementRatingCommand.Execute(viewModel.SelectedPhotos);
             }
         }
 

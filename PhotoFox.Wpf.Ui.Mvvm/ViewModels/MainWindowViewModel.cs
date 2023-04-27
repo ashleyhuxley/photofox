@@ -5,7 +5,6 @@ using NLog;
 using PhotoFox.Model;
 using PhotoFox.Services;
 using PhotoFox.Storage.Blob;
-using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using PhotoFox.Wpf.Ui.Mvvm.Commands;
 using PhotoFox.Wpf.Ui.Mvvm.Messages;
 using System;
@@ -76,7 +75,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             DeleteAlbumCommand deleteAlbumCommand,
             SaveChangesCommand saveChangesCommand,
             SetPermissionsCommand setPermissionsCommand,
-            EditSelectedAlbumCommand editSelectedAlbumCommand)
+            EditSelectedAlbumCommand editSelectedAlbumCommand,
+            DecrementRatingCommand decrementRatingCommand,
+            IncrementRatingCommand incrementRatingCommand)
         {
             this.photoService = photoService;
             this.videoService = videoService;
@@ -88,7 +89,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.Folders = new ObservableCollection<FolderViewModel>();
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
-            this.Videos= new ObservableCollection<VideoViewModel>();
+            this.Videos = new ObservableCollection<VideoViewModel>();
 
             this.allAlbums = new List<AlbumViewModel>();
 
@@ -107,6 +108,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             ReloadExifCommand = new RelayCommand(ReloadExifExecute, () => this.SelectedPhoto != null);
             SetPermissionsCommand = setPermissionsCommand;
             EditSelectedAlbumCommand = editSelectedAlbumCommand;
+            DecrementRatingCommand = decrementRatingCommand;
+            IncrementRatingCommand = incrementRatingCommand;
 
             messenger.Register<RefreshAlbumsMessage>(this);
             messenger.Register<LoadPhotoMessage>(this);
@@ -182,6 +185,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand ReloadExifCommand { get; }
         public ICommand SetPermissionsCommand { get; }
         public ICommand EditSelectedAlbumCommand { get; }
+        public ICommand DecrementRatingCommand { get; }
+        public ICommand IncrementRatingCommand { get; }
 
         public PhotoViewModel? SelectedPhoto
         {

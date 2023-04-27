@@ -3,6 +3,7 @@ using PhotoFox.Storage.Models;
 using System.Drawing;
 using System;
 using PhotoFox.Extensions;
+using PhotoFox.Core;
 
 namespace PhotoFox.Services
 {
@@ -19,7 +20,7 @@ namespace PhotoFox.Services
                 photo.UtcDate.GetValueOrDefault(DateTime.MinValue), 
                 photo.Orientation, 
                 photo.FileHash,
-                photo.StarRating ?? 5);
+                photo.StarRating ?? Constants.DefaultStarRating);
 
             var geolocation = photo.GeolocationLattitude.HasValue && photo.GeolocationLongitude.HasValue 
                 ? new Geolocation(photo.GeolocationLattitude.Value, photo.GeolocationLongitude.Value) 
