@@ -18,5 +18,9 @@ namespace PhotoFox.Services
         IAsyncEnumerable<Photo> GetPhotosInAlbumAsync(string albumId);
 
         Task<Photo> ReloadExifDataAsync(DateTime utcDate, string photoId);
+
+        Task<int> DecrementRatingAsync(DateTime utcDate, string photoId);
+
+        Task<int> IncrementRatingAsync(DateTime utcDate, string photoId);
     }
 }

@@ -271,7 +271,8 @@
                 <TextBlock Text="{Binding SelectedPhoto.FileSize}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">Orientation</Label>
                 <TextBlock Text="{Binding SelectedPhoto.Item.ImageProperties.Orientation}" Style="{StaticResource PropertyStyle}" />
-
+                <Label Style="{StaticResource LabelStyle}">Rating</Label>
+                <wpf:RatingControl Value="{Binding SelectedPhoto.StarRating}" />
                 <Label Style="{StaticResource LabelStyle}">GPS Location</Label>
                 <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}" CommandParameter="{Binding SelectedPhoto}">
                     <Button.Template>

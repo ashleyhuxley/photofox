@@ -5,32 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm"
-        xmlns:converters="clr-namespace:PhotoFox.Ui.Wpf.Converters"
+        xmlns:converters="clr-namespace:PhotoFox.Ui.Wpf.Converters" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf"
         d:DataContext="{d:DesignInstance vm:UploadFilesViewModel}"
         Title="Upload Files" Height="350" Width="850"
         Loaded="Window_Loaded">
     <Window.Resources>
         <converters:StatusImageConverter x:Key="StatusImageConverter" />
     </Window.Resources>
-    <ListView ItemsSource="{Binding Uploads}" Margin="10">
-        <ListView.Resources>
-            <Style TargetType="{x:Type GridViewColumnHeader}">
-                <Setter Property="HorizontalContentAlignment" Value="Left" />
-                <Setter Property="Padding" Value="10,0,0,0" />
-            </Style>
-        </ListView.Resources>
-        <ListView.View>
-            <GridView>
-                <GridViewColumn Header="Filename" Width="400" DisplayMemberBinding="{Binding Filename}" />
-                <GridViewColumn Header="Status" Width="100">
-                    <GridViewColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image Source="{Binding Path=Status, Converter={StaticResource StatusImageConverter}}" Width="16" Height="16" />
-                        </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-                <GridViewColumn Header="Error" Width="500" DisplayMemberBinding="{Binding Error}" />
-            </GridView>
-        </ListView.View>
-    </ListView>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <ListView ItemsSource="{Binding Uploads}" Margin="0,0,0,10">
+            <ListView.Resources>
+                <Style TargetType="{x:Type GridViewColumnHeader}">
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="Padding" Value="10,0,0,0" />
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Filename" Width="400" DisplayMemberBinding="{Binding Filename}" />
+                    <GridViewColumn Header="Status" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Path=Status, Converter={StaticResource StatusImageConverter}}" Width="16" Height="16" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Error" Width="500" DisplayMemberBinding="{Binding Error}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <wpf:ImageButton Width="120" Height="30" ImageSource="Images/bin.png" ImageWidth="16" ImageHeight="16" Command="{Binding CleanUpCommand}">
+                <Label>Clean Up</Label>
+            </wpf:ImageButton>
+        </StackPanel>
+    </Grid>
 </Window>

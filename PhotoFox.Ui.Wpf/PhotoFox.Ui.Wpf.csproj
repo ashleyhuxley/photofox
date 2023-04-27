@@ -7,6 +7,7 @@
     <UseWPF>true</UseWPF>
     <PackageIcon>ic_launcher.png</PackageIcon>
     <ApplicationIcon>ic_launcher.ico</ApplicationIcon>
+	  <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
     <None Remove="Images\add_photo.png" />
     <None Remove="Images\arrow_left.png" />
     <None Remove="Images\arrow_right.png" />
+    <None Remove="Images\bin.png" />
     <None Remove="Images\cancel.png" />
     <None Remove="Images\delete.png" />
     <None Remove="Images\hourglass.png" />
@@ -25,6 +27,8 @@
     <None Remove="Images\picture.png" />
     <None Remove="Images\picture_key.png" />
     <None Remove="Images\placeholder.jpg" />
+    <None Remove="Images\star.png" />
+    <None Remove="Images\star_off.png" />
     <None Remove="Images\stop.png" />
     <None Remove="Images\yes.png" />
   </ItemGroup>
@@ -44,6 +48,7 @@
     <Resource Include="Images\accept.png" />
     <Resource Include="Images\arrow_left.png" />
     <Resource Include="Images\arrow_right.png" />
+    <Resource Include="Images\bin.png" />
     <Resource Include="Images\cancel.png" />
     <Resource Include="Images\delete.png" />
     <Resource Include="Images\hourglass.png" />
@@ -55,6 +60,8 @@
     <Resource Include="Images\picture.png" />
     <Resource Include="Images\picture_key.png" />
     <Resource Include="Images\placeholder.jpg" />
+    <Resource Include="Images\star.png" />
+    <Resource Include="Images\star_off.png" />
     <Resource Include="Images\stop.png" />
   </ItemGroup>
 

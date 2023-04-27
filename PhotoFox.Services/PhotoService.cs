@@ -1,4 +1,5 @@
-﻿using PhotoFox.Core.Exif;
+﻿using PhotoFox.Core;
+using PhotoFox.Core.Exif;
 using PhotoFox.Extensions;
 using PhotoFox.Model;
 using PhotoFox.Storage.Blob;
@@ -72,6 +73,42 @@ namespace PhotoFox.Services
             await this.photoMetadataStorage.SavePhotoAsync(metadata).ConfigureAwait(false);
 
             return Converter.ToPhoto(metadata);
+        }
+
+        public async Task<int> DecrementRatingAsync(DateTime utcDate, string photoId)
+        {
+            var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(utcDate, photoId).ConfigureAwait(false);
+
+            if (!metadata.StarRating.HasValue)
+            {
+                metadata.StarRating = Constants.DefaultStarRating;
+            }
+
+            if (metadata.StarRating >= 1)
+            {
+                metadata.StarRating -= 1;
+            }
+
+            await this.photoMetadataStorage.SavePhotoAsync(metadata).ConfigureAwait(false);
+            return metadata.StarRating.Value;
+        }
+
+        public async Task<int> IncrementRatingAsync(DateTime utcDate, string photoId)
+        {
+            var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(utcDate, photoId).ConfigureAwait(false);
+
+            if (!metadata.StarRating.HasValue)
+            {
+                metadata.StarRating = Constants.DefaultStarRating;
+            }
+
+            if (metadata.StarRating < 5)
+            {
+                metadata.StarRating += 1;
+            }
+
+            await this.photoMetadataStorage.SavePhotoAsync(metadata).ConfigureAwait(false);
+            return metadata.StarRating.Value;
         }
     }
 }
