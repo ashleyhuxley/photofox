@@ -26,22 +26,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.fionasapphire.photofox.viewmodels.AddPhotosViewModel
 import com.fionasapphire.photofox.viewmodels.AddPhotosViewModelState
 import com.fionasapphire.photofox.viewmodels.PhotoUploadState
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
-fun SelectPhotos() {
+fun SelectPhotos(navController: NavHostController) {
     val viewModel = hiltViewModel<AddPhotosViewModel>()
     val context = LocalContext.current
 
+    val albumId = viewModel.albumId ?: "00000000-0000-0000-0000-000000000000"
+
     val state by viewModel.state.collectAsState()
+
     when (state) {
         AddPhotosViewModelState.START -> {
             val pickMultipleMedia =
                 rememberLauncherForActivityResult(PickMultipleVisualMedia(50)) { uris ->
-                    viewModel.uploadAndQueue(uris, "00000000-0000-0000-0000-000000000000", context)
+                    if (uris.isEmpty()) {
+                        navController.popBackStack()
+                    } else {
+                        viewModel.uploadAndQueue(uris, albumId, context)
+                    }
                 }
             SideEffect {
                 pickMultipleMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))

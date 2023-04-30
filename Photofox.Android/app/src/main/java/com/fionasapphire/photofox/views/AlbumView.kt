@@ -1,10 +1,6 @@
-package com.fionasapphire.photofox
+package com.fionasapphire.photofox.views
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,12 +8,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -25,9 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.fionasapphire.photofox.FailureView
+import com.fionasapphire.photofox.ImageStoreFetcherFactory
+import com.fionasapphire.photofox.LoadingView
+import com.fionasapphire.photofox.R
 import com.fionasapphire.photofox.model.PhotoAlbumEntry
 import com.fionasapphire.photofox.viewmodels.PhotosViewModel
 import com.fionasapphire.photofox.viewmodels.PhotosViewModelState
@@ -58,6 +54,7 @@ fun AlbumView(navController: NavHostController) {
             val photos = successState.photos
             AlbumListView(
                 photos = photos.sortedByDescending { it.date },
+                albumId = viewModel.albumId,
                 openImage = { viewModel.openImage(it, context) },
                 albumName = successState.albumName,
                 navController = navController
@@ -70,11 +67,16 @@ fun AlbumView(navController: NavHostController) {
 @Composable
 fun AlbumListView(
     photos: List<PhotoAlbumEntry>,
+    albumId: String,
     albumName: String,
     openImage: (PhotoAlbumEntry) -> Unit,
     navController: NavHostController
 ) {
+    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
                 elevation = 4.dp,
@@ -83,11 +85,24 @@ fun AlbumListView(
                 },
                 backgroundColor =  MaterialTheme.colors.primarySurface,
                 actions = {
-                    IconButton(onClick = { navController.navigate("addPhotos") }) {
+                    IconButton(onClick = { navController.navigate("videos/$albumId") }) {
+                        Icon(Icons.Filled.PlayArrow, null)
+                    }
+                    IconButton(onClick = { navController.navigate("addPhotos/$albumId") }) {
                         Icon(Icons.Filled.Add, null)
                     }
+//                    IconButton(onClick = { scope.launch { if(scaffoldState.drawerState.isClosed) scaffoldState.drawerState.open() else scaffoldState.drawerState.close() }}) {
+//                        Icon(Icons.Filled.Menu, null)
+//                    }
                 })
         },
+        drawerContent = {
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text(text = "Add Photos...")
+                Text(text = "Videos")
+            }
+        },
+
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
