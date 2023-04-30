@@ -60,6 +60,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private readonly List<AlbumViewModel> allAlbums;
 
+        private bool isLoading;
+
         public MainWindowViewModel(
             IPhotoService photoService,
             IVideoService videoService,
@@ -148,6 +150,19 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             foreach (var album in this.allAlbums.Where(a => a.Folder == this.SelectedFolder.Title).OrderBy(o => o.SortOrder))
             {
+                if (album.Image == null)
+                {
+                    string coverId = album.CoverPhotoId;
+                    if (string.IsNullOrEmpty(coverId))
+                    {
+                        album.Image = new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.jpg"));
+                    }
+                    else
+                    {
+                        _ = Task.Run(() => LoadThumbnail(coverId, album));
+                    }
+                }
+
                 this.Albums.Add(album);
             }
         }
@@ -170,6 +185,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public ObservableCollection<VideoViewModel> Videos { get; set; }
 
+        public int AlbumCount => this.allAlbums.Count;
+
         public ICommand AddPhotosCommand { get; }
         public ICommand OpenGpsLink { get; }
         public ICommand DeletePhotoCommand { get; }
@@ -187,6 +204,20 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand EditSelectedAlbumCommand { get; }
         public ICommand DecrementRatingCommand { get; }
         public ICommand IncrementRatingCommand { get; }
+
+        public bool LoadingIndicatorVisible => isLoading;
+        public bool FolderListVisible => !isLoading;
+
+        public bool IsLoading
+        {
+            get => isLoading;
+            set
+            {
+                isLoading = value;
+                OnPropertyChanged(nameof(FolderListVisible));
+                OnPropertyChanged(nameof(LoadingIndicatorVisible));
+            }
+        }
 
         public PhotoViewModel? SelectedPhoto
         {
@@ -313,20 +344,19 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             Log.Trace($"Adding video {video.VideoId}");
 
-            _ = Task.Run(() => LoadThumbnail<Video>(video.VideoId, viewModel), token);
+            _ = Task.Run(() => LoadThumbnail(video.VideoId, viewModel), token);
 
             this.Videos.Add(viewModel);
             this.OnPropertyChanged(nameof(this.Videos.Count));
         }
 
-        public async Task LoadThumbnail<T>(string thumbnailId, ItemViewModelBase<T> viewModel)
-            where T : IDisplayableItem
+        public async Task LoadThumbnail(string thumbnailId, IHasThumbnail viewModel)
         {
             var blob = await this.photoFileStorage.GetThumbnailAsync(thumbnailId);
             if (blob == null)
             {
-                // TODO: This will be swallowed as it's in Fire and Forget - better to replace with an "Error" image
-                throw new InvalidOperationException($"Unable to find {thumbnailId} in thumbnail storage");
+                context.BeginInvoke(() => viewModel.Image = new BitmapImage(new Uri("pack://application:,,,/Images/error.jpg")));
+                return;
             }
 
             var thumbnail = GetImageFromBytes(blob.ToArray());
@@ -397,6 +427,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.allAlbums.Clear();
             this.Folders.Clear();
 
+            IsLoading = true;
+
             await foreach (var album in this.photoAlbumService.GetAllAlbumsAsync())
             {
                 if (!this.Folders.Any(f => f.Title == album.Folder))
@@ -411,22 +443,14 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                     Folder = album.Folder,
                     Description = album.Description,
                     SortOrder = album.SortOrder,
+                    CoverPhotoId = album.CoverPhotoId,
                 };
 
-                string coverId = album.CoverPhotoId;
-                if (string.IsNullOrEmpty(coverId))
-                {
-                    viewModel.Image = new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.jpg"));
-                }
-                else
-                {
-                    var blob = await this.photoFileStorage.GetThumbnailAsync(coverId);
-                    viewModel.Image = GetImageFromBytes(blob.ToArray());
-                }
-
                 this.allAlbums.Add(viewModel);
-                this.OnPropertyChanged(nameof(this.allAlbums.Count));
+                this.OnPropertyChanged(nameof(this.AlbumCount));
             }
+
+            IsLoading = false;
         }
 
         private static BitmapSource GetImageFromBytes(byte[] bytes)
@@ -496,7 +520,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             }
 
             this.photoAlbumService.SetCoverImageAsync(this.SelectedAlbum.AlbumId, this.SelectedPhoto.Item.PhotoId);
-            this.SelectedAlbum.SetImage(this.SelectedPhoto.Image);
+            this.SelectedAlbum.Image = this.SelectedPhoto.Image;
         }
 
         private string? GetAlbumIdForMove()

@@ -3,7 +3,7 @@ using System;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
-    public class PhotoViewModel : ItemViewModelBase<Photo>
+    public class PhotoViewModel : ItemViewModelBase<Photo>, IHasThumbnail
     {
         private int? starRatingOverride;
 
