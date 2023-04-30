@@ -20,6 +20,7 @@
     <None Remove="Images\bin.png" />
     <None Remove="Images\cancel.png" />
     <None Remove="Images\delete.png" />
+    <None Remove="Images\error.png" />
     <None Remove="Images\hourglass.png" />
     <None Remove="Images\images.png" />
     <None Remove="Images\no.png" />
@@ -51,6 +52,7 @@
     <Resource Include="Images\bin.png" />
     <Resource Include="Images\cancel.png" />
     <Resource Include="Images\delete.png" />
+    <Resource Include="Images\error.png" />
     <Resource Include="Images\hourglass.png" />
     <Resource Include="Images\images.png" />
     <Resource Include="Images\add_album.png" />

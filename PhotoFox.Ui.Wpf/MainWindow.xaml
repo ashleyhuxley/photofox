@@ -3,12 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf"
+        xmlns:vm="clr-namespace:PhotoFox.Wpf.Ui.Mvvm.ViewModels;assembly=PhotoFox.Wpf.Ui.Mvvm" xmlns:wpf="clr-namespace:PhotoFox.Ui.Wpf" xmlns:fa="http://schemas.fontawesome.io/icons/"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         mc:Ignorable="d" Icon="Images/photofox.png"
         Loaded="Window_Loaded"
         Title="PhotoFox" Height="800" Width="1200"
         KeyDown="Window_KeyDown">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityCOnverter" />
+    </Window.Resources>
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" Height="25">
             <StatusBar.ItemsPanel>
@@ -35,7 +38,7 @@
             <StatusBarItem Grid.Column="4">
                 <TextBlock>
                     <Run>Albums: </Run>
-                    <Run Text="{Binding Albums.Count, Mode=OneWay}" />
+                    <Run Text="{Binding AlbumCount, Mode=OneWay}" />
                     <Run> - </Run>
                     <Run>Photos: </Run>
                     <Run Text="{Binding Photos.Count, Mode=OneWay}" />
@@ -61,13 +64,28 @@
                     <RowDefinition Height="5" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                
+
+                <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                    <Label 
+                        Visibility="{Binding LoadingIndicatorVisible, Converter={StaticResource BoolToVisibilityCOnverter}}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Margin="0,0,0,15">
+                        Loading...
+                    </Label>
+                    <fa:ImageAwesome Icon="Refresh" Spin="True" Height="48" Width="48" HorizontalAlignment="Center" />
+                </StackPanel>
+
                 <ListView
+                    Grid.Row="0" Grid.Column="0" 
                     x:Name="FolderList"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     ItemsSource="{Binding Folders}"
-                    SelectedItem="{Binding SelectedFolder}">
+                    SelectedItem="{Binding SelectedFolder}"
+                    Visibility="{Binding FolderListVisible, Converter={StaticResource BoolToVisibilityCOnverter}}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White">
