@@ -11,5 +11,6 @@ data class PhotoAlbum(
     val albumId: String,
     val title: String,
     val description: String,
-    val image: ImageReference
+    val image: ImageReference,
+    val folder: String
 )
