@@ -6,7 +6,7 @@ class PhotoAlbumEntity : TableServiceEntity {
     var AlbumName: String = ""
     var AlbumDescription: String = ""
     var CoverPhotoId: String = ""
-
+    var Folder: String = ""
     constructor() {
 
     }

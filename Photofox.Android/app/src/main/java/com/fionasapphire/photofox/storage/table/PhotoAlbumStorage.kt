@@ -26,6 +26,24 @@ class PhotoAlbumStorage
     }
 
     /**
+     * Gets a list of available photo albums from a specified folder
+     * @param folder The folder from which to load the albums
+     * @return A list of photo album entities
+     */
+    fun getPhotoAlbums(folder: String): List<PhotoAlbumEntity> {
+        val table = getTableReference()
+
+        val folderFilter = TableQuery.generateFilterCondition(
+            "Folder", TableQuery.QueryComparisons.EQUAL, folder
+        )
+
+        val query = TableQuery.from(PhotoAlbumEntity::class.java).where(folderFilter)
+
+        val res = table.execute(query)
+        return res.toList()
+    }
+
+    /**
      * Gets an album by its unique ID
      * @param albumId THe unique ID of the album to return
      * @return The album represented by the specified ID, or null if not found
