@@ -40,7 +40,9 @@ import com.fionasapphire.photofox.ui.theme.PhotoFoxTheme
 import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModel
 import com.fionasapphire.photofox.viewmodels.PhotoAlbumsViewModelState
 import com.fionasapphire.photofox.views.AddAlbumView
+import com.fionasapphire.photofox.views.AlbumView
 import com.fionasapphire.photofox.views.SelectPhotos
+import com.fionasapphire.photofox.views.VideosView
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -71,22 +73,27 @@ fun Navi() {
         composable("home") {
             MainView(navController)
         }
-        composable(
-            route = "album/{albumId}",
-            ) {
+        composable("album/{albumId}") {
             AlbumView(navController)
         }
-        composable("addAlbum") { AddAlbumView(onHome = { navController.popBackStack() }) }
-        composable("addPhotos") { SelectPhotos() }
+        composable ("videos/{albumId}") {
+            VideosView(navController)
+        }
+        composable("addAlbum") {
+            AddAlbumView(onHome = { navController.popBackStack() })
+        }
+        composable("addPhotos/{albumId}") {
+            SelectPhotos(navController)
+        }
     }
 }
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun Preview(@PreviewParameter(SampleAlbumProvider::class) items: List<PhotoAlbum>) {
-    //FailureView(message = "Test message")
+    FailureView(message = "Test message")
     //AlbumsListScreen(items.toList())
-    LoadingView("Things")
+    //LoadingView("Things")
 }
 
 @Composable

@@ -2,6 +2,7 @@ package com.fionasapphire.photofox.viewmodels
 
 import android.content.Context
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fionasapphire.photofox.storage.blob.FileStorage
@@ -21,14 +22,12 @@ import javax.inject.Inject
 class AddPhotosViewModel
 @Inject constructor(
     private val fileStorage: FileStorage,
-    private val queueStorage: QueueStorage
+    private val queueStorage: QueueStorage,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     val state = MutableStateFlow<AddPhotosViewModelState>(AddPhotosViewModelState.START)
-
-    init {
-
-    }
+    val albumId: String? = savedStateHandle["albumId"]
 
     /**
      * Upload a list of photos to a particular album

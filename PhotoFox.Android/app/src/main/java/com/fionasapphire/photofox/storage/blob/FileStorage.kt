@@ -1,8 +1,12 @@
 package com.fionasapphire.photofox.storage.blob
 
+import android.content.ContentValues
+import android.util.Log
 import com.fionasapphire.photofox.storage.enums.BlobType
 import com.microsoft.azure.storage.CloudStorageAccount
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Stores and retrieves images and thumbnails from Azure storage
@@ -43,6 +47,14 @@ class FileStorage
         return getResource(imageId, BlobType.images.name)
     }
 
+    fun downloadVideo(videoId: String, filename: String) {
+        downloadToFile(BlobType.videos.name, videoId, filename)
+    }
+
+    fun downloadPhoto(photoId: String, filename: String) {
+        downloadToFile(BlobType.images.name, photoId, filename)
+    }
+
     private fun getResource(imageId: String, containerName: String) : ByteArray {
         val account = CloudStorageAccount.parse(connectionString)
 
@@ -55,5 +67,27 @@ class FileStorage
         blob.download(outputStream)
 
         return outputStream.toByteArray()
+    }
+
+    private fun downloadToFile(containerName: String, imageId: String, fileName: String) {
+        val account = CloudStorageAccount.parse(connectionString)
+
+        val client = account.createCloudBlobClient()
+        val container = client.getContainerReference(containerName)
+
+        val blob = container.getBlockBlobReference(imageId)
+
+        val file = File(fileName)
+
+        try {
+            file.createNewFile()
+            val fos = FileOutputStream(file)
+            blob.download(fos)
+            fos.close()
+        } catch (e: java.lang.Exception) {
+            if (e.message != null) {
+                Log.e(ContentValues.TAG, e.message!!)
+            }
+        }
     }
 }

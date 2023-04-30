@@ -38,14 +38,14 @@ class PhotosViewModel
     ): ViewModel() {
     val state = MutableStateFlow<PhotosViewModelState>(PhotosViewModelState.START)
 
+    val albumId: String = savedStateHandle["albumId"] ?: ""
     init {
-        val albumId: String? = savedStateHandle["albumId"]
-        if (albumId == null)
+        if (albumId.isEmpty())
         {
             state.value = PhotosViewModelState.FAILURE("No album ID specified")
         }
 
-        loadPhotos(albumId = albumId!!)
+        loadPhotos(albumId = albumId)
     }
 
     /**
@@ -56,25 +56,14 @@ class PhotosViewModel
     fun openImage(photo: PhotoAlbumEntry, context: Context) {
         viewModelScope.launch {
             val filename = "${context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)}/${photo.image.imageId}.jpg"
-            val file = File(filename)
 
             // Download the main image file from storage
             withContext(Dispatchers.IO) {
-                val bytes = fileStorage.getImage(photo.image.imageId)
-
-                try {
-                    file.createNewFile()
-                    val fos = FileOutputStream(file)
-                    fos.write(bytes)
-                    fos.close()
-                } catch (e: java.lang.Exception) {
-                    if (e.message != null) {
-                        Log.e(ContentValues.TAG, e.message!!)
-                    }
-                }
+                fileStorage.downloadPhoto(photo.image.imageId, filename)
             }
 
             // Start a new Action to open the image
+            val file = File(filename)
             val intent = Intent(Intent.ACTION_VIEW)
             val uri = FileProvider.getUriForFile(
                 context,
