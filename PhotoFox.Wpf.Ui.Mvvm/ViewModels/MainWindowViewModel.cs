@@ -30,7 +30,8 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         IRecipient<UnloadVideoMessage>,
         IRecipient<UnloadAlbumMessage>,
         IRecipient<UpdateStatusMessage>,
-        IRecipient<SetStatusMessage>
+        IRecipient<SetStatusMessage>,
+        IRecipient<RefreshVisiblePhotosMessage>
     {
         private static readonly ILogger Log = LogManager.GetCurrentClassLogger();
 
@@ -58,9 +59,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         private CancellationTokenSource cancellationTokenSource;
 
-        private readonly List<AlbumViewModel> allAlbums;
+        private bool isLoadingAlbums;
 
-        private bool isLoading;
+        private bool isLoadingPhotos;
+
+        private int minimumRating;
 
         public MainWindowViewModel(
             IPhotoService photoService,
@@ -92,8 +95,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             this.Albums = new ObservableCollection<AlbumViewModel>();
             this.Photos = new ObservableCollection<PhotoViewModel>();
             this.Videos = new ObservableCollection<VideoViewModel>();
-
-            this.allAlbums = new List<AlbumViewModel>();
+            this.VisiblePhotos = new ObservableCollection<PhotoViewModel>();
 
             AddPhotosCommand = addPhotosCommand;
             OpenGpsLink = openGpsLocationCommand;
@@ -120,6 +122,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             messenger.Register<SetStatusMessage>(this);
             messenger.Register<UnloadVideoMessage>(this);
             messenger.Register<UnloadAlbumMessage>(this);
+            messenger.Register<RefreshVisiblePhotosMessage>(this);
 
             this.PropertyChanged += MainWindowViewModel_PropertyChanged;
 
@@ -148,7 +151,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                 return;
             }
 
-            foreach (var album in this.allAlbums.Where(a => a.Folder == this.SelectedFolder.Title).OrderBy(o => o.SortOrder))
+            foreach (var album in Cache.Albums.Where(a => a.Folder == this.SelectedFolder.Title).OrderBy(o => o.SortOrder))
             {
                 if (album.Image == null)
                 {
@@ -172,9 +175,32 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
             cancellationTokenSource.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
+            await LoadAllItems(cancellationTokenSource.Token);
+        }
+
+        private async Task LoadAllItems(CancellationToken cancel)
+        {
+            IsLoadingPhotos = true;
+
             await Task.WhenAll(
-                LoadPhotos(cancellationTokenSource.Token), 
-                LoadVideos(cancellationTokenSource.Token));
+                LoadPhotos(cancel),
+                LoadVideos(cancel));
+
+            IsLoadingPhotos = false;
+        }
+
+        public int MinimumRating
+        {
+            get => this.minimumRating;
+            set
+            {
+                if (value != this.minimumRating)
+                {
+                    this.minimumRating = value;
+                    this.OnPropertyChanged(nameof(MinimumRating));
+                    RefreshVisiblePhotos();
+                }
+            }
         }
 
         public ObservableCollection<FolderViewModel> Folders { get; }
@@ -185,7 +211,9 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
         public ObservableCollection<VideoViewModel> Videos { get; set; }
 
-        public int AlbumCount => this.allAlbums.Count;
+        public ObservableCollection<PhotoViewModel> VisiblePhotos { get; set; }
+
+        public int AlbumCount => Cache.Albums.Count;
 
         public ICommand AddPhotosCommand { get; }
         public ICommand OpenGpsLink { get; }
@@ -205,17 +233,33 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public ICommand DecrementRatingCommand { get; }
         public ICommand IncrementRatingCommand { get; }
 
-        public bool LoadingIndicatorVisible => isLoading;
-        public bool FolderListVisible => !isLoading;
+        public bool LoadingAlbumsIndicatorVisible => isLoadingAlbums;
 
-        public bool IsLoading
+        public bool LoadingPhotosIndicatorVisible => isLoadingPhotos;
+
+        public bool FolderListVisible => !isLoadingAlbums;
+
+        public bool PhotosListVisible => !isLoadingPhotos;
+
+        public bool IsLoadingAlbums
         {
-            get => isLoading;
+            get => isLoadingAlbums;
             set
             {
-                isLoading = value;
+                isLoadingAlbums = value;
                 OnPropertyChanged(nameof(FolderListVisible));
-                OnPropertyChanged(nameof(LoadingIndicatorVisible));
+                OnPropertyChanged(nameof(LoadingAlbumsIndicatorVisible));
+            }
+        }
+
+        public bool IsLoadingPhotos
+        {
+            get => isLoadingPhotos;
+            set
+            {
+                isLoadingPhotos = value;
+                OnPropertyChanged(nameof(LoadingPhotosIndicatorVisible));
+                OnPropertyChanged(nameof(PhotosListVisible));
             }
         }
 
@@ -302,8 +346,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public async Task Load()
         {
             await LoadAlbums();
-            await LoadPhotos(cancellationTokenSource.Token);
-            await LoadVideos(cancellationTokenSource.Token);
+            await LoadAllItems(cancellationTokenSource.Token);
         }
 
         private void LoadPhoto(Photo photo, CancellationToken token)
@@ -371,7 +414,26 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             if (this.SelectedAlbum != null && !string.IsNullOrEmpty(this.SelectedAlbum.AlbumId))
             {
-                await LoadPhotosFromAlbum(this.SelectedAlbum.AlbumId, token);
+                await foreach (var photo in this.photoService.GetPhotosInAlbumAsync(this.SelectedAlbum.AlbumId))
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    LoadPhoto(photo, token);
+                }
+            }
+
+            RefreshVisiblePhotos();
+        }
+
+        private void RefreshVisiblePhotos()
+        {
+            this.VisiblePhotos.Clear();
+            foreach (var photo in this.Photos.Where(p => p.StarRating >= this.MinimumRating))
+            {
+                this.VisiblePhotos.Add(photo);
             }
         }
 
@@ -382,52 +444,24 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 
             if (this.SelectedAlbum != null && !string.IsNullOrEmpty(this.SelectedAlbum.AlbumId))
             {
-                await LoadVideosFromAlbum(this.SelectedAlbum.AlbumId, token);
-            }
-        }
-
-        private async Task LoadPhotosFromAlbum(string albumId, CancellationToken token)
-        {
-            if (token.IsCancellationRequested)
-            {
-                return;
-            }
-
-            await foreach (var photo in this.photoService.GetPhotosInAlbumAsync(albumId))
-            {
-                if (token.IsCancellationRequested)
+                await foreach (var video in this.videoService.GetVideosInAlbumAsync(this.SelectedAlbum.AlbumId))
                 {
-                    break;
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    LoadVideo(video, token);
                 }
-
-                LoadPhoto(photo, token);
-            }
-        }
-
-        private async Task LoadVideosFromAlbum(string albumId, CancellationToken token)
-        {
-            if (token.IsCancellationRequested)
-            {
-                return;
-            }
-
-            await foreach (var video in this.videoService.GetVideosInAlbumAsync(albumId))
-            {
-                if (token.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                LoadVideo(video, token);
             }
         }
 
         private async Task LoadAlbums()
         {
-            this.allAlbums.Clear();
+            Cache.Albums.Clear();
             this.Folders.Clear();
 
-            IsLoading = true;
+            IsLoadingAlbums = true;
 
             await foreach (var album in this.photoAlbumService.GetAllAlbumsAsync())
             {
@@ -446,11 +480,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
                     CoverPhotoId = album.CoverPhotoId,
                 };
 
-                this.allAlbums.Add(viewModel);
+                Cache.Albums.Add(viewModel);
                 this.OnPropertyChanged(nameof(this.AlbumCount));
             }
 
-            IsLoading = false;
+            IsLoadingAlbums = false;
         }
 
         private static BitmapSource GetImageFromBytes(byte[] bytes)
@@ -605,6 +639,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public void Receive(UnloadPhotoMessage message)
         {
             this.Photos.Remove(message.ViewModel);
+            this.VisiblePhotos.Remove(message.ViewModel);
             this.OnPropertyChanged(nameof(this.Photos.Count));
         }
 
@@ -623,6 +658,11 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public async void Receive(RefreshAlbumsMessage message)
         {
             await this.LoadAlbums();
+        }
+
+        public void Receive(RefreshVisiblePhotosMessage message)
+        {
+            this.RefreshVisiblePhotos();
         }
 
         public void Receive(UpdateStatusMessage message)
