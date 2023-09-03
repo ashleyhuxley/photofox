@@ -1,8 +1,5 @@
-﻿using Azure.Data.Tables;
-using Azure.Storage.Blobs;
-using PhotoFox.Storage.Models;
-using System;
-using System.Reflection.Metadata;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 namespace MyApp // Note: actual namespace depends on the project name.
 {
@@ -10,27 +7,51 @@ namespace MyApp // Note: actual namespace depends on the project name.
     {
         static void Main(string[] args)
         {
-            var cs = "DefaultEndpointsProtocol=https;AccountName=photofox;AccountKey=38hd9gnf9MLavn6EilD8dv0k7rwrFW1dD7TBHMgQdcU/9GkWEvI4piW0EqmCNuOmNsrohPK+kPCI+ASt/tuFPw==;EndpointSuffix=core.windows.net";
+            string connectionString = "DefaultEndpointsProtocol=https;AccountName=photofox;AccountKey=38hd9gnf9MLavn6EilD8dv0k7rwrFW1dD7TBHMgQdcU/9GkWEvI4piW0EqmCNuOmNsrohPK+kPCI+ASt/tuFPw==;EndpointSuffix=core.windows.net";
 
-            var client = new BlobServiceClient(cs);
-            var container = client.GetBlobContainerClient("images");
-            var blobs = container.GetBlobs();
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
-            var tclient = new TableServiceClient(cs);
-            var tableClient = tclient.GetTableClient("PhotoMetadata");
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("images");
 
-
-            foreach (var blob in blobs )
+            foreach (BlobItem blobItem in containerClient.GetBlobs())
             {
-                var res = tableClient.Query<PhotoMetadata>(p => p.RowKey == blob.Name);
-                if (!res.Any() )
+                BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
+
+                BlobProperties blobProperties = blobClient.GetProperties();
+                if (blobProperties.ContentType != "image/jpeg" &&  blobProperties.ContentType != "image/png")
                 {
-                    Console.WriteLine(blob.Name);
+                    Console.WriteLine(blobItem.Name);
                 }
             }
+        }
+    }
 
-            Console.WriteLine("Done.");
-            Console.ReadLine();
+    public enum ImageFormat
+    {
+        Unknown,
+        JPG,
+        PNG
+    }
+
+    public class ImageFormatDetector
+    {
+        public static ImageFormat Detect(byte[] bytes)
+        {
+            // Check for PNG signature
+            if (bytes.Length >= 8 &&
+                bytes[0] == 137 && bytes[1] == 80 && bytes[2] == 78 && bytes[3] == 71 &&
+                bytes[4] == 13 && bytes[5] == 10 && bytes[6] == 26 && bytes[7] == 10)
+            {
+                return ImageFormat.PNG;
+            }
+
+            // Check for JPG signature
+            if (bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xD8)
+            {
+                return ImageFormat.JPG;
+            }
+
+            return ImageFormat.Unknown;
         }
     }
 }
