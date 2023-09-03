@@ -135,7 +135,6 @@ fun AlbumsListScreen(albums: List<PhotoAlbum>, navController: NavHostController)
                             text = item.title,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black,
                         )
                     }
                 }
