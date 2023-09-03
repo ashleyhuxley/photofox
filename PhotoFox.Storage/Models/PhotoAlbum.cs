@@ -24,6 +24,7 @@ namespace PhotoFox.Storage.Models
         public string RowKey { get; set; }
         public string Folder { get; set; }
         public string SortOrder { get; set; }
+        public bool IsPublic { get; set; }
         public ETag ETag { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
     }

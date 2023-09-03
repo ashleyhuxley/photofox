@@ -38,7 +38,8 @@ namespace PhotoFox.Services
                     album.AlbumDescription,
                     album.CoverPhotoId,
                     album.Folder,
-                    album.SortOrder);
+                    album.SortOrder,
+                    album.IsPublic);
             }
         }
 
@@ -64,8 +65,23 @@ namespace PhotoFox.Services
             {
                 if (validAlbums.Contains(album.PartitionKey))
                 {
-                    yield return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder, album.SortOrder);
+                    yield return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder, album.SortOrder, album.IsPublic);
                 }
+            }
+        }
+
+        public async IAsyncEnumerable<PhotoAlbum> GetPublicAlbumsAsync()
+        {
+            await foreach (var album in this.photoAlbumDataStorage.GetPublicPhotoAlbumsAsync())
+            {
+                yield return new PhotoAlbum(
+                    album.PartitionKey,
+                    album.AlbumName,
+                    album.AlbumDescription,
+                    album.CoverPhotoId,
+                    album.Folder,
+                    album.SortOrder,
+                    album.IsPublic);
             }
         }
 
@@ -133,7 +149,7 @@ namespace PhotoFox.Services
         public async Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId)
         {
             var album = await this.photoAlbumDataStorage.GetPhotoAlbumAsync(albumId).ConfigureAwait(false);
-            return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder, album.SortOrder);
+            return new PhotoAlbum(album.PartitionKey, album.AlbumName, album.AlbumDescription, album.CoverPhotoId, album.Folder, album.SortOrder, album.IsPublic);
         }
 
         public async Task RemoveFromAlbumAsync(string albumId, string photoId)

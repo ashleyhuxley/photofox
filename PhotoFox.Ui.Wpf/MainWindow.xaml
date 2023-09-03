@@ -10,7 +10,7 @@
         Title="PhotoFox" Height="800" Width="1200"
         KeyDown="Window_KeyDown">
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityCOnverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" Height="25">
@@ -67,7 +67,7 @@
 
                 <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                     <Label 
-                        Visibility="{Binding LoadingIndicatorVisible, Converter={StaticResource BoolToVisibilityCOnverter}}"
+                        Visibility="{Binding LoadingIndicatorVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontSize="18"
@@ -78,6 +78,38 @@
                     <fa:ImageAwesome Icon="Refresh" Spin="True" Height="48" Width="48" HorizontalAlignment="Center" />
                 </StackPanel>
 
+                <!--<TreeView 
+                    x:Name="MainTreeView"
+                    Visibility="{Binding FolderListVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Stretch"
+                    SelectedItemChanged="MainTreeView_SelectedItemChanged"
+                    ItemsSource="{Binding Folders}">
+                    
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Albums}" DataType="{x:Type vm:AlbumViewModel}">
+                            <Label Content="{Binding Title}"/>
+                            <HierarchicalDataTemplate.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                                </Style>
+                            </HierarchicalDataTemplate.ItemContainerStyle>
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding SubAlbums}" DataType="{x:Type vm:AlbumViewModel}">
+                                    <Label Content="{Binding Title}"/>
+                                </HierarchicalDataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                    
+                </TreeView>-->
+
                 <ListView
                     Grid.Row="0" Grid.Column="0" 
                     x:Name="FolderList"
@@ -85,7 +117,7 @@
                     VerticalAlignment="Stretch"
                     ItemsSource="{Binding Folders}"
                     SelectedItem="{Binding SelectedFolder}"
-                    Visibility="{Binding FolderListVisible, Converter={StaticResource BoolToVisibilityCOnverter}}">
+                    Visibility="{Binding FolderListVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding Title}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White">
@@ -142,7 +174,7 @@
 
             <StackPanel Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <Label 
-                        Visibility="{Binding LoadingPhotosIndicatorVisible, Converter={StaticResource BoolToVisibilityCOnverter}}"
+                        Visibility="{Binding LoadingPhotosIndicatorVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontSize="18"
@@ -153,7 +185,7 @@
                 <fa:ImageAwesome Icon="Refresh" Spin="True" Height="48" Width="48" HorizontalAlignment="Center" />
             </StackPanel>
 
-            <TabControl Grid.Column="2" Visibility="{Binding PhotosListVisible, Converter={StaticResource BoolToVisibilityCOnverter}}">
+            <TabControl Grid.Column="2" Visibility="{Binding PhotosListVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                 <TabItem Header="Photos">
                     <ListView
                         x:Name="PhotoList" 
@@ -306,7 +338,7 @@
                 <Label Style="{StaticResource LabelStyle}">Orientation</Label>
                 <TextBlock Text="{Binding SelectedPhoto.Item.ImageProperties.Orientation}" Style="{StaticResource PropertyStyle}" />
                 <Label Style="{StaticResource LabelStyle}">Rating</Label>
-                <wpf:RatingControl Value="{Binding SelectedPhoto.StarRating}" />
+                <wpf:RatingControl Value="{Binding SelectedPhoto.StarRating}" ValueChanged="RatingControl_ValueChanged" />
                 <Label Style="{StaticResource LabelStyle}">GPS Location</Label>
                 <Button Margin="10,0,0,0" Content="{Binding SelectedPhoto.GpsCoords}" Cursor="Hand" Command="{Binding OpenGpsLink}" CommandParameter="{Binding SelectedPhoto}">
                     <Button.Template>

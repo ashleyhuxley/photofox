@@ -1,26 +1,19 @@
 ﻿@using PhotoFox.Model
 @using PhotoFox.Services
 
-<AuthorizeView>
-    <Authorized>
-        <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-            <nav class="flex-column">
-                @foreach (var album in Albums.OrderBy(a => a.Title))
-                {
-                    <div class="nav-item px-3">
-                        <div>
-                            <div class="album-img"><a href="album/@album.AlbumId"><img src="/thumbnail/@album.CoverPhotoId" style="width: 250px;" alt="@album.Title" /></a></div>
-                            <div class="album-title"><a href="album/@album.AlbumId">@album.Title</a> <a href="map/@album.AlbumId">(View Map)</a></div>
-                        </div>
-                    </div>
-                }
-            </nav>
-        </div>
-    </Authorized>
-    <NotAuthorized>
-
-    </NotAuthorized>
-</AuthorizeView>
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @foreach (var album in Albums.OrderBy(a => a.Title))
+        {
+            <div class="nav-item px-3">
+                <div>
+                    <div class="album-img"><a href="album/@album.AlbumId"><img src="/thumbnail/@album.CoverPhotoId" style="width: 250px;" alt="@album.Title" /></a></div>
+                    <div class="album-title"><a href="album/@album.AlbumId">@album.Title</a> <a href="map/@album.AlbumId">(View Map)</a></div>
+                </div>
+            </div>
+        }
+    </nav>
+</div>
 
 @inject IPhotoAlbumService AlbumService;
 
@@ -49,14 +42,18 @@
         var authState = await authenticationStateTask;
         var user = authState.User;
 
+        IAsyncEnumerable<PhotoAlbum> lookup;
+
         if (user?.Identity is null || string.IsNullOrEmpty(user.Identity.Name))
         {
-            return;
+            lookup = this.AlbumService.GetPublicAlbumsAsync();
         }
-
-        var lookup = user.Identity.Name == "fiona" 
-         ? this.AlbumService.GetAllAlbumsAsync() 
-         : this.AlbumService.GetAllAlbumsAsync(user.Identity.Name);
+        else
+        {
+            lookup = user.Identity.Name == "fiona"
+                 ? this.AlbumService.GetAllAlbumsAsync()
+                 : this.AlbumService.GetAllAlbumsAsync(user.Identity.Name);
+        }
 
         this.Albums.Clear();
         await foreach(var album in lookup)

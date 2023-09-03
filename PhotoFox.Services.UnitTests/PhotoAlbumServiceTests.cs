@@ -122,7 +122,7 @@ namespace PhotoFox.Services.UnitTests
         {
             var service = this.GetDefaultService();
 
-            var album = new Model.PhotoAlbum("ALBUMID", "Title", string.Empty, string.Empty, string.Empty, string.Empty);
+            var album = new Model.PhotoAlbum("ALBUMID", "Title", string.Empty, string.Empty, string.Empty, string.Empty, false);
 
             await service.AddAlbumAsync(album);
 

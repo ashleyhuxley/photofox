@@ -2,6 +2,8 @@
 using NLog;
 using PhotoFox.Wpf.Ui.Mvvm.ViewModels;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.Versioning;
@@ -64,7 +66,7 @@ namespace PhotoFox.Ui.Wpf
 
         private void SetupAlbumSort()
         {
-            var view = (CollectionView)CollectionViewSource.GetDefaultView(AlbumList.ItemsSource);
+            var view = (CollectionView)CollectionViewSource.GetDefaultView(this.AlbumList.ItemsSource);
             view.SortDescriptions.Add(new SortDescription("SortOrder", ListSortDirection.Descending));
         }
 
@@ -146,6 +148,16 @@ namespace PhotoFox.Ui.Wpf
             }
 
             e.Handled = true;
+        }
+
+        private void RatingControl_ValueChanged(int obj)
+        {
+            viewModel.SetRatingCommand.Execute(new Tuple<int, IEnumerable<PhotoViewModel>>(obj, viewModel.SelectedPhotos));
+        }
+
+        private async void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            await viewModel.ItemChanged();
         }
     }
 }

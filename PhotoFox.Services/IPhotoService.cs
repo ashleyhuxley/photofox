@@ -22,5 +22,7 @@ namespace PhotoFox.Services
         Task<int> DecrementRatingAsync(DateTime utcDate, string photoId);
 
         Task<int> IncrementRatingAsync(DateTime utcDate, string photoId);
+
+        Task SetRatingAsync(DateTime utcDate, string photoId, int newRating);
     }
 }

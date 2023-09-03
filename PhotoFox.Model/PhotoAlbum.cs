@@ -8,7 +8,8 @@
             string description, 
             string coverPhotoId,
             string folder,
-            string sortOrder)
+            string sortOrder,
+            bool isPublic)
         {
             this.AlbumId = albumId;
             this.Title = title;
@@ -16,6 +17,7 @@
             this.CoverPhotoId = coverPhotoId;
             this.Folder = folder;
             this.SortOrder = sortOrder;
+            this.IsPublic = isPublic;
         }
 
         public string AlbumId { get; }
@@ -24,5 +26,6 @@
         public string CoverPhotoId { get; }
         public string Folder { get; }
         public string SortOrder { get; }
+        public bool IsPublic { get; }
     }
 }

@@ -3,8 +3,6 @@
 @using PhotoFox.Extensions
 @inject IPhotoService PhotoService;
 
-<AuthorizeView>
-    <Authorized>
 <div class="main">
     <div class="left">
         <div class="left-content">
@@ -79,11 +77,6 @@
         }
     </div>
 </div>
-    </Authorized>
-    <NotAuthorized>
-        You do not have permission to view this file.
-    </NotAuthorized>
-</AuthorizeView>
 
 @code {
     [Parameter]

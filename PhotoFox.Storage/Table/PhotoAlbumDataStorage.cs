@@ -51,5 +51,12 @@ namespace PhotoFox.Storage.Table
             var tableClient = client.GetTableClient(TableName);
             await tableClient.UpdateEntityAsync(album, album.ETag, TableUpdateMode.Replace).ConfigureAwait(false);
         }
+
+        public AsyncPageable<PhotoAlbum> GetPublicPhotoAlbumsAsync()
+        {
+            var client = new TableServiceClient(config.StorageConnectionString);
+            var tableClient = client.GetTableClient(TableName);
+            return tableClient.QueryAsync<PhotoAlbum>(p => p.IsPublic);
+        }
     }
 }

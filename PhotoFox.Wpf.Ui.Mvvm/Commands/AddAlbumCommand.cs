@@ -44,7 +44,7 @@ namespace PhotoFox.Wpf.Ui.Mvvm.Commands
             var message = this.messenger.Send(new AddAlbumMessage());
             if (message.DialogResult.HasValue && message.DialogResult.Value && message.ViewModel.AlbumName != null)
             {
-                var album = new PhotoAlbum(Guid.NewGuid().ToString(), message.ViewModel.AlbumName, string.Empty, selectedPhoto.Item.PhotoId, string.Empty, string.Empty);
+                var album = new PhotoAlbum(Guid.NewGuid().ToString(), message.ViewModel.AlbumName, string.Empty, selectedPhoto.Item.PhotoId, string.Empty, string.Empty, false);
 
                 this.photoAlbumService.AddAlbumAsync(album);
 

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
 {
@@ -9,9 +10,12 @@ namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels
         public FolderViewModel(string title)
         {
             this.Title = title;
+            this.Albums = new ObservableCollection<AlbumViewModel>();
         }
 
         public string Title { get; }
+
+        public ObservableCollection<AlbumViewModel> Albums { get; }
 
         public bool IsSelected
         {
