@@ -142,7 +142,6 @@ fun FoldersListScreen(folders: List<String>, navController: NavHostController) {
                         text = it,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black,
                     )
                 }
             }
