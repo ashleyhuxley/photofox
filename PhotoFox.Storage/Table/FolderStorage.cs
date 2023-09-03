@@ -4,22 +4,22 @@ using System.Collections.Generic;
 
 namespace PhotoFox.Storage.Table
 {
-    public class UserStorage : IUserStorage
+    public class FolderStorage : IFolderStorage
     {
-        private const string TableName = "v7AspNetUsers";
+        private const string TableName = "Folders";
 
         private readonly IStorageConfig config;
 
-        public UserStorage(IStorageConfig storageConfig)
+        public FolderStorage(IStorageConfig config)
         {
-            config = storageConfig;
+            this.config = config;
         }
 
-        public IAsyncEnumerable<User> GetUsersAsync()
+        public IAsyncEnumerable<Folder> GetFoldersAsync()
         {
             var client = new TableServiceClient(config.StorageConnectionString);
             var tableClient = client.GetTableClient(TableName);
-            return tableClient.QueryAsync<User>();
+            return tableClient.QueryAsync<Folder>();
         }
     }
 }

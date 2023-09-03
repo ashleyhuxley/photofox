@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System;
 using PhotoFox.Core.Exceptions;
+using Azure.Storage.Blobs.Models;
 
 namespace PhotoFox.Storage.Blob
 {
@@ -44,6 +45,48 @@ namespace PhotoFox.Storage.Blob
             var container = client.GetBlobContainerClient(containerName);
 
             await container.UploadBlobAsync(id, data).ConfigureAwait(false);
+        }
+
+        internal async Task<string> GetContentTypeAsync(string photoId, string containerName)
+        {
+            var client = new BlobServiceClient(this.storageConfig.StorageConnectionString);
+            var container = client.GetBlobContainerClient(containerName);
+
+            var blob = container.GetBlobClient(photoId);
+
+            if (!blob.Exists())
+            {
+                throw new EntityNotFoundException(containerName, photoId);
+            }
+
+            BlobClient blobClient = container.GetBlobClient(blob.Name);
+
+            BlobProperties blobProperties = await blobClient.GetPropertiesAsync()
+                .ConfigureAwait(false);
+            return blobProperties.ContentType;
+        }
+
+        internal async Task SetContentTypeAsync(string photoId, string contentType, string containerName)
+        {
+            var client = new BlobServiceClient(this.storageConfig.StorageConnectionString);
+            var container = client.GetBlobContainerClient(containerName);
+
+            var blob = container.GetBlobClient(photoId);
+
+            if (!blob.Exists())
+            {
+                throw new EntityNotFoundException(containerName, photoId);
+            }
+
+            BlobClient blobClient = container.GetBlobClient(blob.Name);
+
+            BlobHttpHeaders blobHttpHeaders = new BlobHttpHeaders
+            {
+                ContentType = contentType
+            };
+
+            await blobClient.SetHttpHeadersAsync(blobHttpHeaders)
+                .ConfigureAwait(false);
         }
     }
 }

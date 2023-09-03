@@ -14,6 +14,7 @@ using PhotoFox.Extensions;
 using System.Drawing.Imaging;
 using System.Runtime.Versioning;
 using System.Text.Json;
+using PhotoFox.Core;
 
 namespace PhotoFox.Functions.UploadPhoto
 {
@@ -52,6 +53,8 @@ namespace PhotoFox.Functions.UploadPhoto
             this.uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
         }
 
+        private const int ThumbnailWidth = 250;
+
         [FunctionName("Upload")]
         public async Task Run([QueueTrigger("uploads", Connection = "PhotoFoxStorage")]string message, ILogger log)
         {
@@ -89,68 +92,100 @@ namespace PhotoFox.Functions.UploadPhoto
 
         private async Task ProcessPhoto(BinaryData blob, string photoId, string albumId, string title, DateTime dateTaken, ILogger log)
         {
-            var stream = blob.ToStream();
-
-            // Check hash
-            var md5 = await Task.Run(() => streamHash.ComputeHash(stream));
-            var hashResult = await photoHashStorage.HashExistsAsync(md5).ConfigureAwait(false);
-            if (hashResult.HashExists)
+            using (var stream = blob.ToStream())
             {
-                log.LogWarning($"An image with the same hash as {photoId} already exists. This ID is {hashResult.PhotoPartitionKey}:{hashResult.PhotoRowKey}");
+                // Check hash
+                var md5 = await Task.Run(() => streamHash.ComputeHash(stream));
+                var hashResult = await photoHashStorage.HashExistsAsync(md5).ConfigureAwait(false);
+                if (hashResult.HashExists)
+                {
+                    log.LogWarning($"An image with the same hash as {photoId} already exists. This ID is {hashResult.PhotoPartitionKey}:{hashResult.PhotoRowKey}");
 
+                    await uploadStorage.DeleteFileAsync(photoId);
+                    return;
+                }
+
+                // Get EXIF data
+                var exifReader = await ExifReader.FromStreamAsync(stream).ConfigureAwait(false);
+                var metadata = new PhotoMetadata();
+                metadata.Orientation = exifReader.GetOrientation();
+
+                using (var image = Image.FromStream(stream))
+                {
+                    var thumbnail = await Task.Run(() => thumbnailProvider.GenerateThumbnail(image, ThumbnailWidth, metadata.Orientation.ToRotationDegrees())).ConfigureAwait(false);
+
+                    metadata.FocalLength = exifReader.GetFocalLength();
+                    metadata.Device = exifReader.GetModel();
+                    metadata.Aperture = exifReader.GetApeture();
+                    metadata.Exposure = exifReader.GetExposure();
+                    metadata.GeolocationLattitude = exifReader.GetGpsLatitude();
+                    metadata.GeolocationLongitude = exifReader.GetGpsLongitude();
+                    metadata.ISO = exifReader.GetIso();
+                    metadata.Title = title;
+                    metadata.DimensionWidth = exifReader.GetDimensionWidth() ?? image.Width;
+                    metadata.DimensionHeight = exifReader.GetDimensionHeight() ?? image.Height;
+                    metadata.Manufacturer = exifReader.GetManufacturer();
+                    metadata.FileSize = blob.ToArray().Length;
+
+                    var date = exifReader.GetDateTakenUtc() ?? dateTaken;
+                    metadata.PartitionKey = date.ToPartitionKey();
+                    metadata.UtcDate = date;
+                    metadata.RowKey = photoId;
+                    metadata.FileHash = md5;
+
+                    log.LogTrace($"PK: {metadata.PartitionKey}, RK: {metadata.RowKey}");
+
+                    // Upload thumbnail
+                    using (var ms = new MemoryStream())
+                    {
+                        thumbnail.Save(ms, ImageFormat.Jpeg);
+
+                        ms.Seek(0, SeekOrigin.Begin);
+                        var data = await BinaryData.FromStreamAsync(ms);
+                        await photoFileStorage.PutThumbnailAsync(metadata.RowKey, data);
+                    }
+                }
+
+                // Store blob
+                await photoFileStorage.PutPhotoAsync(photoId, blob);
+
+                // Set content-type
+                await photoFileStorage.SetContentTypeAsync(photoId, ToContentType(GetFormat(blob.ToArray())));
+
+                // Store table items
+                await photoMetadataStorage.AddPhotoAsync(metadata);
+                await photoHashStorage.AddHashAsync(md5, metadata.PartitionKey, metadata.RowKey);
+                await photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, metadata.RowKey, metadata.UtcDate.Value);
+
+                // Delete temp file
                 await uploadStorage.DeleteFileAsync(photoId);
-                return;
             }
+        }
 
-            // Get EXIF data
-            var exifReader = await ExifReader.FromStreamAsync(stream).ConfigureAwait(false);
-            var metadata = new PhotoMetadata();
-            metadata.Orientation = exifReader.GetOrientation();
+        private static string ToContentType(ImageType format) => format switch
+        {
+            ImageType.Jpeg => "image/jpeg",
+            ImageType.Png => "image/png",
+            _ => throw new ArgumentOutOfRangeException(nameof(format), $"Not expected format value: {format}")
+        };
 
-            var image = Image.FromStream(stream);
-            var thumbnail = await Task.Run(() => thumbnailProvider.GenerateThumbnail(image, 250, metadata.Orientation.ToRotationDegrees())).ConfigureAwait(false);
-
-            metadata.FocalLength = exifReader.GetFocalLength();
-            metadata.Device = exifReader.GetModel();
-            metadata.Aperture = exifReader.GetApeture();
-            metadata.Exposure = exifReader.GetExposure();
-            metadata.GeolocationLattitude = exifReader.GetGpsLatitude();
-            metadata.GeolocationLongitude = exifReader.GetGpsLongitude();
-            metadata.ISO = exifReader.GetIso();
-            metadata.Title = title;
-            metadata.DimensionWidth = exifReader.GetDimensionWidth() ?? image.Width;
-            metadata.DimensionHeight = exifReader.GetDimensionHeight() ?? image.Height;
-            metadata.Manufacturer = exifReader.GetManufacturer();
-            metadata.FileSize = blob.ToArray().Length;
-
-            var date = exifReader.GetDateTakenUtc() ?? dateTaken;
-            metadata.PartitionKey = date.ToPartitionKey();
-            metadata.UtcDate = date;
-            metadata.RowKey = photoId;
-            metadata.FileHash = md5;
-
-            log.LogTrace($"PK: {metadata.PartitionKey}, RK: {metadata.RowKey}");
-
-            // Upload thumbnail
-            using (var ms = new MemoryStream())
+        private static ImageType GetFormat(byte[] bytes)
+        {
+            // Check for PNG signature
+            if (bytes.Length >= 8 &&
+                bytes[0] == 137 && bytes[1] == 80 && bytes[2] == 78 && bytes[3] == 71 &&
+                bytes[4] == 13 && bytes[5] == 10 && bytes[6] == 26 && bytes[7] == 10)
             {
-                thumbnail.Save(ms, ImageFormat.Jpeg);
-
-                ms.Seek(0, SeekOrigin.Begin);
-                var data = await BinaryData.FromStreamAsync(ms);
-                await photoFileStorage.PutThumbnailAsync(metadata.RowKey, data);
+                return ImageType.Png;
             }
 
-            // Store blob
-            await photoFileStorage.PutPhotoAsync(photoId, blob);
+            // Check for JPG signature
+            if (bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xD8)
+            {
+                return ImageType.Jpeg;
+            }
 
-            // Store table items
-            await photoMetadataStorage.AddPhotoAsync(metadata);
-            await photoHashStorage.AddHashAsync(md5, metadata.PartitionKey, metadata.RowKey);
-            await photoInAlbumStorage.AddPhotoInAlbumAsync(albumId, metadata.RowKey, metadata.UtcDate.Value);
-
-            // Delete temp file
-            await uploadStorage.DeleteFileAsync(photoId);
+            return ImageType.Unknown;
         }
 
         private async Task ProcessVideo(

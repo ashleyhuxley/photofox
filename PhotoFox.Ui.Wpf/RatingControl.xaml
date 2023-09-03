@@ -10,10 +10,10 @@
         <BitmapImage x:Key="off" UriSource="Images/star_off.png"/>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" x:Name="Stars">
-        <Image Source="/Images/star.png" x:Name="star1" Width="16" Height="16" Margin="3" />
-        <Image Source="/Images/star.png" x:Name="star2" Width="16" Height="16" Margin="3" />
-        <Image Source="/Images/star.png" x:Name="star3" Width="16" Height="16" Margin="3" />
-        <Image Source="/Images/star.png" x:Name="star4" Width="16" Height="16" Margin="3" />
-        <Image Source="/Images/star.png" x:Name="star5" Width="16" Height="16" Margin="3" />
+        <Image Source="/Images/star.png" x:Name="star1" Width="16" Height="16" Margin="3" MouseDown="StarMouseDown" Tag="1" />
+        <Image Source="/Images/star.png" x:Name="star2" Width="16" Height="16" Margin="3" MouseDown="StarMouseDown" Tag="2" />
+        <Image Source="/Images/star.png" x:Name="star3" Width="16" Height="16" Margin="3" MouseDown="StarMouseDown" Tag="3" />
+        <Image Source="/Images/star.png" x:Name="star4" Width="16" Height="16" Margin="3" MouseDown="StarMouseDown" Tag="4" />
+        <Image Source="/Images/star.png" x:Name="star5" Width="16" Height="16" Margin="3" MouseDown="StarMouseDown" Tag="5" />
     </StackPanel>
 </UserControl>

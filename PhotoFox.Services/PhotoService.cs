@@ -110,5 +110,13 @@ namespace PhotoFox.Services
             await this.photoMetadataStorage.SavePhotoAsync(metadata).ConfigureAwait(false);
             return metadata.StarRating.Value;
         }
+
+        public async Task SetRatingAsync(DateTime utcDate, string photoId, int newRating)
+        {
+            var metadata = await this.photoMetadataStorage.GetPhotoMetadataAsync(utcDate, photoId).ConfigureAwait(false);
+            metadata.StarRating = newRating;
+
+            await this.photoMetadataStorage.SavePhotoAsync(metadata).ConfigureAwait(false);
+        }
     }
 }

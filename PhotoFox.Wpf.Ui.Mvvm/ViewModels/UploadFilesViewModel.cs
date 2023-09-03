@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace PhotoFox.Wpf.Ui.Mvvm.ViewModels

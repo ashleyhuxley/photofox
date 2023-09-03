@@ -3,47 +3,40 @@
 @using PhotoFox.Model
 @using PhotoFox.Services
 
-<AuthorizeView>
-    <Authorized>
-        @if (loading)
+@if (loading)
+{
+    <div id="loading">Laden...</div>
+}
+else
+{
+    <div id="photos">
+        @foreach (var group in Photos.GroupBy(p => p.DateTaken.Date).OrderByDescending(g => g.Key))
         {
-            <div id="loading">Laden...</div>
-        }
-        else
-        {
-            <div id="photos">
-                @foreach (var group in Photos.GroupBy(p => p.DateTaken.Date).OrderByDescending(g => g.Key))
-                {
-                    <div class="date-header" style="clear: both;">
-                        @group.Key.ToLongDateString()
-                    </div>
+            <div class="date-header" style="clear: both;">
+                @group.Key.ToLongDateString()
+            </div>
 
-                    <div class="gal-container">
-                        <ul class="gal-list">
-                            @foreach (var photo in group)
-                            {
-                                var dateKey = photo.DateTaken.ToPartitionKey();
-                                var idKey = photo.PhotoId;
+            <div class="gal-container">
+                <ul class="gal-list">
+                    @foreach (var photo in group)
+                    {
+                        var dateKey = photo.DateTaken.ToPartitionKey();
+                        var idKey = photo.PhotoId;
 
-                                <li>
-                                    <a href="/photo/@dateKey/@idKey">
-                                        <div class="img">
-                                            <img src="/thumbnail/@photo.PhotoId" alt="@photo.Title" />
-                                        </div>
-                                        <div class="caption"><span>@photo.Title</span></div>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                }
+                        <li>
+                            <a href="/photo/@dateKey/@idKey" target="_blank">
+                                <div class="img">
+                                    <img src="/thumbnail/@photo.PhotoId" alt="@photo.Title" />
+                                </div>
+                                <div class="caption"><span>@photo.Title</span></div>
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
         }
-    </Authorized>
-    <NotAuthorized>
-        You do not have permission to view this album.
-    </NotAuthorized>
-</AuthorizeView>
+    </div>
+}
 
 @inject IPhotoService PhotoService;
 @inject IPhotoAlbumService AlbumService;
@@ -62,17 +55,21 @@
 
     private async Task LoadPhotos()
     {
-        var authState = await authenticationStateTask;
-        var user = authState.User;
-
-        if (user?.Identity is null || string.IsNullOrEmpty(user.Identity.Name) || this.AlbumId == null)
+        var album = await this.AlbumService.GetPhotoAlbumAsync(AlbumId);
+        if (!album.IsPublic)
         {
-            return;
-        }
+            var authState = await authenticationStateTask;
+            var user = authState.User;
 
-        if (user.Identity.Name != "fiona" && !await this.AuthService.HasPermission(AlbumId, user.Identity.Name))
-        {
-            return;
+            if (user?.Identity is null || string.IsNullOrEmpty(user.Identity.Name))
+            {
+                return;
+            }
+
+            if (user.Identity.Name != "fiona" && !await this.AuthService.HasPermission(AlbumId, user.Identity.Name))
+            {
+                return;
+            }
         }
 
         this.Photos.Clear();

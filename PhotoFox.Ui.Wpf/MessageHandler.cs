@@ -150,6 +150,13 @@ namespace PhotoFox.Ui.Wpf
             message.IsConfirmed = result == MessageBoxResult.Yes;
         }
 
+        public static string ToFileExtension(string type) => type switch
+        {
+            "image/jpeg" => ".jpg",
+            "image/png" => ".png",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), $"Not expected type value: {type}"),
+        };
+
         public async void Receive(OpenPhotoMessage message)
         {
             var path = message.PhotoId;
@@ -157,7 +164,9 @@ namespace PhotoFox.Ui.Wpf
             if (message.IsId)
             {
                 var photo = await this.photoStorage.GetPhotoAsync(message.PhotoId);
-                path = Path.GetRandomFileName() + ".jpg";
+                var type = await this.photoStorage.GetPhotoTypeAsync(message.PhotoId);
+
+                path = Path.GetRandomFileName() + ToFileExtension(type);
 
                 File.WriteAllBytes(path, photo.ToArray());
             }

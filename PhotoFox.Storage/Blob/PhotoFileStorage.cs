@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Azure.Storage.Blobs;
+using PhotoFox.Core.Exceptions;
+using System;
 using System.Threading.Tasks;
 
 namespace PhotoFox.Storage.Blob
@@ -42,6 +44,18 @@ namespace PhotoFox.Storage.Blob
         public async Task DeletePhotoAsync(string id)
         {
             await this.DeleteFileAsync(id, PhotosContainer).ConfigureAwait(false);
+        }
+
+        public async Task<string> GetPhotoTypeAsync(string photoId)
+        {
+            return await base.GetContentTypeAsync(photoId, PhotosContainer)
+                .ConfigureAwait(false);
+        }
+
+        public async Task SetContentTypeAsync(string photoId, string contentType)
+        {
+            await base.SetContentTypeAsync(photoId, contentType, PhotosContainer)
+                .ConfigureAwait(false);
         }
     }
 }

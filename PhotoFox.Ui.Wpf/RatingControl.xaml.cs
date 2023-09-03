@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -13,6 +14,8 @@ namespace PhotoFox.Ui.Wpf
         {
             InitializeComponent();
         }
+
+        public event Action<int>? ValueChanged;
 
         public static readonly DependencyProperty ValueProperty =
                 DependencyProperty.Register(
@@ -55,6 +58,15 @@ namespace PhotoFox.Ui.Wpf
             ratingsControl.star3.Source = ratingsControl.Value >= 3 ? on : off;
             ratingsControl.star4.Source = ratingsControl.Value >= 4 ? on : off;
             ratingsControl.star5.Source = ratingsControl.Value >= 5 ? on : off;
+        }
+
+        private void StarMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var value = Convert.ToInt32(((Image)sender).Tag);
+
+            this.SetValue(ValueProperty, value);
+
+            ValueChanged?.Invoke(value);
         }
     }
 }

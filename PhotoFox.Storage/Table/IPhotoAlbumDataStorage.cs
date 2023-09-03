@@ -15,5 +15,7 @@ namespace PhotoFox.Storage.Table
         Task<PhotoAlbum> GetPhotoAlbumAsync(string albumId);
 
         Task ModifyAlbumAsync(PhotoAlbum album);
+
+        AsyncPageable<PhotoAlbum> GetPublicPhotoAlbumsAsync();
     }
 }
