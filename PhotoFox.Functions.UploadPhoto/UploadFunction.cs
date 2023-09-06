@@ -14,7 +14,6 @@ using PhotoFox.Extensions;
 using System.Drawing.Imaging;
 using System.Runtime.Versioning;
 using System.Text.Json;
-using PhotoFox.Core;
 
 namespace PhotoFox.Functions.UploadPhoto
 {
@@ -150,7 +149,7 @@ namespace PhotoFox.Functions.UploadPhoto
                 await photoFileStorage.PutPhotoAsync(photoId, blob);
 
                 // Set content-type
-                await photoFileStorage.SetContentTypeAsync(photoId, ToContentType(GetFormat(blob.ToArray())));
+                await photoFileStorage.SetContentTypeAsync(photoId, ToContentType(FormatDetector.GetFormat(blob.ToArray())));
 
                 // Store table items
                 await photoMetadataStorage.AddPhotoAsync(metadata);
@@ -168,25 +167,6 @@ namespace PhotoFox.Functions.UploadPhoto
             ImageType.Png => "image/png",
             _ => throw new ArgumentOutOfRangeException(nameof(format), $"Not expected format value: {format}")
         };
-
-        private static ImageType GetFormat(byte[] bytes)
-        {
-            // Check for PNG signature
-            if (bytes.Length >= 8 &&
-                bytes[0] == 137 && bytes[1] == 80 && bytes[2] == 78 && bytes[3] == 71 &&
-                bytes[4] == 13 && bytes[5] == 10 && bytes[6] == 26 && bytes[7] == 10)
-            {
-                return ImageType.Png;
-            }
-
-            // Check for JPG signature
-            if (bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xD8)
-            {
-                return ImageType.Jpeg;
-            }
-
-            return ImageType.Unknown;
-        }
 
         private async Task ProcessVideo(
             BinaryData blob, 

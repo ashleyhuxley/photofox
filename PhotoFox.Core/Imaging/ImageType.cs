@@ -1,4 +1,4 @@
-﻿namespace PhotoFox.Core
+﻿namespace PhotoFox.Core.Imaging
 {
     public enum ImageType
     {
